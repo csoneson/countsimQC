@@ -1,0 +1,266 @@
+---
+title: "Comparison of characteristic features across count data sets"
+author: ""
+date: ""
+output: 
+  html_document:
+    toc: true
+  pdf_document:
+    toc: true
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = show_code, warning = FALSE, fig.width = 3.5 * length(dds_list))
+suppressPackageStartupMessages(library(DESeq2))
+suppressPackageStartupMessages(library(edgeR))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(ggplot2))
+
+thm <- theme_bw() + 
+  theme(axis.text = element_text(size = 15),
+        axis.title = element_text(size = 14),
+        strip.text = element_text(size = 15))
+```
+
+```{r}
+obj <- lapply(dds_list, function(ds) {
+  dge <- DGEList(counts = counts(ds))
+  des <- model.matrix(design(ds), data = colData(ds))
+  dge <- calcNormFactors(dge)
+  dge <- estimateDisp(dge, design = des)
+  dds <- estimateSizeFactors(ds, type = "poscounts")
+  dds <- estimateDispersions(dds, quiet = TRUE)
+  list(dge = dge, dds = dds)
+})
+```
+
+```{r}
+sample_df <- do.call(rbind, lapply(obj, function(x) {
+  data.frame(
+    Libsize = colSums(x$dge$counts),
+    Fraczero = colMeans(x$dge$counts == 0),
+    TMM = x$dge$samples$norm.factors
+  )
+})) %>% dplyr::mutate(dataset = rep(names(obj), sapply(obj, function(x) ncol(x$dge))))
+```
+
+```{r}
+feature_df <- do.call(rbind, lapply(obj, function(x) {
+  data.frame(
+    Tagwise = sqrt(x$dge$tagwise.dispersion),
+    Common = sqrt(x$dge$common.dispersion),
+    Trend = sqrt(x$dge$trended.dispersion),
+    AveLogCPM = x$dge$AveLogCPM,
+    Fraczero = rowMeans(x$dge$counts == 0),
+    dispGeneEst = rowData(x$dds)$dispGeneEst,
+    dispFit = rowData(x$dds)$dispFit,
+    dispFinal = rowData(x$dds)$dispersion,
+    baseMean = rowData(x$dds)$baseMean
+  )
+})) %>% dplyr::mutate(dataset = rep(names(obj), sapply(obj, function(x) nrow(x$dge))))
+```
+
+```{r}
+dataset_df <- do.call(rbind, lapply(obj, function(x) {
+  data.frame(
+    prior_df = paste0("prior.df = ", round(x$dge$prior.df, 2))
+  )
+})) %>% dplyr::mutate(AveLogCPM = 0.8 * max(feature_df$AveLogCPM)) %>%
+  dplyr::mutate(Tagwise = 0.9 * max(feature_df$Tagwise)) %>%
+  dplyr::mutate(dataset = names(obj))
+```
+
+## Dispersion/BCV plots {.tabset .tabset-pills}
+
+### edgeR
+
+```{r, fig.width = 3.5 * length(dds_list)}
+ggplot(feature_df %>% dplyr::arrange(AveLogCPM), 
+       aes(x = AveLogCPM, y = Tagwise)) + geom_point(size = 0.25) + facet_wrap(~dataset) + 
+  geom_line(aes(y = Trend), color = "blue", size = 1.5) + 
+  geom_line(aes(y = Common), color = "red", size = 1.5) +
+  geom_text(data = dataset_df, aes(label = prior_df)) + 
+  xlab("Average log CPM") + ylab("Biological coefficient of variation") + 
+  thm
+```
+
+### DESeq2
+
+```{r, fig.width = 3.5 * length(dds_list)}
+ggplot(feature_df %>% dplyr::arrange(baseMean), 
+       aes(x = baseMean, y = dispGeneEst)) + geom_point(size = 0.25) + 
+  facet_wrap(~dataset) + scale_x_log10() + scale_y_log10() +  
+  geom_point(aes(y = dispFinal), color = "lightblue", shape = 21) + 
+  geom_line(aes(y = dispFit), color = "red", size = 1.5) + 
+  xlab("Base mean") + ylab("Dispersion") + 
+  thm
+```
+
+## Library sizes {.tabset .tabset-pills}
+
+### Separate histograms
+
+```{r, fig.width = 3.5 * length(dds_list)}
+ggplot(sample_df, aes(x = Libsize)) + geom_histogram(bins = 30) + facet_wrap(~dataset) +
+  xlab("Library size") + thm
+```
+
+### Overlaid histograms
+
+```{r}
+ggplot(sample_df, aes(x = Libsize, group = dataset, fill = dataset)) + 
+  geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+  xlab("Library size") + thm
+```
+
+### Density plots 
+
+```{r}
+ggplot(sample_df, aes(x = Libsize, group = dataset, fill = dataset)) + 
+  geom_density(alpha = 0.5) +
+  xlab("Library size") + thm
+```
+
+## TMM normalization factors {.tabset .tabset-pills}
+
+### Separate histograms
+
+```{r, fig.width = 3.5 * length(dds_list)}
+ggplot(sample_df, aes(x = TMM)) + geom_histogram(bins = 30) + facet_wrap(~dataset) +
+  xlab("TMM normalization factor") + thm
+```
+
+### Overlaid histograms
+
+```{r}
+ggplot(sample_df, aes(x = TMM, group = dataset, fill = dataset)) + 
+  geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+  xlab("TMM normalization factor") + thm
+```
+
+### Density plots 
+
+```{r}
+ggplot(sample_df, aes(x = TMM, group = dataset, fill = dataset)) + 
+  geom_density(alpha = 0.5) +
+  xlab("TMM normalization factor") + thm
+```
+
+## Expression distributions (average log CPM) {.tabset .tabset-pills}
+
+### Separate histograms
+
+```{r, fig.width = 3.5 * length(dds_list)}
+ggplot(feature_df, aes(x = AveLogCPM)) + geom_histogram(bins = 30) + facet_wrap(~dataset) +
+  xlab("Average log CPM") + thm
+```
+
+### Overlaid histograms
+
+```{r}
+ggplot(feature_df, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
+  geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+  xlab("Average log CPM") + thm
+```
+
+### Density plots 
+
+```{r}
+ggplot(feature_df, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
+  geom_density(alpha = 0.5) +
+  xlab("Average log CPM") + thm
+```
+
+## Fraction zeros per sample {.tabset .tabset-pills}
+
+### Separate histograms
+
+```{r, fig.width = 3.5 * length(dds_list)}
+ggplot(sample_df, aes(x = Fraczero)) + geom_histogram(bins = 30) + facet_wrap(~dataset) +
+  xlab("Dropout fraction per sample") + thm
+```
+
+### Overlaid histograms
+
+```{r}
+ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
+  geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+  xlab("Dropout fraction per sample") + thm
+```
+
+### Density plots 
+
+```{r}
+ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
+  geom_density(alpha = 0.5) +
+  xlab("Dropout fraction per sample") + thm
+```
+
+## Fraction zeros per feature {.tabset .tabset-pills}
+
+### Separate histograms
+
+```{r, fig.width = 3.5 * length(dds_list)}
+ggplot(feature_df, aes(x = Fraczero)) + geom_histogram(bins = 30) + facet_wrap(~dataset) +
+  xlab("Dropout fraction per feature") + thm
+```
+
+### Overlaid histograms
+
+```{r}
+ggplot(feature_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
+  geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+  xlab("Dropout fraction per feature") + thm
+```
+
+### Density plots 
+
+```{r}
+ggplot(feature_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
+  geom_density(alpha = 0.5) +
+  xlab("Dropout fraction per feature") + thm
+```
+
+## Mean expression vs fraction zeros {.tabset .tabset-pills}
+
+### Separate scatter plots
+
+```{r, fig.width = 3.5 * length(dds_list)}
+ggplot(feature_df, aes(x = AveLogCPM, y = Fraczero)) + geom_point(size = 0.75) + 
+  facet_wrap(~dataset) + 
+  xlab("Average log CPM") + ylab("Dropout fraction") + thm
+```
+
+### Overlaid scatter plots
+
+```{r}
+ggplot(feature_df, aes(x = AveLogCPM, y = Fraczero, color = dataset)) + 
+  geom_point(size = 0.75, alpha = 0.5) + 
+  xlab("Average log CPM") + ylab("Dropout fraction") + thm
+```
+
+## Library size vs fraction zeros {.tabset .tabset-pills}
+
+### Separate scatter plots
+
+```{r, fig.width = 3.5 * length(dds_list)}
+ggplot(sample_df, aes(x = Libsize, y = Fraczero)) + geom_point(size = 1) + 
+  facet_wrap(~dataset) + 
+  xlab("Library size") + ylab("Dropout fraction") + thm
+```
+
+### Overlaid scatter plots
+
+```{r}
+ggplot(sample_df, aes(x = Libsize, y = Fraczero, color = dataset)) + 
+  geom_point(size = 1, alpha = 0.5) + 
+  geom_line(stat = "smooth", method = "loess", size = 1, alpha = 0.5) + 
+  xlab("Library size") + ylab("Dropout fraction") + thm
+```
+
+## Session info
+
+```{r}
+sessionInfo()
+```
+

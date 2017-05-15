@@ -1,0 +1,19 @@
+Package: countsimQC
+Type: Package
+Title: Compare RNA-seq Data Sets
+Version: 0.1.0
+Author: Charlotte Soneson
+Maintainer: Charlotte Soneson <charlottesoneson@gmail.com>
+Description: rsimqc provides functionality to create a comprehensive report 
+    comparing many different characteristics of multiple RNA-seq count matrices. 
+    It is mainly intended as a simple way to compare a simulated RNA-seq count 
+    matrix to a real one, possibly the one underlying the simulation. 
+License: GPL (>=2)
+Encoding: UTF-8
+LazyData: true
+Depends: R (>= 3.3)
+Imports: rmarkdown
+RoxygenNote: 6.0.1
+Suggests: knitr,
+    DESeq2
+VignetteBuilder: knitr
