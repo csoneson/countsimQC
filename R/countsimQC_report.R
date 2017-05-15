@@ -1,4 +1,4 @@
-#' Generate report
+#' Generate countsimQC report
 #'
 #' @param dds_list Named list of DESeqDataSets to compare
 #' @param show_code Whether or not to include code in report
@@ -17,7 +17,7 @@
 #' @return No value is returned, but a report is generated in the
 #'   \code{output_dir} directory.
 #'
-generate_report <- function(dds_list, show_code = FALSE, output_format = NULL,
+countsimQC_report <- function(dds_list, show_code = FALSE, output_format = NULL,
                             output_file = NULL, output_dir = "./", ...){
   ## This function was inspired by code from Nicholas Hamilton, obtained from
   ## http://stackoverflow.com/questions/37097535/generate-report-in-r

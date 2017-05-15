@@ -42,12 +42,12 @@ data(countsim_example)
 countsim_example
 ```
 
-Next, we generate the report using the `generate_report()` function. 
+Next, we generate the report using the `countsimQC_report()` function. 
 
 ```{r}
-generate_report(dds_list = countsim_example, show_code = FALSE, 
-                output_format = "html_document", 
-                output_file = "countsim_report.html", output_dir = "./")
+countsimQC_report(dds_list = countsim_example, show_code = FALSE, 
+                  output_format = "html_document", 
+                  output_file = "countsim_report.html", output_dir = "./")
 ```
 
 The report can be generated either as an HTML file (by setting `output_format = 
