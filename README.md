@@ -15,3 +15,10 @@ install.packages(devtools)
 ## Install countsimQC
 devtools::install_github("csoneson/countsimQC")
 ```
+
+To run `countsimQC`, you simply need to call the function `generate_report()`, with an input consisting of a named list of DESeqDataSets (see the [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) package for the description of this class). Each DESeqDataSet should correspond to one data set and contain a count matrix, a data frame with sample information and a design formula, which is needed for dispersion calculations. The package contains an example data set, containing three data sets. 
+
+```
+data(countsim_example)
+generate_report(countsim_example, output_file = "countsim_report.html", output_dir = "./")
+```
