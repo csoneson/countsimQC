@@ -125,6 +125,14 @@ ggplot(sample_df, aes(x = Libsize, group = dataset, fill = dataset)) +
   xlab("Library size") + thm
 ```
 
+### Empirical cumulative distribution function 
+
+```{r libsize_ecdf}
+ggplot(sample_df, aes(x = Libsize, group = dataset, color = dataset)) + 
+  stat_ecdf() + ylab("Cumulative proportion") + 
+  xlab("Library size") + thm
+```
+
 ## TMM normalization factors {.tabset .tabset-pills}
 
 ### Separate histograms
@@ -148,6 +156,14 @@ ggplot(sample_df, aes(x = TMM, group = dataset, fill = dataset)) +
 ```{r tmm_density}
 ggplot(sample_df, aes(x = TMM, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
+  xlab("TMM normalization factor") + thm
+```
+
+### Empirical cumulative distribution function 
+
+```{r tmm_ecdf}
+ggplot(sample_df, aes(x = TMM, group = dataset, color = dataset)) + 
+  stat_ecdf() + ylab("Cumulative proportion") + 
   xlab("TMM normalization factor") + thm
 ```
 
@@ -177,6 +193,14 @@ ggplot(feature_df, aes(x = AveLogCPM, group = dataset, fill = dataset)) +
   xlab("Average log CPM") + thm
 ```
 
+### Empirical cumulative distribution function 
+
+```{r logcpm_ecdf}
+ggplot(feature_df, aes(x = AveLogCPM, group = dataset, color = dataset)) + 
+  stat_ecdf() + ylab("Cumulative proportion") + 
+  xlab("Average log CPM") + thm
+```
+
 ## Fraction zeros per sample {.tabset .tabset-pills}
 
 ### Separate histograms
@@ -184,7 +208,7 @@ ggplot(feature_df, aes(x = AveLogCPM, group = dataset, fill = dataset)) +
 ```{r fraczerosample_sephist, fig.width = 3.5 * length(dds_list)}
 ggplot(sample_df, aes(x = Fraczero)) + geom_histogram(bins = 30) + 
   facet_wrap(~dataset, nrow = 1) +
-  xlab("Dropout fraction per sample") + thm
+  xlab("Fraction zeros per sample") + thm
 ```
 
 ### Overlaid histograms
@@ -192,7 +216,7 @@ ggplot(sample_df, aes(x = Fraczero)) + geom_histogram(bins = 30) +
 ```{r fraczerosample_overlaidhist}
 ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
-  xlab("Dropout fraction per sample") + thm
+  xlab("Fraction zeros per sample") + thm
 ```
 
 ### Density plots 
@@ -200,7 +224,15 @@ ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) +
 ```{r fraczerosample_density}
 ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
-  xlab("Dropout fraction per sample") + thm
+  xlab("Fraction zeros per sample") + thm
+```
+
+### Empirical cumulative distribution function 
+
+```{r fraczerosample_ecdf}
+ggplot(sample_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
+  stat_ecdf() + ylab("Cumulative proportion") + 
+  xlab("Fraction zeros per sample") + thm
 ```
 
 ## Fraction zeros per feature {.tabset .tabset-pills}
@@ -210,7 +242,7 @@ ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) +
 ```{r fraczerofeaturesephist, fig.width = 3.5 * length(dds_list)}
 ggplot(feature_df, aes(x = Fraczero)) + geom_histogram(bins = 30) + 
   facet_wrap(~dataset, nrow = 1) +
-  xlab("Dropout fraction per feature") + thm
+  xlab("Fraction zeros per feature") + thm
 ```
 
 ### Overlaid histograms
@@ -218,7 +250,7 @@ ggplot(feature_df, aes(x = Fraczero)) + geom_histogram(bins = 30) +
 ```{r fraczerofeature_overlaidhist}
 ggplot(feature_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
-  xlab("Dropout fraction per feature") + thm
+  xlab("Fraction zeros per feature") + thm
 ```
 
 ### Density plots 
@@ -226,7 +258,15 @@ ggplot(feature_df, aes(x = Fraczero, group = dataset, fill = dataset)) +
 ```{r fraczerofeature_density}
 ggplot(feature_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
-  xlab("Dropout fraction per feature") + thm
+  xlab("Fraction zeros per feature") + thm
+```
+
+### Empirical cumulative distribution function 
+
+```{r fraczerofeature_ecdf}
+ggplot(feature_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
+  stat_ecdf() + ylab("Cumulative proportion") + 
+  xlab("Fraction zeros per feature") + thm
 ```
 
 ## Mean expression vs fraction zeros {.tabset .tabset-pills}

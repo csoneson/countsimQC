@@ -22,6 +22,11 @@ countsimQC_report <- function(dds_list, show_code = FALSE, output_format = NULL,
   ## This function was inspired by code from Nicholas Hamilton, provided at
   ## http://stackoverflow.com/questions/37097535/generate-report-in-r
 
+  ## Raise an error if the input list is not named
+  if (length(setdiff(unique(names(dds_list)), c("", NA, NULL))) != length(dds_list))
+    stop("The dds_list must be a named list, with unique names for all elements.")
+
+  ## Raise an error if the output directory already exists
   if (file.exists(paste0(output_dir, "/", gsub(".html", "_figures", basename(output_file)))))
     stop("The folder ",
          paste0(output_dir, "/", gsub(".html", "_figures", basename(output_file))),
