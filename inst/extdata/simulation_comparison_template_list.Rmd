@@ -7,16 +7,72 @@ output:
     toc: true
   pdf_document:
     toc: true
+references:
+- id: Love2014DESeq2
+  title: Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2
+  author:
+  - family: Love
+    given: Michael I
+  - family: Huber
+    given: Wolfgang
+  - family: Anders
+    given: Simon
+  container-title: Genome Biology
+  volume: 15
+  page: 550
+  type: article-journal
+  URL: https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8
+  issued:
+    year: 2014
+- id: Robinson2010edgeR
+  title: edgeR-a Bioconductor package for differential expression analysis of digital gene expression data
+  author:
+  - family: Robinson
+    given: Mark D
+  - family: McCarthy
+    given: Davis J
+  - family: Smyth
+    given: Gordon K
+  container-title: Bioinformatics
+  volume: 26
+  page: 139-140
+  type: article-journal
+  URL: https://academic.oup.com/bioinformatics/article-lookup/doi/10.1093/bioinformatics/btp616
+  issued:
+    year: 2010
+- id: Robinson2010TMM
+  title: A scaling normalization method for differential expression analysis of RNA-seq data
+  author:
+  - family: Robinson
+    given: Mark D
+  - family: Oshlack
+    given: Alicia
+  container-title: Genome Biology
+  volume: 11
+  page: R25
+  type: article-journal
+  URL: https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25
+  issued:
+    year: 2010
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = show_code, warning = FALSE,
-                      fig.path = paste0(gsub(".html", "_figures/", output_file)))
+knitr::opts_chunk$set(echo = show_code, warning = FALSE)
 
 suppressPackageStartupMessages(library(DESeq2))
 suppressPackageStartupMessages(library(edgeR))
 suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(ggplot2))
+
+## Determine number of rows and columns in facetted plots 
+## (first element = columns, second element = rows)
+col_row <- grDevices::n2mfrow(length(dds_list))
+
+## Determine height/width of each panel in multi-panel plots
+panel_size <- 4.5
+
+plots <- list()
 
 thm <- theme_bw() + 
   theme(axis.text = element_text(size = 15),
@@ -65,245 +121,361 @@ feature_df <- do.call(rbind, lapply(obj, function(x) {
 ```{r}
 dataset_df <- do.call(rbind, lapply(obj, function(x) {
   data.frame(
-    prior_df = paste0("prior.df = ", round(x$dge$prior.df, 2))
+    prior_df = paste0("prior.df = ", round(x$dge$prior.df, 2)),
+    n_vars = nrow(x$dge$counts),
+    n_samples = ncol(x$dge$counts)
   )
 })) %>% dplyr::mutate(AveLogCPM = 0.8 * max(feature_df$AveLogCPM)) %>%
   dplyr::mutate(Tagwise = 0.9 * max(feature_df$Tagwise)) %>%
   dplyr::mutate(dataset = names(obj))
 ```
 
+## Data set dimensions {.tabset .tabset-pills}
+
+The number of samples (columns) and variables (rows) in each data set. 
+
+### Number of samples (columns)
+
+```{r nsamples}
+plots[["nsamples"]] <- 
+  ggplot(dataset_df, aes(x = dataset, y = n_samples, fill = dataset)) + 
+  geom_bar(stat = "identity", alpha = 0.5) + 
+  xlab("") + ylab("Number of samples") + 
+  thm
+plots[["nsamples"]]
+```
+
+### Number of variables (rows)
+
+```{r nvariables}
+plots[["nvariables"]] <- 
+  ggplot(dataset_df, aes(x = dataset, y = n_vars, fill = dataset)) + 
+  geom_bar(stat = "identity", alpha = 0.5) + 
+  xlab("") + ylab("Number of variables") + 
+  thm
+plots[["nvariables"]]
+```
+
+
 ## Dispersion/BCV plots {.tabset .tabset-pills}
+
+The association between the average abundance and the dispersion or "biological 
+coefficient of variation" (=sqrt(dispersion)), as calculated by
+[edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html)
+[@Robinson2010edgeR] and
+[DESeq2](http://bioconductor.org/packages/release/bioc/html/DESeq2.html) 
+[@Love2014DESeq2]. In the edgeR plot, the estimated prior degrees of freedom are
+indicated.
 
 ### edgeR
 
-```{r bcv_edgeR, fig.width = 3.5 * length(dds_list)}
-ggplot(feature_df %>% dplyr::arrange(AveLogCPM), 
-       aes(x = AveLogCPM, y = Tagwise)) + geom_point(size = 0.25) + 
-  facet_wrap(~dataset, nrow = 1) + 
+```{r bcv_edgeR, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
+plots[["bcv_edgeR"]] <- 
+  ggplot(feature_df %>% dplyr::arrange(AveLogCPM), 
+         aes(x = AveLogCPM, y = Tagwise)) + geom_point(size = 0.25) + 
+  facet_wrap(~dataset, nrow = col_row[2]) + 
   geom_line(aes(y = Trend), color = "blue", size = 1.5) + 
   geom_line(aes(y = Common), color = "red", size = 1.5) +
   geom_text(data = dataset_df, aes(label = prior_df)) + 
   xlab("Average log CPM") + ylab("Biological coefficient of variation") + 
   thm
+plots[["bcv_edgeR"]]
 ```
 
 ### DESeq2
 
-```{r dispersion_DESeq2, fig.width = 3.5 * length(dds_list)}
-ggplot(feature_df %>% dplyr::arrange(baseMean), 
-       aes(x = baseMean, y = dispGeneEst)) + geom_point(size = 0.25) + 
-  facet_wrap(~dataset, nrow = 1) + scale_x_log10() + scale_y_log10() +  
+```{r dispersion_DESeq2, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
+plots[["dispersion_DESeq2"]] <- 
+  ggplot(feature_df %>% dplyr::arrange(baseMean), 
+         aes(x = baseMean, y = dispGeneEst)) + geom_point(size = 0.25) + 
+  facet_wrap(~dataset, nrow = col_row[2]) + scale_x_log10() + scale_y_log10() +  
   geom_point(aes(y = dispFinal), color = "lightblue", shape = 21) + 
   geom_line(aes(y = dispFit), color = "red", size = 1.5) + 
   xlab("Base mean") + ylab("Dispersion") + 
   thm
+plots[["dispersion_DESeq2"]]
 ```
 
 ## Library sizes {.tabset .tabset-pills}
 
+The distribution of the total count per sample, i.e., the column sums of the
+respective data matrices.
+
 ### Separate histograms
 
-```{r libsize_sephist, fig.width = 3.5 * length(dds_list)}
-ggplot(sample_df, aes(x = Libsize)) + geom_histogram(bins = 30) + 
-  facet_wrap(~dataset, nrow = 1) +
+```{r libsize_sephist, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
+plots[["libsize_sephist"]] <- 
+  ggplot(sample_df, aes(x = Libsize)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = col_row[2]) +
   xlab("Library size") + thm
+plots[["libsize_sephist"]]
 ```
 
 ### Overlaid histograms
 
 ```{r libsize_overlaidhist}
-ggplot(sample_df, aes(x = Libsize, group = dataset, fill = dataset)) + 
+plots[["libsize_overlaidhist"]] <- 
+  ggplot(sample_df, aes(x = Libsize, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
   xlab("Library size") + thm
+plots[["libsize_overlaidhist"]]
 ```
 
 ### Density plots 
 
 ```{r libsize_density}
-ggplot(sample_df, aes(x = Libsize, group = dataset, fill = dataset)) + 
+plots[["libsize_density"]] <- 
+  ggplot(sample_df, aes(x = Libsize, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("Library size") + thm
+plots[["libsize_density"]]
 ```
 
 ### Empirical cumulative distribution function 
 
 ```{r libsize_ecdf}
-ggplot(sample_df, aes(x = Libsize, group = dataset, color = dataset)) + 
+plots[["libsize_ecdf"]] <- 
+  ggplot(sample_df, aes(x = Libsize, group = dataset, color = dataset)) + 
   stat_ecdf() + ylab("Cumulative proportion") + 
   xlab("Library size") + thm
+plots[["libsize_ecdf"]]
 ```
 
 ## TMM normalization factors {.tabset .tabset-pills}
 
+The TMM normalization factors [@Robinson2010TMM], intended to adjust for
+differences in RNA composition, as calculated by
+[edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html)
+[@Robinson2010edgeR].
+
 ### Separate histograms
 
-```{r tmm_sephist, fig.width = 3.5 * length(dds_list)}
-ggplot(sample_df, aes(x = TMM)) + geom_histogram(bins = 30) + 
-  facet_wrap(~dataset, nrow = 1) +
+```{r tmm_sephist, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
+plots[["tmm_sephist"]] <- 
+  ggplot(sample_df, aes(x = TMM)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = col_row[2]) +
   xlab("TMM normalization factor") + thm
+plots[["tmm_sephist"]]
 ```
 
 ### Overlaid histograms
 
 ```{r tmm_overlaidhist}
-ggplot(sample_df, aes(x = TMM, group = dataset, fill = dataset)) + 
+plots[["tmm_overlaidhist"]] <- 
+  ggplot(sample_df, aes(x = TMM, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
   xlab("TMM normalization factor") + thm
+plots[["tmm_overlaidhist"]]
 ```
 
 ### Density plots 
 
 ```{r tmm_density}
-ggplot(sample_df, aes(x = TMM, group = dataset, fill = dataset)) + 
+plots[["tmm_density"]] <- 
+  ggplot(sample_df, aes(x = TMM, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("TMM normalization factor") + thm
+plots[["tmm_density"]]
 ```
 
 ### Empirical cumulative distribution function 
 
 ```{r tmm_ecdf}
-ggplot(sample_df, aes(x = TMM, group = dataset, color = dataset)) + 
+plots[["tmm_ecdf"]] <- 
+  ggplot(sample_df, aes(x = TMM, group = dataset, color = dataset)) + 
   stat_ecdf() + ylab("Cumulative proportion") + 
   xlab("TMM normalization factor") + thm
+plots[["tmm_ecdf"]]
 ```
 
 ## Expression distributions (average log CPM) {.tabset .tabset-pills}
 
+The distribution of average abundance values for the variables. 
+
 ### Separate histograms
 
-```{r logcpm_sephist, fig.width = 3.5 * length(dds_list)}
-ggplot(feature_df, aes(x = AveLogCPM)) + geom_histogram(bins = 30) + 
-  facet_wrap(~dataset, nrow = 1) +
+```{r logcpm_sephist, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
+plots[["logcpm_sephist"]] <- 
+  ggplot(feature_df, aes(x = AveLogCPM)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = col_row[2]) +
   xlab("Average log CPM") + thm
+plots[["logcpm_sephist"]]
 ```
 
 ### Overlaid histograms
 
 ```{r logcpm_overlaidhist}
-ggplot(feature_df, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
+plots[["logcpm_overlaidhist"]] <- 
+  ggplot(feature_df, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
   xlab("Average log CPM") + thm
+plots[["logcpm_overlaidhist"]]
 ```
 
 ### Density plots 
 
 ```{r logcpm_density}
-ggplot(feature_df, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
+plots[["logcpm_density"]] <- 
+  ggplot(feature_df, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("Average log CPM") + thm
+plots[["logcpm_density"]]
 ```
 
 ### Empirical cumulative distribution function 
 
 ```{r logcpm_ecdf}
-ggplot(feature_df, aes(x = AveLogCPM, group = dataset, color = dataset)) + 
+plots[["logcpm_ecdf"]] <- 
+  ggplot(feature_df, aes(x = AveLogCPM, group = dataset, color = dataset)) + 
   stat_ecdf() + ylab("Cumulative proportion") + 
   xlab("Average log CPM") + thm
+plots[["logcpm_ecdf"]]
 ```
 
 ## Fraction zeros per sample {.tabset .tabset-pills}
 
+The distribution of the fraction of zeros observed per sample. 
+
 ### Separate histograms
 
-```{r fraczerosample_sephist, fig.width = 3.5 * length(dds_list)}
-ggplot(sample_df, aes(x = Fraczero)) + geom_histogram(bins = 30) + 
-  facet_wrap(~dataset, nrow = 1) +
+```{r fraczerosample_sephist, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
+plots[["fraczerosample_sephist"]] <- 
+  ggplot(sample_df, aes(x = Fraczero)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = col_row[2]) +
   xlab("Fraction zeros per sample") + thm
+plots[["fraczerosample_sephist"]]
 ```
 
 ### Overlaid histograms
 
 ```{r fraczerosample_overlaidhist}
-ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
+plots[["fraczerosample_overlaidhist"]] <- 
+  ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
   xlab("Fraction zeros per sample") + thm
+plots[["fraczerosample_overlaidhist"]]
 ```
 
 ### Density plots 
 
 ```{r fraczerosample_density}
-ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
+plots[["fraczerosample_density"]] <- 
+  ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("Fraction zeros per sample") + thm
+plots[["fraczerosample_density"]]
 ```
 
 ### Empirical cumulative distribution function 
 
 ```{r fraczerosample_ecdf}
-ggplot(sample_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
+plots[["fraczerosample_ecdf"]] <- 
+  ggplot(sample_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
   stat_ecdf() + ylab("Cumulative proportion") + 
   xlab("Fraction zeros per sample") + thm
+plots[["fraczerosample_ecdf"]]
 ```
 
 ## Fraction zeros per feature {.tabset .tabset-pills}
 
+The distribution of the fraction of zeros observed per variable. 
+
 ### Separate histograms
 
-```{r fraczerofeaturesephist, fig.width = 3.5 * length(dds_list)}
-ggplot(feature_df, aes(x = Fraczero)) + geom_histogram(bins = 30) + 
-  facet_wrap(~dataset, nrow = 1) +
+```{r fraczerofeature_sephist, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
+plots[["fraczerofeature_sephist"]] <- 
+  ggplot(feature_df, aes(x = Fraczero)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = col_row[2]) +
   xlab("Fraction zeros per feature") + thm
+plots[["fraczerofeature_sephist"]]
 ```
 
 ### Overlaid histograms
 
 ```{r fraczerofeature_overlaidhist}
-ggplot(feature_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
+plots[["fraczerofeature_overlaidhist"]] <- 
+  ggplot(feature_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
   xlab("Fraction zeros per feature") + thm
+plots[["fraczerofeature_overlaidhist"]]
 ```
 
 ### Density plots 
 
 ```{r fraczerofeature_density}
-ggplot(feature_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
+plots[["fraczerofeature_density"]] <- 
+  ggplot(feature_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("Fraction zeros per feature") + thm
+plots[["fraczerofeature_density"]]
 ```
 
 ### Empirical cumulative distribution function 
 
 ```{r fraczerofeature_ecdf}
-ggplot(feature_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
+plots[["fraczerofeature_ecdf"]] <- 
+  ggplot(feature_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
   stat_ecdf() + ylab("Cumulative proportion") + 
   xlab("Fraction zeros per feature") + thm
-```
-
-## Mean expression vs fraction zeros {.tabset .tabset-pills}
-
-### Separate scatter plots
-
-```{r logcpmfraczero_sepscatter, fig.width = 3.5 * length(dds_list)}
-ggplot(feature_df, aes(x = AveLogCPM, y = Fraczero)) + geom_point(size = 0.75) + 
-  facet_wrap(~dataset, nrow = 1) + 
-  xlab("Average log CPM") + ylab("Dropout fraction") + thm
-```
-
-### Overlaid scatter plots
-
-```{r logcpmfraczero_overlaidscatter}
-ggplot(feature_df, aes(x = AveLogCPM, y = Fraczero, color = dataset)) + 
-  geom_point(size = 0.75, alpha = 0.5) + 
-  xlab("Average log CPM") + ylab("Dropout fraction") + thm
+plots[["fraczerofeature_ecdf"]]
 ```
 
 ## Library size vs fraction zeros {.tabset .tabset-pills}
 
+The association between the total count and the fraction of zeros observed per
+sample.
+
 ### Separate scatter plots
 
-```{r libsizefraczero_sepscatter, fig.width = 3.5 * length(dds_list)}
-ggplot(sample_df, aes(x = Libsize, y = Fraczero)) + geom_point(size = 1) + 
-  facet_wrap(~dataset, nrow = 1) + 
-  xlab("Library size") + ylab("Dropout fraction") + thm
+```{r libsizefraczero_sepscatter, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
+plots[["libsizefraczero_sepscatter"]] <- 
+  ggplot(sample_df, aes(x = Libsize, y = Fraczero)) + geom_point(size = 1) + 
+  facet_wrap(~dataset, nrow = col_row[2]) + 
+  xlab("Library size") + ylab("Fraction zeros") + thm
+plots[["libsizefraczero_sepscatter"]]
 ```
 
 ### Overlaid scatter plots
 
 ```{r libsizefraczero_overlaidscatter}
-ggplot(sample_df, aes(x = Libsize, y = Fraczero, color = dataset)) + 
+plots[["libsizefraczero_overlaidscatter"]] <- 
+  ggplot(sample_df, aes(x = Libsize, y = Fraczero, color = dataset)) + 
   geom_point(size = 1, alpha = 0.5) + 
   geom_line(stat = "smooth", method = "loess", size = 1, alpha = 0.5) + 
-  xlab("Library size") + ylab("Dropout fraction") + thm
+  xlab("Library size") + ylab("Fraction zeros") + thm
+plots[["libsizefraczero_overlaidscatter"]]
+```
+
+## Mean expression vs fraction zeros {.tabset .tabset-pills}
+
+The association between the average abundance and the fraction of zeros observed
+per variable.
+
+### Separate scatter plots
+
+```{r logcpmfraczero_sepscatter, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
+plots[["logcpmfraczero_sepscatter"]] <- 
+  ggplot(feature_df, aes(x = AveLogCPM, y = Fraczero)) + geom_point(size = 0.75) + 
+  facet_wrap(~dataset, nrow = col_row[2]) + 
+  xlab("Average log CPM") + ylab("Fraction zeros") + thm
+plots[["logcpmfraczero_sepscatter"]]
+```
+
+### Overlaid scatter plots
+
+```{r logcpmfraczero_overlaidscatter}
+plots[["logcpmfraczero_overlaidscatter"]] <- 
+  ggplot(feature_df, aes(x = AveLogCPM, y = Fraczero, color = dataset)) + 
+  geom_point(size = 0.75, alpha = 0.5) + 
+  xlab("Average log CPM") + ylab("Fraction zeros") + thm
+plots[["logcpmfraczero_overlaidscatter"]]
+```
+
+
+```{r, include = FALSE}
+if (save_ggplots) 
+  saveRDS(plots, 
+          file = paste0(gsub("\\.pdf$|\\.html$", "", output_file), "_ggplots.rds"))
 ```
 
 ## Session info
@@ -311,4 +483,6 @@ ggplot(sample_df, aes(x = Libsize, y = Fraczero, color = dataset)) +
 ```{r}
 sessionInfo()
 ```
+
+## References
 

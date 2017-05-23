@@ -5,29 +5,59 @@
 \title{Generate countsimQC report}
 \usage{
 countsimQC_report(dds_list, show_code = FALSE, output_format = NULL,
-  output_file = NULL, output_dir = "./", ...)
+  output_file = NULL, output_dir = "./", rmd_template = NULL,
+  force_overwrite = FALSE, save_ggplots = FALSE, ...)
 }
 \arguments{
-\item{dds_list}{Named list of DESeqDataSets to compare}
+\item{dds_list}{Named list of \code{DESeqDataSets} to compare. See the
+\code{DESeq2} Bioconductor package
+(http://bioconductor.org/packages/release/bioc/html/DESeq2.html) for more
+information about the \code{DESeqDataSet} class. Each \code{DESeqDataSet}
+object in the list should contain a count matrix, a data frame with sample
+information and a design formula. The sample information and design formula
+will be used to calculate dispersions appropriately.}
 
-\item{show_code}{Whether or not to include code in report}
+\item{show_code}{Whether or not to include the code in report.}
 
 \item{output_format}{The output format of the report. If set to NULL, an html
 report will be generated. Other options are "html_document" or
-"pdf_document", or "all" to generate both an html report and a pdf report.}
+"pdf_document" to generate an html or a pdf report, respectively.}
 
-\item{output_file}{The name of the report}
+\item{output_file}{The file name of the report.}
 
-\item{output_dir}{The directory where the report will be saved}
+\item{output_dir}{The directory where the report should be saved.}
 
-\item{...}{Other arguments that will be passed to \code{rmarkdown::render}}
+\item{rmd_template}{The Rmarkdown (.Rmd) file that will be used as the
+template for generating the report. If set to NULL (default), the template
+provided with the countsimQC package will be used. See Details for more
+information.}
+
+\item{force_overwrite}{Whether to force overwrite existing output files and
+directories when saving the generated report and figures.}
+
+\item{save_ggplots}{Whether to save the ggplot objects for all the output
+figures, to allow additional fine-tuning and generation of individual
+plots. Note, however, that the resulting file can be quite large,
+especially when large or many data sets are compared.}
+
+\item{...}{Other arguments that will be passed to \code{rmarkdown::render}.}
 }
 \value{
 No value is returned, but a report is generated in the
   \code{output_dir} directory.
 }
 \description{
-Generate countsimQC report
+Generate a report comparing various characteristics of a collection of count
+data sets.
+}
+\details{
+When the function is called, the template file (specified by
+  rmd_template) will be copied into the output folder, and
+  \code{rmarkdown::render} will be called to generate the final reports. If
+  there is already a .Rmd file with the same name in the output folder, the
+  function will raise an error and stop, to avoid overwriting the existing
+  file. The reason for this behaviour is that the copied template in the
+  output folder will be deleted once the report is generated.
 }
 \author{
 Charlotte Soneson, using a template from Nicholas Hamilton
