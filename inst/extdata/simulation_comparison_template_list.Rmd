@@ -59,11 +59,11 @@ references:
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = show_code, warning = FALSE)
 
-suppressPackageStartupMessages(library(DESeq2))
-suppressPackageStartupMessages(library(edgeR))
-suppressPackageStartupMessages(library(dplyr))
-suppressPackageStartupMessages(library(tidyr))
-suppressPackageStartupMessages(library(ggplot2))
+# suppressPackageStartupMessages(library(DESeq2))
+# suppressPackageStartupMessages(library(edgeR))
+# suppressPackageStartupMessages(library(dplyr))
+# suppressPackageStartupMessages(library(tidyr))
+# suppressPackageStartupMessages(library(ggplot2))
 
 ## Determine number of rows and columns in facetted plots 
 ## (first element = columns, second element = rows)
@@ -80,7 +80,8 @@ thm <- theme_bw() +
         strip.text = element_text(size = 15))
 ```
 
-```{r}
+```{r, message = FALSE}
+message("Calculating dispersions...")
 obj <- lapply(dds_list, function(ds) {
   dge <- DGEList(counts = counts(ds))
   des <- model.matrix(design(ds), data = colData(ds))
@@ -221,14 +222,24 @@ plots[["libsize_overlaidhist"]] <-
 plots[["libsize_overlaidhist"]]
 ```
 
-### Density plots 
+### Density plots
 
 ```{r libsize_density}
 plots[["libsize_density"]] <- 
+  ggplot(sample_df, aes(x = Libsize, group = dataset, color = dataset)) + 
+  geom_line(alpha = 0.5, size = 1.5, stat = "density") +
+  xlab("Library size") + thm
+plots[["libsize_density"]]
+```
+
+### Density plots (filled)
+
+```{r libsize_density_filled}
+plots[["libsize_density_filled"]] <- 
   ggplot(sample_df, aes(x = Libsize, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("Library size") + thm
-plots[["libsize_density"]]
+plots[["libsize_density_filled"]]
 ```
 
 ### Empirical cumulative distribution function 
@@ -236,9 +247,17 @@ plots[["libsize_density"]]
 ```{r libsize_ecdf}
 plots[["libsize_ecdf"]] <- 
   ggplot(sample_df, aes(x = Libsize, group = dataset, color = dataset)) + 
-  stat_ecdf() + ylab("Cumulative proportion") + 
+  stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Library size") + thm
 plots[["libsize_ecdf"]]
+
+ks_df <- as.data.frame(t(combn(unique(sample_df$dataset), 2))) %>%
+  dplyr::rename(dataset1 = V1, dataset2 = V2)
+ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
+  round(ks.test(sample_df$Libsize[sample_df$dataset == ks_df$dataset1[i]], 
+                sample_df$Libsize[sample_df$dataset == ks_df$dataset2[i]])$stat, 3)
+})
+DT::datatable(ks_df)
 ```
 
 ## TMM normalization factors {.tabset .tabset-pills}
@@ -268,14 +287,24 @@ plots[["tmm_overlaidhist"]] <-
 plots[["tmm_overlaidhist"]]
 ```
 
-### Density plots 
+### Density plots
 
 ```{r tmm_density}
 plots[["tmm_density"]] <- 
+  ggplot(sample_df, aes(x = TMM, group = dataset, color = dataset)) + 
+  geom_line(alpha = 0.5, size = 1.5, stat = "density") +
+  xlab("TMM normalization factor") + thm
+plots[["tmm_density"]]
+```
+
+### Density plots (filled) 
+
+```{r tmm_density_filled}
+plots[["tmm_density_filled"]] <- 
   ggplot(sample_df, aes(x = TMM, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("TMM normalization factor") + thm
-plots[["tmm_density"]]
+plots[["tmm_density_filled"]]
 ```
 
 ### Empirical cumulative distribution function 
@@ -283,9 +312,17 @@ plots[["tmm_density"]]
 ```{r tmm_ecdf}
 plots[["tmm_ecdf"]] <- 
   ggplot(sample_df, aes(x = TMM, group = dataset, color = dataset)) + 
-  stat_ecdf() + ylab("Cumulative proportion") + 
+  stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("TMM normalization factor") + thm
 plots[["tmm_ecdf"]]
+
+ks_df <- as.data.frame(t(combn(unique(sample_df$dataset), 2))) %>%
+  dplyr::rename(dataset1 = V1, dataset2 = V2)
+ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
+  round(ks.test(sample_df$TMM[sample_df$dataset == ks_df$dataset1[i]], 
+                sample_df$TMM[sample_df$dataset == ks_df$dataset2[i]])$stat, 3)
+})
+DT::datatable(ks_df)
 ```
 
 ## Expression distributions (average log CPM) {.tabset .tabset-pills}
@@ -312,14 +349,24 @@ plots[["logcpm_overlaidhist"]] <-
 plots[["logcpm_overlaidhist"]]
 ```
 
-### Density plots 
+### Density plots
 
 ```{r logcpm_density}
 plots[["logcpm_density"]] <- 
+  ggplot(feature_df, aes(x = AveLogCPM, group = dataset, color = dataset)) + 
+  geom_line(alpha = 0.5, size = 1.5, stat = "density") +
+  xlab("Average log CPM") + thm
+plots[["logcpm_density"]]
+```
+
+### Density plots (filled) 
+
+```{r logcpm_density_filled}
+plots[["logcpm_density_filled"]] <- 
   ggplot(feature_df, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("Average log CPM") + thm
-plots[["logcpm_density"]]
+plots[["logcpm_density_filled"]]
 ```
 
 ### Empirical cumulative distribution function 
@@ -327,9 +374,17 @@ plots[["logcpm_density"]]
 ```{r logcpm_ecdf}
 plots[["logcpm_ecdf"]] <- 
   ggplot(feature_df, aes(x = AveLogCPM, group = dataset, color = dataset)) + 
-  stat_ecdf() + ylab("Cumulative proportion") + 
+  stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Average log CPM") + thm
 plots[["logcpm_ecdf"]]
+
+ks_df <- as.data.frame(t(combn(unique(feature_df$dataset), 2))) %>%
+  dplyr::rename(dataset1 = V1, dataset2 = V2)
+ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
+  round(ks.test(feature_df$AveLogCPM[feature_df$dataset == ks_df$dataset1[i]], 
+                feature_df$AveLogCPM[feature_df$dataset == ks_df$dataset2[i]])$stat, 3)
+})
+DT::datatable(ks_df)
 ```
 
 ## Fraction zeros per sample {.tabset .tabset-pills}
@@ -356,14 +411,24 @@ plots[["fraczerosample_overlaidhist"]] <-
 plots[["fraczerosample_overlaidhist"]]
 ```
 
-### Density plots 
+### Density plots
 
 ```{r fraczerosample_density}
 plots[["fraczerosample_density"]] <- 
+  ggplot(sample_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
+  geom_line(alpha = 0.5, size = 1.5, stat = "density") +
+  xlab("Fraction zeros per sample") + thm
+plots[["fraczerosample_density"]]
+```
+
+### Density plots (filled) 
+
+```{r fraczerosample_density_filled}
+plots[["fraczerosample_density_filled"]] <- 
   ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("Fraction zeros per sample") + thm
-plots[["fraczerosample_density"]]
+plots[["fraczerosample_density_filled"]]
 ```
 
 ### Empirical cumulative distribution function 
@@ -371,9 +436,17 @@ plots[["fraczerosample_density"]]
 ```{r fraczerosample_ecdf}
 plots[["fraczerosample_ecdf"]] <- 
   ggplot(sample_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
-  stat_ecdf() + ylab("Cumulative proportion") + 
+  stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Fraction zeros per sample") + thm
 plots[["fraczerosample_ecdf"]]
+
+ks_df <- as.data.frame(t(combn(unique(sample_df$dataset), 2))) %>%
+  dplyr::rename(dataset1 = V1, dataset2 = V2)
+ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
+  round(ks.test(sample_df$Fraczero[sample_df$dataset == ks_df$dataset1[i]], 
+                sample_df$Fraczero[sample_df$dataset == ks_df$dataset2[i]])$stat, 3)
+})
+DT::datatable(ks_df)
 ```
 
 ## Fraction zeros per feature {.tabset .tabset-pills}
@@ -400,14 +473,24 @@ plots[["fraczerofeature_overlaidhist"]] <-
 plots[["fraczerofeature_overlaidhist"]]
 ```
 
-### Density plots 
+### Density plots
 
 ```{r fraczerofeature_density}
 plots[["fraczerofeature_density"]] <- 
+  ggplot(feature_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
+  geom_line(alpha = 0.5, size = 1.5, stat = "density") +
+  xlab("Fraction zeros per feature") + thm
+plots[["fraczerofeature_density"]]
+```
+
+### Density plots (filled) 
+
+```{r fraczerofeature_density_filled}
+plots[["fraczerofeature_density_filled"]] <- 
   ggplot(feature_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("Fraction zeros per feature") + thm
-plots[["fraczerofeature_density"]]
+plots[["fraczerofeature_density_filled"]]
 ```
 
 ### Empirical cumulative distribution function 
@@ -415,9 +498,17 @@ plots[["fraczerofeature_density"]]
 ```{r fraczerofeature_ecdf}
 plots[["fraczerofeature_ecdf"]] <- 
   ggplot(feature_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
-  stat_ecdf() + ylab("Cumulative proportion") + 
+  stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Fraction zeros per feature") + thm
 plots[["fraczerofeature_ecdf"]]
+
+ks_df <- as.data.frame(t(combn(unique(feature_df$dataset), 2))) %>%
+  dplyr::rename(dataset1 = V1, dataset2 = V2)
+ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
+  round(ks.test(feature_df$Fraczero[feature_df$dataset == ks_df$dataset1[i]], 
+                feature_df$Fraczero[feature_df$dataset == ks_df$dataset2[i]])$stat, 3)
+})
+DT::datatable(ks_df)
 ```
 
 ## Library size vs fraction zeros {.tabset .tabset-pills}
