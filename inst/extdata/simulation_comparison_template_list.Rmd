@@ -7,6 +7,7 @@ output:
     toc: true
   pdf_document:
     toc: true
+always_allow_html: yes
 references:
 - id: Love2014DESeq2
   title: Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2
@@ -57,20 +58,20 @@ references:
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = show_code, warning = FALSE)
+knitr::opts_chunk$set(echo = show_code, warning = FALSE, message = FALSE)
 
-# suppressPackageStartupMessages(library(DESeq2))
-# suppressPackageStartupMessages(library(edgeR))
-# suppressPackageStartupMessages(library(dplyr))
-# suppressPackageStartupMessages(library(tidyr))
-# suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(DESeq2))
+suppressPackageStartupMessages(library(edgeR))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(ggplot2))
 
 ## Determine number of rows and columns in facetted plots 
 ## (first element = columns, second element = rows)
 col_row <- grDevices::n2mfrow(length(dds_list))
 
 ## Determine height/width of each panel in multi-panel plots
-panel_size <- 4.5
+panel_size <- 4
 
 plots <- list()
 
@@ -83,10 +84,12 @@ thm <- theme_bw() +
 ```{r, message = FALSE}
 message("Calculating dispersions...")
 obj <- lapply(dds_list, function(ds) {
+  ## --- edgeR
   dge <- DGEList(counts = counts(ds))
   des <- model.matrix(design(ds), data = colData(ds))
   dge <- calcNormFactors(dge)
   dge <- estimateDisp(dge, design = des)
+  ## --- DESeq2
   dds <- estimateSizeFactors(ds, type = "poscounts")
   dds <- estimateDispersions(dds, quiet = TRUE)
   list(dge = dge, dds = dds)
@@ -94,6 +97,7 @@ obj <- lapply(dds_list, function(ds) {
 ```
 
 ```{r}
+## Summarize sample characteristics
 sample_df <- do.call(rbind, lapply(obj, function(x) {
   data.frame(
     Libsize = colSums(x$dge$counts),
@@ -104,6 +108,7 @@ sample_df <- do.call(rbind, lapply(obj, function(x) {
 ```
 
 ```{r}
+## Summarize variable characteristics
 feature_df <- do.call(rbind, lapply(obj, function(x) {
   data.frame(
     Tagwise = sqrt(x$dge$tagwise.dispersion),
@@ -120,6 +125,7 @@ feature_df <- do.call(rbind, lapply(obj, function(x) {
 ```
 
 ```{r}
+## Summarize data set characteristics
 dataset_df <- do.call(rbind, lapply(obj, function(x) {
   data.frame(
     prior_df = paste0("prior.df = ", round(x$dge$prior.df, 2)),
@@ -157,11 +163,10 @@ plots[["nvariables"]] <-
 plots[["nvariables"]]
 ```
 
-
 ## Dispersion/BCV plots {.tabset .tabset-pills}
 
 The association between the average abundance and the dispersion or "biological 
-coefficient of variation" (=sqrt(dispersion)), as calculated by
+coefficient of variation" (sqrt(dispersion)), as calculated by
 [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html)
 [@Robinson2010edgeR] and
 [DESeq2](http://bioconductor.org/packages/release/bioc/html/DESeq2.html) 
@@ -169,6 +174,10 @@ coefficient of variation" (=sqrt(dispersion)), as calculated by
 indicated.
 
 ### edgeR
+
+The black dots represent the tagwise dispersion estimates, the red line the 
+common dispersion and the blue curve represents the trended dispersion
+estimates.
 
 ```{r bcv_edgeR, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
 plots[["bcv_edgeR"]] <- 
@@ -184,6 +193,10 @@ plots[["bcv_edgeR"]]
 ```
 
 ### DESeq2
+
+The black dots are the gene-wise dispersion estimates, the red curve the fitted
+mean-dispersion relationship and the blue circles represent the final dispersion
+estimates.
 
 ```{r dispersion_DESeq2, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
 plots[["dispersion_DESeq2"]] <- 
@@ -255,7 +268,7 @@ ks_df <- as.data.frame(t(combn(unique(sample_df$dataset), 2))) %>%
   dplyr::rename(dataset1 = V1, dataset2 = V2)
 ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
   round(ks.test(sample_df$Libsize[sample_df$dataset == ks_df$dataset1[i]], 
-                sample_df$Libsize[sample_df$dataset == ks_df$dataset2[i]])$stat, 3)
+                sample_df$Libsize[sample_df$dataset == ks_df$dataset2[i]])$statistic, 3)
 })
 DT::datatable(ks_df)
 ```
@@ -320,7 +333,7 @@ ks_df <- as.data.frame(t(combn(unique(sample_df$dataset), 2))) %>%
   dplyr::rename(dataset1 = V1, dataset2 = V2)
 ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
   round(ks.test(sample_df$TMM[sample_df$dataset == ks_df$dataset1[i]], 
-                sample_df$TMM[sample_df$dataset == ks_df$dataset2[i]])$stat, 3)
+                sample_df$TMM[sample_df$dataset == ks_df$dataset2[i]])$statistic, 3)
 })
 DT::datatable(ks_df)
 ```
@@ -382,7 +395,7 @@ ks_df <- as.data.frame(t(combn(unique(feature_df$dataset), 2))) %>%
   dplyr::rename(dataset1 = V1, dataset2 = V2)
 ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
   round(ks.test(feature_df$AveLogCPM[feature_df$dataset == ks_df$dataset1[i]], 
-                feature_df$AveLogCPM[feature_df$dataset == ks_df$dataset2[i]])$stat, 3)
+                feature_df$AveLogCPM[feature_df$dataset == ks_df$dataset2[i]])$statistic, 3)
 })
 DT::datatable(ks_df)
 ```
@@ -444,7 +457,7 @@ ks_df <- as.data.frame(t(combn(unique(sample_df$dataset), 2))) %>%
   dplyr::rename(dataset1 = V1, dataset2 = V2)
 ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
   round(ks.test(sample_df$Fraczero[sample_df$dataset == ks_df$dataset1[i]], 
-                sample_df$Fraczero[sample_df$dataset == ks_df$dataset2[i]])$stat, 3)
+                sample_df$Fraczero[sample_df$dataset == ks_df$dataset2[i]])$statistic, 3)
 })
 DT::datatable(ks_df)
 ```
@@ -506,7 +519,7 @@ ks_df <- as.data.frame(t(combn(unique(feature_df$dataset), 2))) %>%
   dplyr::rename(dataset1 = V1, dataset2 = V2)
 ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
   round(ks.test(feature_df$Fraczero[feature_df$dataset == ks_df$dataset1[i]], 
-                feature_df$Fraczero[feature_df$dataset == ks_df$dataset2[i]])$stat, 3)
+                feature_df$Fraczero[feature_df$dataset == ks_df$dataset2[i]])$statistic, 3)
 })
 DT::datatable(ks_df)
 ```

@@ -5,7 +5,7 @@
 \title{Generate countsimQC report}
 \usage{
 countsimQC_report(dds_list, show_code = FALSE, output_format = NULL,
-  output_file = NULL, output_dir = "./", rmd_template = NULL,
+  output_file, output_dir = "./", rmd_template = NULL,
   force_overwrite = FALSE, save_ggplots = FALSE, ...)
 }
 \arguments{
@@ -17,28 +17,28 @@ object in the list should contain a count matrix, a data frame with sample
 information and a design formula. The sample information and design formula
 will be used to calculate dispersions appropriately.}
 
-\item{show_code}{Whether or not to include the code in report.}
+\item{show_code}{Whether or not to include the code in the final report.}
 
-\item{output_format}{The output format of the report. If set to NULL, an html
-report will be generated. Other options are "html_document" or
-"pdf_document" to generate an html or a pdf report, respectively.}
+\item{output_format}{The output format of the report. If set to NULL or
+"html_document", an html report will be generated. If set to
+"pdf_document", a pdf report will be generated.}
 
-\item{output_file}{The file name of the report.}
+\item{output_file}{The file name of the final report.}
 
-\item{output_dir}{The directory where the report should be saved.}
+\item{output_dir}{The directory where the final report should be saved.}
 
 \item{rmd_template}{The Rmarkdown (.Rmd) file that will be used as the
 template for generating the report. If set to NULL (default), the template
 provided with the countsimQC package will be used. See Details for more
 information.}
 
-\item{force_overwrite}{Whether to force overwrite existing output files and
-directories when saving the generated report and figures.}
+\item{force_overwrite}{Whether to force overwrite existing output files when
+saving the generated report and figures.}
 
 \item{save_ggplots}{Whether to save the ggplot objects for all the output
 figures, to allow additional fine-tuning and generation of individual
-plots. Note, however, that the resulting file can be quite large,
-especially when large or many data sets are compared.}
+plots. Note, that the resulting file can be quite large, especially when
+many or large data sets are compared.}
 
 \item{...}{Other arguments that will be passed to \code{rmarkdown::render}.}
 }
@@ -47,13 +47,13 @@ No value is returned, but a report is generated in the
   \code{output_dir} directory.
 }
 \description{
-Generate a report comparing various characteristics of a collection of count
-data sets.
+Generate a report comparing a range of characteristics across a collection of
+count data sets.
 }
 \details{
 When the function is called, the template file (specified by
-  rmd_template) will be copied into the output folder, and
-  \code{rmarkdown::render} will be called to generate the final reports. If
+  \code{rmd_template}) will be copied into the output folder, and
+  \code{rmarkdown::render} will be called to generate the final report. If
   there is already a .Rmd file with the same name in the output folder, the
   function will raise an error and stop, to avoid overwriting the existing
   file. The reason for this behaviour is that the copied template in the

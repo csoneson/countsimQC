@@ -18,15 +18,16 @@ generate_individual_plots(ggplots_rds, device = "png", output_dir = "./",
 \item{output_dir}{The output directory where the plots will be generated.}
 
 \item{n_datasets}{The number of data sets that are compared in the figures.
-Needed to set the size of the plots correctly.}
+This is needed to set the size of the plots correctly.}
 }
 \value{
 No value is returned, but plots are generated in the designated
   output directory.
 }
 \description{
-From the collection of ggplot objects that can be saved when generating a
-countsimQC report, generate individual plots.
+Generate separate plots for all evaluation criteria using the collection of
+ggplot objects that can be saved when generating a countsimQC report (by
+setting \code{save_ggplots = TRUE}).
 }
 \author{
 Charlotte Soneson
