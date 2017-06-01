@@ -79,7 +79,31 @@ thm <- theme_bw() +
   theme(axis.text = element_text(size = 15),
         axis.title = element_text(size = 14),
         strip.text = element_text(size = 15))
+
+## Check whether the emo package is available
+has_emo <- suppressPackageStartupMessages(suppressWarnings(require("emo") == TRUE))
 ```
+
+```{r}
+## Help function
+make_df <- function(df, column) {
+  ks_df <- as.data.frame(t(combn(unique(df$dataset), 2))) %>%
+    dplyr::rename(dataset1 = V1, dataset2 = V2)
+  ks_res <- as.data.frame(t(sapply(1:nrow(ks_df), function(i) {
+    kst <- ks.test(df[, column][df$dataset == ks_df$dataset1[i]], 
+                   df[, column][df$dataset == ks_df$dataset2[i]])
+    c(statistic = round(kst$statistic, 3), pvalue = round(kst$p.value, 3))
+  })))
+  ks_df$`K-S statistic` <- ks_res$statistic
+  ks_df$`K-S p-value` <- ks_res$pvalue
+  if (has_emo)
+    ks_df$status <- ifelse(ks_res$pvalue < 0.1, emo::ji("warning"), emo::ji("white_check_mark"))
+  DT::datatable(ks_df, options = list(
+    columnDefs = list(list(className = "dt-center", targets = 3:ncol(ks_df)))
+  ))
+}
+```
+
 
 ```{r, message = FALSE}
 message("Calculating dispersions...")
@@ -115,6 +139,8 @@ feature_df <- do.call(rbind, lapply(obj, function(x) {
     Common = sqrt(x$dge$common.dispersion),
     Trend = sqrt(x$dge$trended.dispersion),
     AveLogCPM = x$dge$AveLogCPM,
+    average_log2_cpm = apply(cpm(x$dge, prior.count = 2, log = TRUE), 1, mean), 
+    variance_log2_cpm = apply(cpm(x$dge, prior.count = 2, log = TRUE), 1, var),
     Fraczero = rowMeans(x$dge$counts == 0),
     dispGeneEst = rowData(x$dds)$dispGeneEst,
     dispFit = rowData(x$dds)$dispFit,
@@ -210,6 +236,35 @@ plots[["dispersion_DESeq2"]] <-
 plots[["dispersion_DESeq2"]]
 ```
 
+## Mean-variance plots {.tabset .tabset-pills}
+
+The difference between these mean-variance plots and the mean-dispersion plots
+above is that the plots in this section do not take the information about the
+experimental design and sample grouping into account, but display the mean and
+variance of log2(CPM) estimates across all samples.
+
+### Separate scatter plots
+
+```{r meanvar_sepscatter, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
+plots[["meanvar_sepscatter"]] <- 
+  ggplot(feature_df, aes(x = average_log2_cpm, y = variance_log2_cpm)) + 
+  geom_point(size = 0.75) + facet_wrap(~dataset, nrow = col_row[2]) + 
+  xlab("Mean of log2(CPM)") + ylab("Variance of log2(CPM)") + 
+  thm
+plots[["meanvar_sepscatter"]]
+```
+
+### Overlaid scatter plots
+
+```{r meanvar_overlaidscatter}
+plots[["meanvar_overlaidscatter"]] <- 
+  ggplot(feature_df, aes(x = average_log2_cpm, y = variance_log2_cpm, color = dataset)) + 
+  geom_point(size = 0.75, alpha = 0.5) + 
+  xlab("Mean of log2(CPM)") + ylab("Variance of log2(CPM)") + 
+  thm
+plots[["meanvar_overlaidscatter"]]
+```
+
 ## Library sizes {.tabset .tabset-pills}
 
 The distribution of the total count per sample, i.e., the column sums of the
@@ -264,13 +319,7 @@ plots[["libsize_ecdf"]] <-
   xlab("Library size") + thm
 plots[["libsize_ecdf"]]
 
-ks_df <- as.data.frame(t(combn(unique(sample_df$dataset), 2))) %>%
-  dplyr::rename(dataset1 = V1, dataset2 = V2)
-ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
-  round(ks.test(sample_df$Libsize[sample_df$dataset == ks_df$dataset1[i]], 
-                sample_df$Libsize[sample_df$dataset == ks_df$dataset2[i]])$statistic, 3)
-})
-DT::datatable(ks_df)
+make_df(sample_df, "Libsize")
 ```
 
 ## TMM normalization factors {.tabset .tabset-pills}
@@ -329,13 +378,7 @@ plots[["tmm_ecdf"]] <-
   xlab("TMM normalization factor") + thm
 plots[["tmm_ecdf"]]
 
-ks_df <- as.data.frame(t(combn(unique(sample_df$dataset), 2))) %>%
-  dplyr::rename(dataset1 = V1, dataset2 = V2)
-ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
-  round(ks.test(sample_df$TMM[sample_df$dataset == ks_df$dataset1[i]], 
-                sample_df$TMM[sample_df$dataset == ks_df$dataset2[i]])$statistic, 3)
-})
-DT::datatable(ks_df)
+make_df(sample_df, "TMM")
 ```
 
 ## Expression distributions (average log CPM) {.tabset .tabset-pills}
@@ -391,13 +434,7 @@ plots[["logcpm_ecdf"]] <-
   xlab("Average log CPM") + thm
 plots[["logcpm_ecdf"]]
 
-ks_df <- as.data.frame(t(combn(unique(feature_df$dataset), 2))) %>%
-  dplyr::rename(dataset1 = V1, dataset2 = V2)
-ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
-  round(ks.test(feature_df$AveLogCPM[feature_df$dataset == ks_df$dataset1[i]], 
-                feature_df$AveLogCPM[feature_df$dataset == ks_df$dataset2[i]])$statistic, 3)
-})
-DT::datatable(ks_df)
+make_df(feature_df, "AveLogCPM")
 ```
 
 ## Fraction zeros per sample {.tabset .tabset-pills}
@@ -453,13 +490,7 @@ plots[["fraczerosample_ecdf"]] <-
   xlab("Fraction zeros per sample") + thm
 plots[["fraczerosample_ecdf"]]
 
-ks_df <- as.data.frame(t(combn(unique(sample_df$dataset), 2))) %>%
-  dplyr::rename(dataset1 = V1, dataset2 = V2)
-ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
-  round(ks.test(sample_df$Fraczero[sample_df$dataset == ks_df$dataset1[i]], 
-                sample_df$Fraczero[sample_df$dataset == ks_df$dataset2[i]])$statistic, 3)
-})
-DT::datatable(ks_df)
+make_df(sample_df, "Fraczero")
 ```
 
 ## Fraction zeros per feature {.tabset .tabset-pills}
@@ -515,13 +546,7 @@ plots[["fraczerofeature_ecdf"]] <-
   xlab("Fraction zeros per feature") + thm
 plots[["fraczerofeature_ecdf"]]
 
-ks_df <- as.data.frame(t(combn(unique(feature_df$dataset), 2))) %>%
-  dplyr::rename(dataset1 = V1, dataset2 = V2)
-ks_df$`K-S statistic` <- sapply(1:nrow(ks_df), function(i) {
-  round(ks.test(feature_df$Fraczero[feature_df$dataset == ks_df$dataset1[i]], 
-                feature_df$Fraczero[feature_df$dataset == ks_df$dataset2[i]])$statistic, 3)
-})
-DT::datatable(ks_df)
+make_df(feature_df, "Fraczero")
 ```
 
 ## Library size vs fraction zeros {.tabset .tabset-pills}
