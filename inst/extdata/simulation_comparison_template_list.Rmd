@@ -169,23 +169,23 @@ The number of samples (columns) and variables (rows) in each data set.
 
 ### Number of samples (columns)
 
-```{r nsamples}
+```{r nsamples, fig.width = 10, fig.height = 7}
 plots[["nsamples"]] <- 
   ggplot(dataset_df, aes(x = dataset, y = n_samples, fill = dataset)) + 
   geom_bar(stat = "identity", alpha = 0.5) + 
   xlab("") + ylab("Number of samples") + 
-  thm
+  thm + theme(axis.text.x = element_text(size = 15, angle = 90, hjust = 1, vjust = 0.5))
 plots[["nsamples"]]
 ```
 
 ### Number of variables (rows)
 
-```{r nvariables}
+```{r nvariables, fig.width = 10, fig.height = 7}
 plots[["nvariables"]] <- 
   ggplot(dataset_df, aes(x = dataset, y = n_vars, fill = dataset)) + 
   geom_bar(stat = "identity", alpha = 0.5) + 
   xlab("") + ylab("Number of variables") + 
-  thm
+thm + theme(axis.text.x = element_text(size = 15, angle = 90, hjust = 1, vjust = 0.5))
 plots[["nvariables"]]
 ```
 
