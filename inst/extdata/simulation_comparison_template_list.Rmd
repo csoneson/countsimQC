@@ -64,11 +64,11 @@ references:
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = showCode, warning = FALSE, message = FALSE)
 
-# suppressPackageStartupMessages(library(DESeq2))
-# suppressPackageStartupMessages(library(edgeR))
-# suppressPackageStartupMessages(library(dplyr))
-# suppressPackageStartupMessages(library(tidyr))
-# suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(DESeq2))
+suppressPackageStartupMessages(library(edgeR))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(tidyr))
+suppressPackageStartupMessages(library(ggplot2))
 
 ## Determine number of rows and columns in facetted plots 
 ## (first element = columns, second element = rows)
