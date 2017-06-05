@@ -46,7 +46,7 @@
 #' @export
 #' @importFrom rmarkdown render
 #' @importFrom tools file_ext file_path_sans_ext
-#' @import DESeq2 edgeR dplyr tidyr ggplot2
+#' @import SummarizedExperiment DESeq2 edgeR dplyr tidyr ggplot2
 #' @return No value is returned, but a report is generated in the
 #'   \code{outputDir} directory.
 #'

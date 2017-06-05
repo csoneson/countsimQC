@@ -3,6 +3,7 @@
 export(countsimQCReport)
 export(generateIndividualPlots)
 import(DESeq2)
+import(SummarizedExperiment)
 import(dplyr)
 import(edgeR)
 import(ggplot2)
