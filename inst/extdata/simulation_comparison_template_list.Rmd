@@ -57,8 +57,12 @@ references:
     year: 2010
 ---
 
+## Description
+
+`r I(description)`
+
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(echo = show_code, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = showCode, warning = FALSE, message = FALSE)
 
 # suppressPackageStartupMessages(library(DESeq2))
 # suppressPackageStartupMessages(library(edgeR))
@@ -68,10 +72,10 @@ knitr::opts_chunk$set(echo = show_code, warning = FALSE, message = FALSE)
 
 ## Determine number of rows and columns in facetted plots 
 ## (first element = columns, second element = rows)
-col_row <- grDevices::n2mfrow(length(dds_list))
+colRow <- grDevices::n2mfrow(length(ddsList))
 
-## Determine height/width of each panel in multi-panel plots
-panel_size <- 4
+## Set height/width of each panel in multi-panel plots
+panelSize <- 4
 
 plots <- list()
 
@@ -80,16 +84,18 @@ thm <- theme_bw() +
         axis.title = element_text(size = 14),
         strip.text = element_text(size = 15))
 
-## Check whether the emo package is available
+## Check whether the emo package is available (not currently used)
 has_emo <- suppressPackageStartupMessages(suppressWarnings(require("emo") == TRUE))
 ```
 
 ```{r}
-## Help function
-make_df <- function(df, column) {
+## Help function to make data table with K-S statistics and p-values
+makeDF <- function(df, column) {
   if (length(unique(df$dataset)) > 1) {
+    ## Generate data frame with all pairs of data sets
     ks_df <- as.data.frame(t(combn(unique(df$dataset), 2))) %>%
       dplyr::rename(dataset1 = V1, dataset2 = V2)
+    ## Calculate K-S statistic and p-value for each pair of data sets
     ks_res <- as.data.frame(t(sapply(1:nrow(ks_df), function(i) {
       kst <- ks.test(df[, column][df$dataset == ks_df$dataset1[i]], 
                      df[, column][df$dataset == ks_df$dataset2[i]])
@@ -106,23 +112,23 @@ make_df <- function(df, column) {
 
 
 ```{r, message = FALSE}
-message("Calculating dispersions...")
-obj <- lapply(dds_list, function(ds) {
+message("Calculating dispersions. This can take some time...")
+obj <- lapply(ddsList, function(ds) {
   ## --- edgeR
-  dge <- DGEList(counts = counts(ds))
+  dge <- edgeR::DGEList(counts = counts(ds))
   des <- model.matrix(design(ds), data = colData(ds))
-  dge <- calcNormFactors(dge)
-  dge <- estimateDisp(dge, design = des)
+  dge <- edgeR::calcNormFactors(dge)
+  dge <- edgeR::estimateDisp(dge, design = des)
   ## --- DESeq2
-  dds <- estimateSizeFactors(ds, type = "poscounts")
-  dds <- estimateDispersions(dds, quiet = TRUE)
+  dds <- DESeq2::estimateSizeFactors(ds, type = "poscounts")
+  dds <- DESeq2::estimateDispersions(dds, quiet = TRUE)
   list(dge = dge, dds = dds)
 })
 ```
 
 ```{r}
 ## Summarize sample characteristics
-sample_df <- do.call(rbind, lapply(obj, function(x) {
+sampleDF <- do.call(rbind, lapply(obj, function(x) {
   data.frame(
     Libsize = colSums(x$dge$counts),
     Fraczero = colMeans(x$dge$counts == 0),
@@ -133,14 +139,14 @@ sample_df <- do.call(rbind, lapply(obj, function(x) {
 
 ```{r}
 ## Summarize variable characteristics
-feature_df <- do.call(rbind, lapply(obj, function(x) {
+featureDF <- do.call(rbind, lapply(obj, function(x) {
   data.frame(
     Tagwise = sqrt(x$dge$tagwise.dispersion),
     Common = sqrt(x$dge$common.dispersion),
     Trend = sqrt(x$dge$trended.dispersion),
     AveLogCPM = x$dge$AveLogCPM,
-    average_log2_cpm = apply(cpm(x$dge, prior.count = 2, log = TRUE), 1, mean), 
-    variance_log2_cpm = apply(cpm(x$dge, prior.count = 2, log = TRUE), 1, var),
+    average_log2_cpm = apply(edgeR::cpm(x$dge, prior.count = 2, log = TRUE), 1, mean), 
+    variance_log2_cpm = apply(edgeR::cpm(x$dge, prior.count = 2, log = TRUE), 1, var),
     Fraczero = rowMeans(x$dge$counts == 0),
     dispGeneEst = rowData(x$dds)$dispGeneEst,
     dispFit = rowData(x$dds)$dispFit,
@@ -152,14 +158,14 @@ feature_df <- do.call(rbind, lapply(obj, function(x) {
 
 ```{r}
 ## Summarize data set characteristics
-dataset_df <- do.call(rbind, lapply(obj, function(x) {
+datasetDF <- do.call(rbind, lapply(obj, function(x) {
   data.frame(
     prior_df = paste0("prior.df = ", round(x$dge$prior.df, 2)),
-    n_vars = nrow(x$dge$counts),
-    n_samples = ncol(x$dge$counts)
+    nVars = nrow(x$dge$counts),
+    nSamples = ncol(x$dge$counts)
   )
-})) %>% dplyr::mutate(AveLogCPM = 0.8 * max(feature_df$AveLogCPM)) %>%
-  dplyr::mutate(Tagwise = 0.9 * max(feature_df$Tagwise)) %>%
+})) %>% dplyr::mutate(AveLogCPM = 0.8 * max(featureDF$AveLogCPM)) %>%
+  dplyr::mutate(Tagwise = 0.9 * max(featureDF$Tagwise)) %>%
   dplyr::mutate(dataset = names(obj))
 ```
 
@@ -169,24 +175,24 @@ The number of samples (columns) and variables (rows) in each data set.
 
 ### Number of samples (columns)
 
-```{r nsamples, fig.width = 10, fig.height = 7}
-plots[["nsamples"]] <- 
-  ggplot(dataset_df, aes(x = dataset, y = n_samples, fill = dataset)) + 
+```{r nSamples, fig.width = 10, fig.height = 7}
+plots[["nSamples"]] <- 
+  ggplot(datasetDF, aes(x = dataset, y = nSamples, fill = dataset)) + 
   geom_bar(stat = "identity", alpha = 0.5) + 
-  xlab("") + ylab("Number of samples") + 
+  xlab("") + ylab("Number of samples (columns)") + 
   thm + theme(axis.text.x = element_text(size = 15, angle = 90, hjust = 1, vjust = 0.5))
-plots[["nsamples"]]
+plots[["nSamples"]]
 ```
 
 ### Number of variables (rows)
 
-```{r nvariables, fig.width = 10, fig.height = 7}
-plots[["nvariables"]] <- 
-  ggplot(dataset_df, aes(x = dataset, y = n_vars, fill = dataset)) + 
+```{r nVariables, fig.width = 10, fig.height = 7}
+plots[["nVariables"]] <- 
+  ggplot(datasetDF, aes(x = dataset, y = nVars, fill = dataset)) + 
   geom_bar(stat = "identity", alpha = 0.5) + 
-  xlab("") + ylab("Number of variables") + 
+  xlab("") + ylab("Number of variables (rows)") + 
 thm + theme(axis.text.x = element_text(size = 15, angle = 90, hjust = 1, vjust = 0.5))
-plots[["nvariables"]]
+plots[["nVariables"]]
 ```
 
 ## Dispersion/BCV plots {.tabset .tabset-pills}
@@ -196,8 +202,8 @@ coefficient of variation" (sqrt(dispersion)), as calculated by
 [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html)
 [@Robinson2010edgeR] and
 [DESeq2](http://bioconductor.org/packages/release/bioc/html/DESeq2.html) 
-[@Love2014DESeq2]. In the edgeR plot, the estimated prior degrees of freedom are
-indicated.
+[@Love2014DESeq2]. In the edgeR plot, the estimate of the prior degrees of
+freedom is indicated.
 
 ### edgeR
 
@@ -205,17 +211,17 @@ The black dots represent the tagwise dispersion estimates, the red line the
 common dispersion and the blue curve represents the trended dispersion
 estimates.
 
-```{r bcv_edgeR, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
-plots[["bcv_edgeR"]] <- 
-  ggplot(feature_df %>% dplyr::arrange(AveLogCPM), 
+```{r BCVedgeR, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["BCVedgeR"]] <- 
+  ggplot(featureDF %>% dplyr::arrange(AveLogCPM), 
          aes(x = AveLogCPM, y = Tagwise)) + geom_point(size = 0.25) + 
-  facet_wrap(~dataset, nrow = col_row[2]) + 
+  facet_wrap(~dataset, nrow = colRow[2]) + 
   geom_line(aes(y = Trend), color = "blue", size = 1.5) + 
   geom_line(aes(y = Common), color = "red", size = 1.5) +
-  geom_text(data = dataset_df, aes(label = prior_df)) + 
+  geom_text(data = datasetDF, aes(label = prior_df)) + 
   xlab("Average log CPM") + ylab("Biological coefficient of variation") + 
   thm
-plots[["bcv_edgeR"]]
+plots[["BCVedgeR"]]
 ```
 
 ### DESeq2
@@ -224,45 +230,48 @@ The black dots are the gene-wise dispersion estimates, the red curve the fitted
 mean-dispersion relationship and the blue circles represent the final dispersion
 estimates.
 
-```{r dispersion_DESeq2, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
-plots[["dispersion_DESeq2"]] <- 
-  ggplot(feature_df %>% dplyr::arrange(baseMean), 
+```{r dispersionDESeq2, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["dispersionDESeq2"]] <- 
+  ggplot(featureDF %>% dplyr::arrange(baseMean), 
          aes(x = baseMean, y = dispGeneEst)) + geom_point(size = 0.25) + 
-  facet_wrap(~dataset, nrow = col_row[2]) + scale_x_log10() + scale_y_log10() +  
+  facet_wrap(~dataset, nrow = colRow[2]) + scale_x_log10() + scale_y_log10() +  
   geom_point(aes(y = dispFinal), color = "lightblue", shape = 21) + 
   geom_line(aes(y = dispFit), color = "red", size = 1.5) + 
   xlab("Base mean") + ylab("Dispersion") + 
   thm
-plots[["dispersion_DESeq2"]]
+plots[["dispersionDESeq2"]]
 ```
 
 ## Mean-variance plots {.tabset .tabset-pills}
 
-The difference between these mean-variance plots and the mean-dispersion plots
-above is that the plots in this section do not take the information about the
-experimental design and sample grouping into account, but display the mean and
-variance of log2(CPM) estimates across all samples.
+The difference between these mean-variance plots and the mean-dispersion plots 
+above is that the plots in this section do not take the information about the 
+experimental design and sample grouping into account, but display the mean and 
+variance of log2(CPM) estimates across all samples, calculated using the `cpm`
+function from
+[edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html) 
+[@Robinson2010edgeR], with a prior count of 2.
 
 ### Separate scatter plots
 
-```{r meanvar_sepscatter, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
-plots[["meanvar_sepscatter"]] <- 
-  ggplot(feature_df, aes(x = average_log2_cpm, y = variance_log2_cpm)) + 
-  geom_point(size = 0.75) + facet_wrap(~dataset, nrow = col_row[2]) + 
+```{r meanVarSepScatter, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["meanVarSepScatter"]] <- 
+  ggplot(featureDF, aes(x = average_log2_cpm, y = variance_log2_cpm)) + 
+  geom_point(size = 0.75) + facet_wrap(~dataset, nrow = colRow[2]) + 
   xlab("Mean of log2(CPM)") + ylab("Variance of log2(CPM)") + 
   thm
-plots[["meanvar_sepscatter"]]
+plots[["meanVarSepScatter"]]
 ```
 
 ### Overlaid scatter plots
 
-```{r meanvar_overlaidscatter}
-plots[["meanvar_overlaidscatter"]] <- 
-  ggplot(feature_df, aes(x = average_log2_cpm, y = variance_log2_cpm, color = dataset)) + 
+```{r meanVarOverlaidScatter}
+plots[["meanVarOverlaidScatter"]] <- 
+  ggplot(featureDF, aes(x = average_log2_cpm, y = variance_log2_cpm, color = dataset)) + 
   geom_point(size = 0.75, alpha = 0.5) +
   xlab("Mean of log2(CPM)") + ylab("Variance of log2(CPM)") + 
   thm
-plots[["meanvar_overlaidscatter"]]
+plots[["meanVarOverlaidScatter"]]
 ```
 
 ## Library sizes {.tabset .tabset-pills}
@@ -272,54 +281,54 @@ respective data matrices.
 
 ### Separate histograms
 
-```{r libsize_sephist, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
-plots[["libsize_sephist"]] <- 
-  ggplot(sample_df, aes(x = Libsize)) + geom_histogram(bins = 30) + 
-  facet_wrap(~dataset, nrow = col_row[2]) +
+```{r libsizeSepHist, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["libsizeSepHist"]] <- 
+  ggplot(sampleDF, aes(x = Libsize)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = colRow[2]) +
   xlab("Library size") + thm
-plots[["libsize_sephist"]]
+plots[["libsizeSepHist"]]
 ```
 
 ### Overlaid histograms
 
-```{r libsize_overlaidhist}
-plots[["libsize_overlaidhist"]] <- 
-  ggplot(sample_df, aes(x = Libsize, group = dataset, fill = dataset)) + 
+```{r libsizeOverlaidHist}
+plots[["libsizeOverlaidHist"]] <- 
+  ggplot(sampleDF, aes(x = Libsize, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
   xlab("Library size") + thm
-plots[["libsize_overlaidhist"]]
+plots[["libsizeOverlaidHist"]]
 ```
 
 ### Density plots
 
-```{r libsize_density}
-plots[["libsize_density"]] <- 
-  ggplot(sample_df, aes(x = Libsize, group = dataset, color = dataset)) + 
+```{r libsizeDensity}
+plots[["libsizeDensity"]] <- 
+  ggplot(sampleDF, aes(x = Libsize, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
   xlab("Library size") + thm
-plots[["libsize_density"]]
+plots[["libsizeDensity"]]
 ```
 
 ### Density plots (filled)
 
-```{r libsize_density_filled}
-plots[["libsize_density_filled"]] <- 
-  ggplot(sample_df, aes(x = Libsize, group = dataset, fill = dataset)) + 
+```{r libsizeDensityFilled}
+plots[["libsizeDensityFilled"]] <- 
+  ggplot(sampleDF, aes(x = Libsize, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("Library size") + thm
-plots[["libsize_density_filled"]]
+plots[["libsizeDensityFilled"]]
 ```
 
 ### Empirical cumulative distribution function 
 
-```{r libsize_ecdf}
-plots[["libsize_ecdf"]] <- 
-  ggplot(sample_df, aes(x = Libsize, group = dataset, color = dataset)) + 
+```{r libsizeEcdf}
+plots[["libsizeEcdf"]] <- 
+  ggplot(sampleDF, aes(x = Libsize, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Library size") + thm
-plots[["libsize_ecdf"]]
+plots[["libsizeEcdf"]]
 
-make_df(sample_df, "Libsize")
+makeDF(sampleDF, "Libsize")
 ```
 
 ## TMM normalization factors {.tabset .tabset-pills}
@@ -331,54 +340,54 @@ differences in RNA composition, as calculated by
 
 ### Separate histograms
 
-```{r tmm_sephist, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
-plots[["tmm_sephist"]] <- 
-  ggplot(sample_df, aes(x = TMM)) + geom_histogram(bins = 30) + 
-  facet_wrap(~dataset, nrow = col_row[2]) +
+```{r tmmSepHist, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["tmmSepHist"]] <- 
+  ggplot(sampleDF, aes(x = TMM)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = colRow[2]) +
   xlab("TMM normalization factor") + thm
-plots[["tmm_sephist"]]
+plots[["tmmSepHist"]]
 ```
 
 ### Overlaid histograms
 
-```{r tmm_overlaidhist}
-plots[["tmm_overlaidhist"]] <- 
-  ggplot(sample_df, aes(x = TMM, group = dataset, fill = dataset)) + 
+```{r tmmOverlaidHist}
+plots[["tmmOverlaidHist"]] <- 
+  ggplot(sampleDF, aes(x = TMM, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
   xlab("TMM normalization factor") + thm
-plots[["tmm_overlaidhist"]]
+plots[["tmmOverlaidHist"]]
 ```
 
 ### Density plots
 
-```{r tmm_density}
-plots[["tmm_density"]] <- 
-  ggplot(sample_df, aes(x = TMM, group = dataset, color = dataset)) + 
+```{r tmmDensity}
+plots[["tmmDensity"]] <- 
+  ggplot(sampleDF, aes(x = TMM, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
   xlab("TMM normalization factor") + thm
-plots[["tmm_density"]]
+plots[["tmmDensity"]]
 ```
 
 ### Density plots (filled) 
 
-```{r tmm_density_filled}
-plots[["tmm_density_filled"]] <- 
-  ggplot(sample_df, aes(x = TMM, group = dataset, fill = dataset)) + 
+```{r tmmDensityFilled}
+plots[["tmmDensityFilled"]] <- 
+  ggplot(sampleDF, aes(x = TMM, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("TMM normalization factor") + thm
-plots[["tmm_density_filled"]]
+plots[["tmmDensityFilled"]]
 ```
 
 ### Empirical cumulative distribution function 
 
-```{r tmm_ecdf}
-plots[["tmm_ecdf"]] <- 
-  ggplot(sample_df, aes(x = TMM, group = dataset, color = dataset)) + 
+```{r tmmEcdf}
+plots[["tmmEcdf"]] <- 
+  ggplot(sampleDF, aes(x = TMM, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("TMM normalization factor") + thm
-plots[["tmm_ecdf"]]
+plots[["tmmEcdf"]]
 
-make_df(sample_df, "TMM")
+makeDF(sampleDF, "TMM")
 ```
 
 ## Expression distributions (average log CPM) {.tabset .tabset-pills}
@@ -387,54 +396,54 @@ The distribution of average abundance values for the variables.
 
 ### Separate histograms
 
-```{r logcpm_sephist, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
-plots[["logcpm_sephist"]] <- 
-  ggplot(feature_df, aes(x = AveLogCPM)) + geom_histogram(bins = 30) + 
-  facet_wrap(~dataset, nrow = col_row[2]) +
+```{r logCPMSepHist, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["logCPMSepHist"]] <- 
+  ggplot(featureDF, aes(x = AveLogCPM)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = colRow[2]) +
   xlab("Average log CPM") + thm
-plots[["logcpm_sephist"]]
+plots[["logCPMSepHist"]]
 ```
 
 ### Overlaid histograms
 
-```{r logcpm_overlaidhist}
-plots[["logcpm_overlaidhist"]] <- 
-  ggplot(feature_df, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
+```{r logCPMOverlaidHist}
+plots[["logCPMOverlaidHist"]] <- 
+  ggplot(featureDF, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
   xlab("Average log CPM") + thm
-plots[["logcpm_overlaidhist"]]
+plots[["logCPMOverlaidHist"]]
 ```
 
 ### Density plots
 
-```{r logcpm_density}
-plots[["logcpm_density"]] <- 
-  ggplot(feature_df, aes(x = AveLogCPM, group = dataset, color = dataset)) + 
+```{r logCPMDensity}
+plots[["logCPMDensity"]] <- 
+  ggplot(featureDF, aes(x = AveLogCPM, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
   xlab("Average log CPM") + thm
-plots[["logcpm_density"]]
+plots[["logCPMDensity"]]
 ```
 
 ### Density plots (filled) 
 
-```{r logcpm_density_filled}
-plots[["logcpm_density_filled"]] <- 
-  ggplot(feature_df, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
+```{r logCPMDensityFilled}
+plots[["logCPMDensityFilled"]] <- 
+  ggplot(featureDF, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("Average log CPM") + thm
-plots[["logcpm_density_filled"]]
+plots[["logCPMDensityFilled"]]
 ```
 
 ### Empirical cumulative distribution function 
 
-```{r logcpm_ecdf}
-plots[["logcpm_ecdf"]] <- 
-  ggplot(feature_df, aes(x = AveLogCPM, group = dataset, color = dataset)) + 
+```{r logCPMEcdf}
+plots[["logCPMEcdf"]] <- 
+  ggplot(featureDF, aes(x = AveLogCPM, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Average log CPM") + thm
-plots[["logcpm_ecdf"]]
+plots[["logCPMEcdf"]]
 
-make_df(feature_df, "AveLogCPM")
+makeDF(featureDF, "AveLogCPM")
 ```
 
 ## Fraction zeros per sample {.tabset .tabset-pills}
@@ -443,54 +452,54 @@ The distribution of the fraction of zeros observed per sample.
 
 ### Separate histograms
 
-```{r fraczerosample_sephist, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
-plots[["fraczerosample_sephist"]] <- 
-  ggplot(sample_df, aes(x = Fraczero)) + geom_histogram(bins = 30) + 
-  facet_wrap(~dataset, nrow = col_row[2]) +
+```{r fraczeroSampleSepHist, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["fraczeroSampleSepHist"]] <- 
+  ggplot(sampleDF, aes(x = Fraczero)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = colRow[2]) +
   xlab("Fraction zeros per sample") + thm
-plots[["fraczerosample_sephist"]]
+plots[["fraczeroSampleSepHist"]]
 ```
 
 ### Overlaid histograms
 
-```{r fraczerosample_overlaidhist}
-plots[["fraczerosample_overlaidhist"]] <- 
-  ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
+```{r fraczeroSampleOverlaidHist}
+plots[["fraczeroSampleOverlaidHist"]] <- 
+  ggplot(sampleDF, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
   xlab("Fraction zeros per sample") + thm
-plots[["fraczerosample_overlaidhist"]]
+plots[["fraczeroSampleOverlaidHist"]]
 ```
 
 ### Density plots
 
-```{r fraczerosample_density}
-plots[["fraczerosample_density"]] <- 
-  ggplot(sample_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
+```{r fraczeroSampleDensity}
+plots[["fraczeroSampleDensity"]] <- 
+  ggplot(sampleDF, aes(x = Fraczero, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
   xlab("Fraction zeros per sample") + thm
-plots[["fraczerosample_density"]]
+plots[["fraczeroSampleDensity"]]
 ```
 
 ### Density plots (filled) 
 
-```{r fraczerosample_density_filled}
-plots[["fraczerosample_density_filled"]] <- 
-  ggplot(sample_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
+```{r fraczeroSampleDensityFilled}
+plots[["fraczeroSampleDensityFilled"]] <- 
+  ggplot(sampleDF, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("Fraction zeros per sample") + thm
-plots[["fraczerosample_density_filled"]]
+plots[["fraczeroSampleDensityFilled"]]
 ```
 
 ### Empirical cumulative distribution function 
 
-```{r fraczerosample_ecdf}
-plots[["fraczerosample_ecdf"]] <- 
-  ggplot(sample_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
+```{r fraczeroSampleEcdf}
+plots[["fraczeroSampleEcdf"]] <- 
+  ggplot(sampleDF, aes(x = Fraczero, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Fraction zeros per sample") + thm
-plots[["fraczerosample_ecdf"]]
+plots[["fraczeroSampleEcdf"]]
 
-make_df(sample_df, "Fraczero")
+makeDF(sampleDF, "Fraczero")
 ```
 
 ## Fraction zeros per feature {.tabset .tabset-pills}
@@ -499,54 +508,54 @@ The distribution of the fraction of zeros observed per variable.
 
 ### Separate histograms
 
-```{r fraczerofeature_sephist, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
-plots[["fraczerofeature_sephist"]] <- 
-  ggplot(feature_df, aes(x = Fraczero)) + geom_histogram(bins = 30) + 
-  facet_wrap(~dataset, nrow = col_row[2]) +
+```{r fraczeroFeatureSepHist, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["fraczeroFeatureSepHist"]] <- 
+  ggplot(featureDF, aes(x = Fraczero)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = colRow[2]) +
   xlab("Fraction zeros per feature") + thm
-plots[["fraczerofeature_sephist"]]
+plots[["fraczeroFeatureSepHist"]]
 ```
 
 ### Overlaid histograms
 
-```{r fraczerofeature_overlaidhist}
-plots[["fraczerofeature_overlaidhist"]] <- 
-  ggplot(feature_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
+```{r fraczeroFeatureOverlaidHist}
+plots[["fraczeroFeatureOverlaidHist"]] <- 
+  ggplot(featureDF, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
   xlab("Fraction zeros per feature") + thm
-plots[["fraczerofeature_overlaidhist"]]
+plots[["fraczeroFeatureOverlaidHist"]]
 ```
 
 ### Density plots
 
-```{r fraczerofeature_density}
-plots[["fraczerofeature_density"]] <- 
-  ggplot(feature_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
+```{r fraczeroFeatureDensity}
+plots[["fraczeroFeatureDensity"]] <- 
+  ggplot(featureDF, aes(x = Fraczero, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
   xlab("Fraction zeros per feature") + thm
-plots[["fraczerofeature_density"]]
+plots[["fraczeroFeatureDensity"]]
 ```
 
 ### Density plots (filled) 
 
-```{r fraczerofeature_density_filled}
-plots[["fraczerofeature_density_filled"]] <- 
-  ggplot(feature_df, aes(x = Fraczero, group = dataset, fill = dataset)) + 
+```{r fraczeroFeatureDensityFilled}
+plots[["fraczeroFeatureDensityFilled"]] <- 
+  ggplot(featureDF, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
   xlab("Fraction zeros per feature") + thm
-plots[["fraczerofeature_density_filled"]]
+plots[["fraczeroFeatureDensityFilled"]]
 ```
 
 ### Empirical cumulative distribution function 
 
-```{r fraczerofeature_ecdf}
-plots[["fraczerofeature_ecdf"]] <- 
-  ggplot(feature_df, aes(x = Fraczero, group = dataset, color = dataset)) + 
+```{r fraczeroFeatureEcdf}
+plots[["fraczeroFeatureEcdf"]] <- 
+  ggplot(featureDF, aes(x = Fraczero, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Fraction zeros per feature") + thm
-plots[["fraczerofeature_ecdf"]]
+plots[["fraczeroFeatureEcdf"]]
 
-make_df(feature_df, "Fraczero")
+makeDF(featureDF, "Fraczero")
 ```
 
 ## Library size vs fraction zeros {.tabset .tabset-pills}
@@ -556,23 +565,23 @@ sample.
 
 ### Separate scatter plots
 
-```{r libsizefraczero_sepscatter, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
-plots[["libsizefraczero_sepscatter"]] <- 
-  ggplot(sample_df, aes(x = Libsize, y = Fraczero)) + geom_point(size = 1) + 
-  facet_wrap(~dataset, nrow = col_row[2]) + 
+```{r libsizeFraczeroSepScatter, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["libsizeFraczeroSepScatter"]] <- 
+  ggplot(sampleDF, aes(x = Libsize, y = Fraczero)) + geom_point(size = 1) + 
+  facet_wrap(~dataset, nrow = colRow[2]) + 
   xlab("Library size") + ylab("Fraction zeros") + thm
-plots[["libsizefraczero_sepscatter"]]
+plots[["libsizeFraczeroSepScatter"]]
 ```
 
 ### Overlaid scatter plots
 
-```{r libsizefraczero_overlaidscatter}
-plots[["libsizefraczero_overlaidscatter"]] <- 
-  ggplot(sample_df, aes(x = Libsize, y = Fraczero, color = dataset)) + 
+```{r libsizeFraczeroOverlaidScatter}
+plots[["libsizeFraczeroOverlaidScatter"]] <- 
+  ggplot(sampleDF, aes(x = Libsize, y = Fraczero, color = dataset)) + 
   geom_point(size = 1, alpha = 0.5) + 
   geom_line(stat = "smooth", method = "loess", size = 1, alpha = 0.5) + 
   xlab("Library size") + ylab("Fraction zeros") + thm
-plots[["libsizefraczero_overlaidscatter"]]
+plots[["libsizeFraczeroOverlaidScatter"]]
 ```
 
 ## Mean expression vs fraction zeros {.tabset .tabset-pills}
@@ -582,29 +591,30 @@ per variable.
 
 ### Separate scatter plots
 
-```{r logcpmfraczero_sepscatter, fig.width = panel_size * col_row[1], fig.height = panel_size * col_row[2]}
-plots[["logcpmfraczero_sepscatter"]] <- 
-  ggplot(feature_df, aes(x = AveLogCPM, y = Fraczero)) + geom_point(size = 0.75) + 
-  facet_wrap(~dataset, nrow = col_row[2]) + 
+```{r logCPMFraczeroSepScatter, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["logCPMFraczeroSepScatter"]] <- 
+  ggplot(featureDF, aes(x = AveLogCPM, y = Fraczero)) + geom_point(size = 0.75) + 
+  facet_wrap(~dataset, nrow = colRow[2]) + 
   xlab("Average log CPM") + ylab("Fraction zeros") + thm
-plots[["logcpmfraczero_sepscatter"]]
+plots[["logCPMFraczeroSepScatter"]]
 ```
 
 ### Overlaid scatter plots
 
-```{r logcpmfraczero_overlaidscatter}
-plots[["logcpmfraczero_overlaidscatter"]] <- 
-  ggplot(feature_df, aes(x = AveLogCPM, y = Fraczero, color = dataset)) + 
+```{r logCPMFraczeroOverlaidScatter}
+plots[["logCPMFraczeroOverlaidScatter"]] <- 
+  ggplot(featureDF, aes(x = AveLogCPM, y = Fraczero, color = dataset)) + 
   geom_point(size = 0.75, alpha = 0.5) + 
   xlab("Average log CPM") + ylab("Fraction zeros") + thm
-plots[["logcpmfraczero_overlaidscatter"]]
+plots[["logCPMFraczeroOverlaidScatter"]]
 ```
 
 
 ```{r, include = FALSE}
-if (save_ggplots) 
+if (savePlots) 
   saveRDS(plots, 
-          file = paste0(gsub("\\.pdf$|\\.html$", "", output_file), "_ggplots.rds"))
+          file = paste0(outputDir, "/",
+                        tools::file_path_sans_ext(basename(outputFile)), "_ggplots.rds"))
 ```
 
 ## Session info

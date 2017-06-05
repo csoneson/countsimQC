@@ -1,24 +1,29 @@
 Package: countsimQC
 Type: Package
 Title: Compare Characteristic Features of Count Data Sets
-Version: 0.3.2
+Version: 0.4.0
 Author: Charlotte Soneson
 Maintainer: Charlotte Soneson <charlottesoneson@gmail.com>
 Description: countsimQC provides functionality to create a comprehensive report 
-    comparing many different characteristics across a collection of (RNA-seq) count matrices. 
-    It is mainly intended as a simple way to compare one or more synthetic RNA-seq count 
-    matrices to a real count matrix, possibly the one underlying the simulation. 
-    However, any collection of count matrices can be compared.
+    comparing a broad range of characteristics across a collection of count 
+    matrices. One important use case is the comparison of one or more synthetic 
+    count matrices to a real count matrix, possibly the one underlying the 
+    simulations. However, any collection of count matrices can be compared.
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.3)
+Depends: R (>= 3.4)
 Imports: rmarkdown,
     edgeR,
-    DESeq2,
+    DESeq2 (>= 1.16.0),
     dplyr,
     tidyr,
-    ggplot2
+    ggplot2,
+    grDevices,
+    tools
 RoxygenNote: 6.0.1
-Suggests: knitr
+Suggests: knitr,
+    testthat
 VignetteBuilder: knitr
+biocViews: Microbiome, RNASeq, SingleCell, ExperimentalDesign, QualityControl, 
+    ReportWriting, Visualization

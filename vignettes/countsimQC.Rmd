@@ -16,11 +16,11 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 The `countsimQC` package provides a simple way to compare the characteristic 
-features of a collection of (RNA-seq) count data sets. An important application
-is in situations where a synthetic count data set has been generated using a
-real count data set as an underlying source of parameters, in which case it is
-often important to verify that the final synthetic data captures the main
-features of the original data set. However, the package can be used to create a
+features of a collection of (e.g., RNA-seq) count data sets. An important
+application is in situations where a synthetic count data set has been generated
+using a real count data set as an underlying source of parameters, in which case
+it is often important to verify that the final synthetic data captures the main 
+features of the original data set. However, the package can be used to create a 
 visual overview of any collection of count data sets.
 
 In this vignette we will show how to generate a comparative report from a 
@@ -37,36 +37,40 @@ Bioconductor package.
 suppressPackageStartupMessages(library(countsimQC))
 suppressPackageStartupMessages(library(DESeq2))
 
-data(countsim_example)
-countsim_example
+data(countsimExample)
+countsimExample
 ```
 
-Next, we generate the report using the `countsimQC_report()` function. 
+Next, we generate the report using the `countsimQCReport()` function. 
 
 ```{r, results = "hide", warning = FALSE}
-countsimQC_report(dds_list = countsim_example, show_code = FALSE, 
-                  output_format = "html_document", 
-                  output_file = "countsim_report.html", output_dir = "./", 
-                  save_ggplots = TRUE, force_overwrite = TRUE)
+countsimQCReport(ddsList = countsimExample, showCode = FALSE, 
+                 outputFormat = "html_document", 
+                 outputFile = "countsim_report.html", outputDir = "./", 
+                 savePlots = TRUE, forceOverwrite = TRUE,
+                 description = "This is my test report.")
 ```
 
 This function can generate either an HTML file (by setting `output_format = 
 "html_document"` or `output_format=NULL`) or a pdf file (by setting 
-`output_format = "pdf_document"`).
+`output_format = "pdf_document"`). The `description` argument can be used to
+provide a more extensive description of the data set(s) that are included in the
+report.
 
-If the argument `save_ggplots` is set to TRUE, an .rds file containing the 
+If the argument `savePlots` is set to TRUE, an .rds file containing the 
 individual ggplot objects will be generated. These objects can be used to
 perform fine-tuning of the visualizations if desired. Note, however, that the
 .rds file can become large if the number of data sets is large, or if the
 individual data sets have many samples or variables. The convenience function 
-`generate_individual_plots()` can be used to quickly generate individual figures
+`generateIndividualPlots()` can be used to quickly generate individual figures
 for all plots included in the report, using a variety of devices. For example,
 to generate each plot in pdf format:
 
 ```{r, warning = FALSE}
 ggplots <- readRDS("countsim_report_ggplots.rds")
-generate_individual_plots(ggplots, device = "pdf", n_datasets = 3, 
-                          output_dir = "./figures")
+if (!dir.exists("figures")) dir.create("figures")
+generateIndividualPlots(ggplots, device = "pdf", nDatasets = 3, 
+                        outputDir = "./figures")
 ```
 
 

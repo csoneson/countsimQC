@@ -2,9 +2,9 @@ library(countsimQC)
 context("Check report generation")
 
 local({
-  x <- lapply(countsim_example, function(w) w[1:100, ])
-  if (file.exists("report_from_test.rmd")) {
-    file.remove("report_from_test.rmd")
+  x <- lapply(countsimExample, function(w) w[1:100, ])
+  if (file.exists("report_from_test.Rmd")) {
+    file.remove("report_from_test.Rmd")
   }
   if (file.exists("report_from_test.html")) {
     file.remove("report_from_test.html")
@@ -17,74 +17,74 @@ local({
   }
 
   test_that("Input argument errors are recognized", {
-    ## output_format
-    expect_error(countsimQC_report(dds_list = x, output_format = "html",
-                                   output_file = "report_from_test.html",
-                                   output_dir = "./", save_ggplots = TRUE))
-    expect_error(countsimQC_report(dds_list = x, output_format = "html_document",
-                                   output_file = "report_from_test.pdf",
-                                   output_dir = "./", save_ggplots = TRUE))
-    ## dds_list
-    expect_error(countsimQC_report(dds_list = x[[1]], output_format = "html_document",
-                                   output_file = "report_from_test.html",
-                                   output_dir = "./", save_ggplots = TRUE))
-    expect_error(countsimQC_report(dds_list = list(A = 1:3),
-                                   output_format = "html_document",
-                                   output_file = "report_from_test.html",
-                                   output_dir = "./", save_ggplots = TRUE))
+    ## outputFormat
+    expect_error(countsimQCReport(ddsList = x, outputFormat = "html",
+                                  outputFile = "report_from_test.html",
+                                  outputDir = "./", savePlots = TRUE))
+    expect_error(countsimQCReport(ddsList = x, outputFormat = "html_document",
+                                  outputFile = "report_from_test.pdf",
+                                  outputDir = "./", savePlots = TRUE))
+    ## ddsList
+    expect_error(countsimQCReport(ddsList = x[[1]], outputFormat = "html_document",
+                                  outputFile = "report_from_test.html",
+                                  outputDir = "./", savePlots = TRUE))
+    expect_error(countsimQCReport(ddsList = list(A = 1:3),
+                                  outputFormat = "html_document",
+                                  outputFile = "report_from_test.html",
+                                  outputDir = "./", savePlots = TRUE))
     y <- x
     names(y) <- NULL
-    expect_error(countsimQC_report(dds_list = y, output_format = "html_document",
-                                   output_file = "report_from_test.html",
-                                   output_dir = "./", save_ggplots = TRUE))
+    expect_error(countsimQCReport(ddsList = y, outputFormat = "html_document",
+                                  outputFile = "report_from_test.html",
+                                  outputDir = "./", savePlots = TRUE))
     y <- x
     names(y) <- c("A", "A", "B")
-    expect_error(countsimQC_report(dds_list = y, output_format = "html_document",
-                                   output_file = "report_from_test.html",
-                                   output_dir = "./", save_ggplots = TRUE))
+    expect_error(countsimQCReport(ddsList = y, outputFormat = "html_document",
+                                  outputFile = "report_from_test.html",
+                                  outputDir = "./", savePlots = TRUE))
     ## rmd_template
-    expect_error(countsimQC_report(dds_list = x, output_format = "html_document",
-                                   output_file = "report_from_test.html",
-                                   output_dir = "./", save_ggplots = TRUE,
-                                   rmd_template = "nonexistent.Rmd"))
+    expect_error(countsimQCReport(ddsList = x, outputFormat = "html_document",
+                                  outputFile = "report_from_test.html",
+                                  outputDir = "./", savePlots = TRUE,
+                                  rmdTemplate = "nonexistent.Rmd"))
 
     ## existing rmd output
     file.create("test_generated.Rmd")
-    expect_error(countsimQC_report(dds_list = x, output_format = "html_document",
-                                   output_file = "test_generated.html",
-                                   output_dir = "./", save_ggplots = TRUE))
+    expect_error(countsimQCReport(ddsList = x, outputFormat = "html_document",
+                                  outputFile = "test_generated.html",
+                                  outputDir = "./", savePlots = TRUE))
     file.remove("test_generated.Rmd")
   })
 
-  countsimQC_report(dds_list = x, output_file = "report_from_test.html",
-                    output_dir = "./", save_ggplots = TRUE)
+  countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
+                   outputDir = "./", savePlots = TRUE)
 
-  test_that("Report is not generated if force_overwrite = FALSE", {
-    ## Report should not be generated if it already exists and force_overwrite = FALSE
-    expect_error(countsimQC_report(dds_list = x, output_file = "report_from_test.html",
-                                   output_dir = "./", save_ggplots = TRUE,
-                                   force_overwrite = FALSE))
+  test_that("Report is not generated if forceOverwrite = FALSE", {
+    ## Report should not be generated if it already exists and forceOverwrite = FALSE
+    expect_error(countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
+                                  outputDir = "./", savePlots = TRUE,
+                                  forceOverwrite = FALSE))
 
-    ## Report should be generated if it already exists and force_overwrite = TRUE
-    expect_is(countsimQC_report(dds_list = x, output_file = "report_from_test.html",
-                                output_dir = "./", save_ggplots = TRUE,
-                                force_overwrite = TRUE), "character")
+    ## Report should be generated if it already exists and forceOverwrite = TRUE
+    expect_is(countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
+                               outputDir = "./", savePlots = TRUE,
+                               forceOverwrite = TRUE), "character")
 
-    ## Report should not be generated if the ggplots object exists and force_overwrite = FALSE
+    ## Report should not be generated if the ggplots object exists and forceOverwrite = FALSE
     file.remove("./report_from_test.html")
-    expect_error(countsimQC_report(dds_list = x, output_file = "report_from_test.html",
-                                   output_dir = "./", save_ggplots = TRUE,
-                                   force_overwrite = FALSE))
+    expect_error(countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
+                                  outputDir = "./", savePlots = TRUE,
+                                  forceOverwrite = FALSE))
 
-    ## Report should be generated even if the ggplots object exists, if save_ggplots = FALSE
-    expect_is(countsimQC_report(dds_list = x, output_file = "report_from_test.html",
-                                output_dir = "./", save_ggplots = FALSE,
-                                force_overwrite = FALSE), "character")
+    ## Report should be generated even if the ggplots object exists, if savePlots = FALSE
+    expect_is(countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
+                               outputDir = "./", savePlots = FALSE,
+                               forceOverwrite = FALSE), "character")
 
     ## pdf report should be generated even if the html report exists
-    expect_is(countsimQC_report(dds_list = x, output_format = "pdf_document",
-                                output_file = "report_from_test.pdf",
-                                output_dir = "./", save_ggplots = FALSE,
-                                force_overwrite = FALSE), "character")
+    expect_is(countsimQCReport(ddsList = x, outputFormat = "pdf_document",
+                               outputFile = "report_from_test.pdf",
+                               outputDir = "./", savePlots = FALSE,
+                               forceOverwrite = FALSE), "character")
   })
 })

@@ -1,0 +1,21 @@
+countsimQC v0.4.0 (2017-06-05)
+=================
+
+Changes:
+
+* Major overhaul of function and argument names for increased consistency.
+
+countsimQC v0.3.2 (2017-06-04)
+=================
+
+Changes:
+
+* Added mean-variance plots
+
+countsimQC v0.3.0 (2017-05-24)
+=================
+
+Changes:
+
+* Added K-S statistics 
+* Added line density plots
