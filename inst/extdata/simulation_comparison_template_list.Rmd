@@ -319,6 +319,27 @@ plots[["libsizeDensityFilled"]] <-
 plots[["libsizeDensityFilled"]]
 ```
 
+### Box plots
+
+```{r libsizeBox}
+plots[["libsizeBox"]] <- 
+  ggplot(sampleDF, aes(x = dataset, y = Libsize, color = dataset)) + 
+  geom_boxplot(outlier.size = -1, alpha = 0.5) + 
+  geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
+  ylab("Library size") + xlab("") + thm
+plots[["libsizeBox"]]
+```
+
+### Violin plots
+
+```{r libsizeViolin}
+plots[["libsizeViolin"]] <- 
+  ggplot(sampleDF, aes(x = dataset, y = Libsize, fill = dataset)) + 
+  geom_violin(alpha = 0.5) + 
+  ylab("Library size") + xlab("") + thm
+plots[["libsizeViolin"]]
+```
+
 ### Empirical cumulative distribution function 
 
 ```{r libsizeEcdf}
@@ -378,6 +399,27 @@ plots[["tmmDensityFilled"]] <-
 plots[["tmmDensityFilled"]]
 ```
 
+### Box plots
+
+```{r tmmBox}
+plots[["tmmBox"]] <- 
+  ggplot(sampleDF, aes(x = dataset, y = TMM, color = dataset)) + 
+  geom_boxplot(outlier.size = -1, alpha = 0.5) + 
+  geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
+  ylab("TMM normalization factor") + xlab("") + thm
+plots[["tmmBox"]]
+```
+
+### Violin plots
+
+```{r tmmViolin}
+plots[["tmmViolin"]] <- 
+  ggplot(sampleDF, aes(x = dataset, y = TMM, fill = dataset)) + 
+  geom_violin(alpha = 0.5) + 
+  ylab("TMM normalization factor") + xlab("") + thm
+plots[["tmmViolin"]]
+```
+
 ### Empirical cumulative distribution function 
 
 ```{r tmmEcdf}
@@ -432,6 +474,27 @@ plots[["logCPMDensityFilled"]] <-
   geom_density(alpha = 0.5) +
   xlab("Average log CPM") + thm
 plots[["logCPMDensityFilled"]]
+```
+
+### Box plots
+
+```{r logCPMBox}
+plots[["logCPMBox"]] <- 
+  ggplot(featureDF, aes(x = dataset, y = AveLogCPM, color = dataset)) + 
+  geom_boxplot(outlier.size = -1, alpha = 0.5) + 
+  geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
+  ylab("Average log CPM") + xlab("") + thm
+plots[["logCPMBox"]]
+```
+
+### Violin plots
+
+```{r logCPMViolin}
+plots[["logCPMViolin"]] <- 
+  ggplot(featureDF, aes(x = dataset, y = AveLogCPM, fill = dataset)) + 
+  geom_violin(alpha = 0.5) + 
+  ylab("Average log CPM") + xlab("") + thm
+plots[["logCPMViolin"]]
 ```
 
 ### Empirical cumulative distribution function 
@@ -490,6 +553,27 @@ plots[["fraczeroSampleDensityFilled"]] <-
 plots[["fraczeroSampleDensityFilled"]]
 ```
 
+### Box plots
+
+```{r fraczeroSampleBox}
+plots[["fraczeroSampleBox"]] <- 
+  ggplot(sampleDF, aes(x = dataset, y = Fraczero, color = dataset)) + 
+  geom_boxplot(outlier.size = -1, alpha = 0.5) + 
+  geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
+  ylab("Fraction zeros per sample") + xlab("") + thm
+plots[["fraczeroSampleBox"]]
+```
+
+### Violin plots
+
+```{r fraczeroSampleViolin}
+plots[["fraczeroSampleViolin"]] <- 
+  ggplot(sampleDF, aes(x = dataset, y = Fraczero, fill = dataset)) + 
+  geom_violin(alpha = 0.5) + 
+  ylab("Fraction zeros per sample") + xlab("") + thm
+plots[["fraczeroSampleViolin"]]
+```
+
 ### Empirical cumulative distribution function 
 
 ```{r fraczeroSampleEcdf}
@@ -544,6 +628,27 @@ plots[["fraczeroFeatureDensityFilled"]] <-
   geom_density(alpha = 0.5) +
   xlab("Fraction zeros per feature") + thm
 plots[["fraczeroFeatureDensityFilled"]]
+```
+
+### Box plots
+
+```{r fraczeroFeatureBox}
+plots[["fraczeroFeatureBox"]] <- 
+  ggplot(featureDF, aes(x = dataset, y = Fraczero, color = dataset)) + 
+  geom_boxplot(outlier.size = -1, alpha = 0.5) + 
+  geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
+  ylab("Fraction zeros per feature") + xlab("") + thm
+plots[["fraczeroFeatureBox"]]
+```
+
+### Violin plots
+
+```{r fraczeroFeatureViolin}
+plots[["fraczeroFeatureViolin"]] <- 
+  ggplot(featureDF, aes(x = dataset, y = Fraczero, fill = dataset)) + 
+  geom_violin(alpha = 0.5) + 
+  ylab("Fraction zeros per feature") + xlab("") + thm
+plots[["fraczeroFeatureViolin"]]
 ```
 
 ### Empirical cumulative distribution function 
