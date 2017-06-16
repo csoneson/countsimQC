@@ -108,6 +108,12 @@ makeDF <- function(df, column) {
     ))
   } 
 }
+
+## Help function to determine the number of objects to calculate the pairwise
+## correlations for
+getNForCorr <- function(x, Nmax) {
+  (min(x, Nmax) * (min(x, Nmax) - 1)) / 2
+}
 ```
 
 
@@ -124,6 +130,39 @@ obj <- lapply(ddsList, function(ds) {
   dds <- DESeq2::estimateDispersions(dds, quiet = TRUE)
   list(dge = dge, dds = dds)
 })
+```
+
+```{r, message = FALSE}
+## Calculate between-sample correlations
+message("Calculating sample correlations.")
+sampleCorrDF <- do.call(rbind, lapply(obj, function(x) {
+  cpms <- edgeR::cpm(x$dge, prior.count = 2, log = TRUE)
+  if (ncol(cpms) > 500) {
+    set.seed(123)
+    cpms <- cpms[, sample(seq_len(ncol(cpms)), 500, replace = FALSE)]
+  }
+  corrs <- cor(cpms, use = "pairwise.complete.obs", method = "spearman")
+  data.frame(
+    Correlation = corrs[upper.tri(corrs)]
+  )
+})) %>% dplyr::mutate(dataset = rep(names(obj), sapply(obj, function(x) getNForCorr(ncol(x$dge), 500))))
+```
+
+```{r, message = FALSE}
+## Calculate between-variable correlations
+message("Calculating variable correlations.")
+featureCorrDF <- do.call(rbind, lapply(obj, function(x) {
+  cpms <- edgeR::cpm(x$dge, prior.count = 2, log = TRUE)
+  cpms <- cpms[rowVars(cpms) > 0, ]
+  if (nrow(cpms) > 500) {
+    set.seed(123)
+    cpms <- cpms[sample(seq_len(nrow(cpms)), 500, replace = FALSE), ]
+  }
+  corrs <- cor(t(cpms), use = "pairwise.complete.obs", method = "spearman")
+  data.frame(
+    Correlation = corrs[upper.tri(corrs)]
+  )
+})) %>% dplyr::mutate(dataset = rep(names(obj), sapply(obj, function(x) getNForCorr(nrow(x$dge), 500))))
 ```
 
 ```{r}
@@ -661,6 +700,167 @@ plots[["fraczeroFeatureEcdf"]] <-
 plots[["fraczeroFeatureEcdf"]]
 
 makeDF(featureDF, "Fraczero")
+```
+
+## Sample-sample correlations {.tabset .tabset-pills}
+
+The distribution of Spearman correlation coefficients for all pairs of samples, 
+calculated on the log-CPM values obtained via the `cpm` function from `edgeR`, 
+with a prior.count of 2. If there are more than 500 samples in a data set, the
+pairwise correlations between 500 randomly selected samples are shown.
+
+### Separate histograms
+
+```{r sampleCorrSepHist, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["sampleCorrSepHist"]] <- 
+  ggplot(sampleCorrDF, aes(x = Correlation)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = colRow[2]) +
+  xlab("Sample-sample correlation") + thm
+plots[["sampleCorrSepHist"]]
+```
+
+### Overlaid histograms
+
+```{r sampleCorrOverlaidHist}
+plots[["sampleCorrOverlaidHist"]] <- 
+  ggplot(sampleCorrDF, aes(x = Correlation, group = dataset, fill = dataset)) + 
+  geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+  xlab("Sample-sample correlation") + thm
+plots[["sampleCorrOverlaidHist"]]
+```
+
+### Density plots
+
+```{r sampleCorrDensity}
+plots[["sampleCorrDensity"]] <- 
+  ggplot(sampleCorrDF, aes(x = Correlation, group = dataset, color = dataset)) + 
+  geom_line(alpha = 0.5, size = 1.5, stat = "density") +
+  xlab("Sample-sample correlation") + thm
+plots[["sampleCorrDensity"]]
+```
+
+### Density plots (filled)
+
+```{r sampleCorrDensityFilled}
+plots[["sampleCorrDensityFilled"]] <- 
+  ggplot(sampleCorrDF, aes(x = Correlation, group = dataset, fill = dataset)) + 
+  geom_density(alpha = 0.5) +
+  xlab("Sample-sample correlation") + thm
+plots[["sampleCorrDensityFilled"]]
+```
+
+### Box plots
+
+```{r sampleCorrBox}
+plots[["sampleCorrBox"]] <- 
+  ggplot(sampleCorrDF, aes(x = dataset, y = Correlation, color = dataset)) + 
+  geom_boxplot(outlier.size = -1, alpha = 0.5) + 
+  geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
+  ylab("Sample-sample correlation") + xlab("") + thm
+plots[["sampleCorrBox"]]
+```
+
+### Violin plots
+
+```{r sampleCorrViolin}
+plots[["sampleCorrViolin"]] <- 
+  ggplot(sampleCorrDF, aes(x = dataset, y = Correlation, fill = dataset)) + 
+  geom_violin(alpha = 0.5) + 
+  ylab("Sample-sample correlation") + xlab("") + thm
+plots[["sampleCorrViolin"]]
+```
+
+### Empirical cumulative distribution function 
+
+```{r sampleCorrEcdf}
+plots[["sampleCorrEcdf"]] <- 
+  ggplot(sampleCorrDF, aes(x = Correlation, group = dataset, color = dataset)) + 
+  stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
+  xlab("Sample-sample correlation") + thm
+plots[["sampleCorrEcdf"]]
+
+makeDF(sampleCorrDF, "Correlation")
+```
+
+## Variable-variable correlations {.tabset .tabset-pills}
+
+The distribution of Spearman correlation coefficients for all pairs of samples,
+calculated on the log-CPM values obtained via the `cpm` function from `edgeR`,
+with a prior.count of 2. Only non-constant variables are considered, and if
+there are more than 500 such variables in a data set, the pairwise correlations
+between 500 randomly selected variables are shown.
+
+### Separate histograms
+
+```{r featureCorrSepHist, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["featureCorrSepHist"]] <- 
+  ggplot(featureCorrDF, aes(x = Correlation)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = colRow[2]) +
+  xlab("Variable-variable correlation") + thm
+plots[["featureCorrSepHist"]]
+```
+
+### Overlaid histograms
+
+```{r featureCorrOverlaidHist}
+plots[["featureCorrOverlaidHist"]] <- 
+  ggplot(featureCorrDF, aes(x = Correlation, group = dataset, fill = dataset)) + 
+  geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+  xlab("Variable-variable correlation") + thm
+plots[["featureCorrOverlaidHist"]]
+```
+
+### Density plots
+
+```{r featureCorrDensity}
+plots[["featureCorrDensity"]] <- 
+  ggplot(featureCorrDF, aes(x = Correlation, group = dataset, color = dataset)) + 
+  geom_line(alpha = 0.5, size = 1.5, stat = "density") +
+  xlab("Variable-variable correlation") + thm
+plots[["featureCorrDensity"]]
+```
+
+### Density plots (filled)
+
+```{r featureCorrDensityFilled}
+plots[["featureCorrDensityFilled"]] <- 
+  ggplot(featureCorrDF, aes(x = Correlation, group = dataset, fill = dataset)) + 
+  geom_density(alpha = 0.5) +
+  xlab("Variable-variable correlation") + thm
+plots[["featureCorrDensityFilled"]]
+```
+
+### Box plots
+
+```{r featureCorrBox}
+plots[["featureCorrBox"]] <- 
+  ggplot(featureCorrDF, aes(x = dataset, y = Correlation, color = dataset)) + 
+  geom_boxplot(outlier.size = -1, alpha = 0.5) + 
+  geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
+  ylab("Variable-variable correlation") + xlab("") + thm
+plots[["featureCorrBox"]]
+```
+
+### Violin plots
+
+```{r featureCorrViolin}
+plots[["featureCorrViolin"]] <- 
+  ggplot(featureCorrDF, aes(x = dataset, y = Correlation, fill = dataset)) + 
+  geom_violin(alpha = 0.5) + 
+  ylab("Variable-variable correlation") + xlab("") + thm
+plots[["featureCorrViolin"]]
+```
+
+### Empirical cumulative distribution function 
+
+```{r featureCorrEcdf}
+plots[["featureCorrEcdf"]] <- 
+  ggplot(featureCorrDF, aes(x = Correlation, group = dataset, color = dataset)) + 
+  stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
+  xlab("Variable-variable correlation") + thm
+plots[["featureCorrEcdf"]]
+
+makeDF(featureCorrDF, "Correlation")
 ```
 
 ## Library size vs fraction zeros {.tabset .tabset-pills}
