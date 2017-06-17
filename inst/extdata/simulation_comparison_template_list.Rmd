@@ -108,17 +108,10 @@ makeDF <- function(df, column) {
     ))
   } 
 }
-
-## Help function to determine the number of objects to calculate the pairwise
-## correlations for
-getNForCorr <- function(x, Nmax) {
-  (min(x, Nmax) * (min(x, Nmax) - 1)) / 2
-}
 ```
 
-
 ```{r, message = FALSE}
-message("Calculating dispersions. This can take some time...")
+message("Calculating dispersions. This can take some time, please be patient.")
 obj <- lapply(ddsList, function(ds) {
   ## --- edgeR
   dge <- edgeR::DGEList(counts = counts(ds))
@@ -135,7 +128,7 @@ obj <- lapply(ddsList, function(ds) {
 ```{r, message = FALSE}
 ## Calculate between-sample correlations
 message("Calculating sample correlations.")
-sampleCorrDF <- do.call(rbind, lapply(obj, function(x) {
+sampleCorrDF <- lapply(obj, function(x) {
   cpms <- edgeR::cpm(x$dge, prior.count = 2, log = TRUE)
   if (ncol(cpms) > subsampleSize) {
     set.seed(123)
@@ -145,13 +138,16 @@ sampleCorrDF <- do.call(rbind, lapply(obj, function(x) {
   data.frame(
     Correlation = corrs[upper.tri(corrs)]
   )
-})) %>% dplyr::mutate(dataset = rep(names(obj), sapply(obj, function(x) getNForCorr(ncol(x$dge), subsampleSize))))
+})
+ns <- sapply(sampleCorrDF, nrow)
+sampleCorrDF <- do.call(rbind, sampleCorrDF) %>% 
+  dplyr::mutate(dataset = rep(names(sampleCorrDF), ns))
 ```
 
 ```{r, message = FALSE}
 ## Calculate between-variable correlations
 message("Calculating variable correlations.")
-featureCorrDF <- do.call(rbind, lapply(obj, function(x) {
+featureCorrDF <- lapply(obj, function(x) {
   cpms <- edgeR::cpm(x$dge, prior.count = 2, log = TRUE)
   cpms <- cpms[genefilter::rowVars(cpms) > 0, ]
   if (nrow(cpms) > subsampleSize) {
@@ -162,23 +158,29 @@ featureCorrDF <- do.call(rbind, lapply(obj, function(x) {
   data.frame(
     Correlation = corrs[upper.tri(corrs)]
   )
-})) %>% dplyr::mutate(dataset = rep(names(obj), sapply(obj, function(x) getNForCorr(nrow(x$dge), subsampleSize))))
+})
+ns <- sapply(featureCorrDF, nrow)
+featureCorrDF <- do.call(rbind, featureCorrDF) %>% 
+  dplyr::mutate(dataset = rep(names(featureCorrDF), ns))
 ```
 
 ```{r}
 ## Summarize sample characteristics
-sampleDF <- do.call(rbind, lapply(obj, function(x) {
+sampleDF <- lapply(obj, function(x) {
   data.frame(
     Libsize = colSums(x$dge$counts),
     Fraczero = colMeans(x$dge$counts == 0),
     TMM = x$dge$samples$norm.factors
   )
-})) %>% dplyr::mutate(dataset = rep(names(obj), sapply(obj, function(x) ncol(x$dge))))
+})
+ns <- sapply(sampleDF, nrow)
+sampleDF <- do.call(rbind, sampleDF) %>% 
+  dplyr::mutate(dataset = rep(names(sampleDF), ns))
 ```
 
 ```{r}
 ## Summarize variable characteristics
-featureDF <- do.call(rbind, lapply(obj, function(x) {
+featureDF <- lapply(obj, function(x) {
   data.frame(
     Tagwise = sqrt(x$dge$tagwise.dispersion),
     Common = sqrt(x$dge$common.dispersion),
@@ -192,7 +194,10 @@ featureDF <- do.call(rbind, lapply(obj, function(x) {
     dispFinal = rowData(x$dds)$dispersion,
     baseMean = rowData(x$dds)$baseMean
   )
-})) %>% dplyr::mutate(dataset = rep(names(obj), sapply(obj, function(x) nrow(x$dge))))
+})
+ns <- sapply(featureDF, nrow)
+featureDF <- do.call(rbind, featureDF) %>% 
+  dplyr::mutate(dataset = rep(names(featureDF), ns))
 ```
 
 ```{r}
@@ -203,7 +208,8 @@ datasetDF <- do.call(rbind, lapply(obj, function(x) {
     nVars = nrow(x$dge$counts),
     nSamples = ncol(x$dge$counts)
   )
-})) %>% dplyr::mutate(AveLogCPM = 0.8 * max(featureDF$AveLogCPM)) %>%
+})) %>% 
+  dplyr::mutate(AveLogCPM = 0.8 * max(featureDF$AveLogCPM)) %>%
   dplyr::mutate(Tagwise = 0.9 * max(featureDF$Tagwise)) %>%
   dplyr::mutate(dataset = names(obj))
 ```
@@ -283,11 +289,11 @@ plots[["dispersionDESeq2"]]
 
 ## Mean-variance plots {.tabset .tabset-pills}
 
-The difference between these mean-variance plots and the mean-dispersion plots 
-above is that the plots in this section do not take the information about the 
-experimental design and sample grouping into account, but display the mean and 
-variance of log2(CPM) estimates across all samples, calculated using the `cpm`
-function from
+The relation between the empirical mean and variance. The difference between 
+these mean-variance plots and the mean-dispersion plots above is that the plots 
+in this section do not take the information about the experimental design and 
+sample grouping into account, but simply display the mean and variance of
+log2(CPM) estimates across all samples, calculated using the `cpm` function from
 [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html) 
 [@Robinson2010edgeR], with a prior count of 2.
 
