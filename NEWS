@@ -1,3 +1,11 @@
+countsimQC v0.4.1 (2017-06-17)
+=================
+
+Changes:
+
+* Added pairwise sample and variable correlation distributions.
+* Added box plots and violin plots.
+
 countsimQC v0.4.0 (2017-06-05)
 =================
 
@@ -10,12 +18,12 @@ countsimQC v0.3.2 (2017-06-04)
 
 Changes:
 
-* Added mean-variance plots
+* Added mean-variance plots.
 
 countsimQC v0.3.0 (2017-05-24)
 =================
 
 Changes:
 
-* Added K-S statistics 
-* Added line density plots
+* Added K-S statistics.
+* Added line density plots.

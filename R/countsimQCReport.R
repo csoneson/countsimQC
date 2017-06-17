@@ -31,6 +31,9 @@
 #'   the generated report. This will be included in the beginning of the report.
 #'   If set to NULL, a default description listing the number and names of the
 #'   included data sets will be used.
+#' @param subsampleSize The maximal number of samples (variables) for which
+#'   pairwise correlation coefficients will be calculated. If the number of
+#'   samples (variables) exceeds this number, they will be randomly subsampled.
 #' @param ... Other arguments that will be passed to \code{rmarkdown::render}.
 #'
 #' @author Charlotte Soneson
@@ -46,7 +49,7 @@
 #' @export
 #' @importFrom rmarkdown render
 #' @importFrom tools file_ext file_path_sans_ext
-#' @import SummarizedExperiment DESeq2 edgeR dplyr tidyr ggplot2
+#' @import SummarizedExperiment DESeq2 edgeR dplyr tidyr ggplot2 genefilter
 #' @return No value is returned, but a report is generated in the
 #'   \code{outputDir} directory.
 #'
@@ -60,7 +63,8 @@
 countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
                              outputFormat = NULL, showCode = FALSE,
                              rmdTemplate = NULL, forceOverwrite = FALSE,
-                             savePlots = FALSE, description = NULL, ...){
+                             savePlots = FALSE, description = NULL,
+                             subsampleSize = 500, ...){
   ## This function was inspired by code from Nicholas Hamilton, provided at
   ## http://stackoverflow.com/questions/37097535/generate-report-in-r
 
