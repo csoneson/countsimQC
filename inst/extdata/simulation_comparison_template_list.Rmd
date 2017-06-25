@@ -112,15 +112,49 @@ makeDF <- function(df, column) {
 
 ```{r, message = FALSE}
 message("Calculating dispersions. This can take some time, please be patient.")
+if (is.finite(maxNForDisp)) {
+  msg <- paste0("If there are more than ", maxNForDisp, 
+                " samples in a data set, the dispersions are calculated using ",
+                maxNForDisp, " randomly selected samples.")
+} else {
+  msg <- ""
+}
 obj <- lapply(ddsList, function(ds) {
   ## --- edgeR
   dge <- edgeR::DGEList(counts = counts(ds))
   des <- model.matrix(design(ds), data = SummarizedExperiment::colData(ds))
   dge <- edgeR::calcNormFactors(dge)
-  dge <- edgeR::estimateDisp(dge, design = des)
+  if (ncol(dge) > maxNForDisp) {
+    set.seed(123)
+    keepSamples <- sample(seq_len(ncol(dge)), maxNForDisp, replace = FALSE)
+    dgetmp <- dge[, keepSamples]
+    destmp <- des[keepSamples, ]
+    destmp <- destmp[, colSums(destmp) > 0]
+    dgetmp <- edgeR::estimateDisp(dgetmp, design = destmp)
+    stopifnot(all(rownames(dge) == rownames(dgetmp)))
+    dge$tagwise.dispersion <- dgetmp$tagwise.dispersion
+    dge$common.dispersion <- dgetmp$common.dispersion
+    dge$trended.dispersion <- dgetmp$trended.dispersion
+    dge$prior.df <- dgetmp$prior.df
+    dge$AveLogCPM <- edgeR::aveLogCPM(dge)
+  } else {
+    dge <- edgeR::estimateDisp(dge, design = des)
+  }
   ## --- DESeq2
   dds <- DESeq2::estimateSizeFactors(ds, type = "poscounts")
-  dds <- DESeq2::estimateDispersions(dds, quiet = TRUE)
+  if (ncol(dds) > maxNForDisp) {
+    set.seed(123)
+    keepSamples <- sample(seq_len(ncol(dds)), maxNForDisp, replace = FALSE)
+    ddstmp <- dds[, keepSamples]
+    ddstmp <- DESeq2::estimateDispersions(ddstmp, quiet = TRUE)
+    stopifnot(all(rownames(dds) == rownames(ddstmp)))
+    rowData(dds)$dispGeneEst <- rowData(ddstmp)$dispGeneEst
+    rowData(dds)$dispFit <- rowData(ddstmp)$dispFit
+    rowData(dds)$dispersion <- rowData(ddstmp)$dispersion
+    rowData(dds)$baseMean <- rowMeans(counts(dds, normalized = TRUE))
+  } else {
+    dds <- DESeq2::estimateDispersions(dds, quiet = TRUE)
+  }
   list(dge = dge, dds = dds)
 })
 ```
@@ -248,7 +282,7 @@ coefficient of variation" (sqrt(dispersion)), as calculated by
 [@Robinson2010edgeR] and
 [DESeq2](http://bioconductor.org/packages/release/bioc/html/DESeq2.html) 
 [@Love2014DESeq2]. In the edgeR plot, the estimate of the prior degrees of
-freedom is indicated.
+freedom is indicated. `r I(msg)`
 
 ### edgeR
 

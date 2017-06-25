@@ -34,6 +34,10 @@
 #' @param subsampleSize The maximal number of samples (variables) for which
 #'   pairwise correlation coefficients will be calculated. If the number of
 #'   samples (variables) exceeds this number, they will be randomly subsampled.
+#' @param maxNForDisp The maximal number of samples that will be used to
+#'   estimate dispersions. By default, all samples are used. This can be lowered
+#'   to speed up calculations (and obtain approximate results) for large data
+#'   sets.
 #' @param ... Other arguments that will be passed to \code{rmarkdown::render}.
 #'
 #' @author Charlotte Soneson
@@ -64,7 +68,7 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
                              outputFormat = NULL, showCode = FALSE,
                              rmdTemplate = NULL, forceOverwrite = FALSE,
                              savePlots = FALSE, description = NULL,
-                             subsampleSize = 500, ...){
+                             subsampleSize = 500, maxNForDisp = Inf, ...){
   ## This function was inspired by code from Nicholas Hamilton, provided at
   ## http://stackoverflow.com/questions/37097535/generate-report-in-r
 

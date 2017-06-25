@@ -6,7 +6,8 @@
 \usage{
 countsimQCReport(ddsList, outputFile, outputDir = "./", outputFormat = NULL,
   showCode = FALSE, rmdTemplate = NULL, forceOverwrite = FALSE,
-  savePlots = FALSE, description = NULL, subsampleSize = 500, ...)
+  savePlots = FALSE, description = NULL, subsampleSize = 500,
+  maxNForDisp = Inf, ...)
 }
 \arguments{
 \item{ddsList}{Named list of \code{DESeqDataSets} to compare. See the
@@ -49,6 +50,11 @@ included data sets will be used.}
 \item{subsampleSize}{The maximal number of samples (variables) for which
 pairwise correlation coefficients will be calculated. If the number of
 samples (variables) exceeds this number, they will be randomly subsampled.}
+
+\item{maxNForDisp}{The maximal number of samples that will be used to
+estimate dispersions. By default, all samples are used. This can be lowered
+to speed up calculations (and obtain approximate results) for large data
+sets.}
 
 \item{...}{Other arguments that will be passed to \code{rmarkdown::render}.}
 }
