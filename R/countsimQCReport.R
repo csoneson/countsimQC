@@ -105,12 +105,13 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
          "with a unique name for each element.", call. = FALSE)
 
   ## ------------------------- output files --------------------------------- ##
-  outputReport <- paste0(outputDir, "/", basename(outputFile))
-  outputPlots <- paste0(outputDir, "/",
-                           tools::file_path_sans_ext(basename(outputFile)),
-                        "_ggplots.rds")
-  outputRmd <- paste0(outputDir, "/",
-                       tools::file_path_sans_ext(basename(outputFile)), ".Rmd")
+  outputReport <- file.path(outputDir, basename(outputFile))
+  outputPlots <- file.path(outputDir,
+                           paste0(tools::file_path_sans_ext(basename(outputFile)),
+                                  "_ggplots.rds"))
+  outputRmd <- file.path(outputDir,
+                         paste0(tools::file_path_sans_ext(basename(outputFile)),
+                                ".Rmd"))
 
   ## Report
   if (file.exists(outputReport)) {
