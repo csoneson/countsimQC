@@ -205,7 +205,7 @@ sampleDF <- lapply(obj, function(x) {
     Libsize = colSums(x$dge$counts),
     Fraczero = colMeans(x$dge$counts == 0),
     TMM = x$dge$samples$norm.factors
-  )
+  ) %>% dplyr::mutate(EffLibsize = Libsize * TMM)
 })
 ns <- sapply(sampleDF, nrow)
 sampleDF <- do.call(rbind, sampleDF) %>% 
@@ -509,6 +509,84 @@ plots[["tmmEcdf"]] <-
 plots[["tmmEcdf"]]
 
 makeDF(sampleDF, "TMM")
+```
+
+## Effective library sizes {.tabset .tabset-pills}
+
+The distribution of the total count per sample multiplied by the TMM
+normalization factor.
+
+### Separate histograms
+
+```{r effLibsizeSepHist, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
+plots[["effLibsizeSepHist"]] <- 
+  ggplot(sampleDF, aes(x = EffLibsize)) + geom_histogram(bins = 30) + 
+  facet_wrap(~dataset, nrow = colRow[2]) +
+  xlab("Effective library size") + thm
+plots[["effLibsizeSepHist"]]
+```
+
+### Overlaid histograms
+
+```{r effLibsizeOverlaidHist}
+plots[["effLibsizeOverlaidHist"]] <- 
+  ggplot(sampleDF, aes(x = EffLibsize, group = dataset, fill = dataset)) + 
+  geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
+  xlab("Effective library size") + thm
+plots[["effLibsizeOverlaidHist"]]
+```
+
+### Density plots
+
+```{r effLibsizeDensity}
+plots[["effLibsizeDensity"]] <- 
+  ggplot(sampleDF, aes(x = EffLibsize, group = dataset, color = dataset)) + 
+  geom_line(alpha = 0.5, size = 1.5, stat = "density") +
+  xlab("Effective library size") + thm
+plots[["effLibsizeDensity"]]
+```
+
+### Density plots (filled)
+
+```{r effLibsizeDensityFilled}
+plots[["effLibsizeDensityFilled"]] <- 
+  ggplot(sampleDF, aes(x = EffLibsize, group = dataset, fill = dataset)) + 
+  geom_density(alpha = 0.5) +
+  xlab("Effective library size") + thm
+plots[["effLibsizeDensityFilled"]]
+```
+
+### Box plots
+
+```{r effLibsizeBox}
+plots[["effLibsizeBox"]] <- 
+  ggplot(sampleDF, aes(x = dataset, y = EffLibsize, color = dataset)) + 
+  geom_boxplot(outlier.size = -1, alpha = 0.5) + 
+  geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
+  ylab("Effective library size") + xlab("") + thm
+plots[["effLibsizeBox"]]
+```
+
+### Violin plots
+
+```{r effLibsizeViolin}
+plots[["effLibsizeViolin"]] <- 
+  ggplot(sampleDF, aes(x = dataset, y = EffLibsize, fill = dataset)) + 
+  geom_violin(alpha = 0.5) + 
+  ylab("Effective library size") + xlab("") + thm
+plots[["effLibsizeViolin"]]
+```
+
+### Empirical cumulative distribution function 
+
+```{r effLibsizeEcdf}
+plots[["effLibsizeEcdf"]] <- 
+  ggplot(sampleDF, aes(x = EffLibsize, group = dataset, color = dataset)) + 
+  stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
+  xlab("Effective library size") + thm
+plots[["effLibsizeEcdf"]]
+
+makeDF(sampleDF, "EffLibsize")
 ```
 
 ## Expression distributions (average log CPM) {.tabset .tabset-pills}

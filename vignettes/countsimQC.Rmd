@@ -51,9 +51,9 @@ countsimQCReport(ddsList = countsimExample, showCode = FALSE,
                  description = "This is my test report.")
 ```
 
-This function can generate either an HTML file (by setting `output_format = 
-"html_document"` or `output_format=NULL`) or a pdf file (by setting 
-`output_format = "pdf_document"`). The `description` argument can be used to
+This function can generate either an HTML file (by setting `outputFormat = 
+"html_document"` or `outputFormat=NULL`) or a pdf file (by setting 
+`outputFormat = "pdf_document"`). The `description` argument can be used to
 provide a more extensive description of the data set(s) that are included in the
 report.
 

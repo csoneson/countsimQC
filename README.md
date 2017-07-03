@@ -24,12 +24,12 @@ function `countsimQCReport()`, with an input consisting of a named list of
 package for the description of this class). Each `DESeqDataSet` should
 correspond to one data set and contain a count matrix, a data frame with sample
 information and a design formula, which is needed for dispersion calculations.
-The package contains an example data set, containing subsets of three data sets;
+The package contains an example data set with subsets of three data sets:
 two synthetic ones and the real data set that was used to generate them.
 
 ```
 data(countsimExample)
-countsimQCReport(countsimExample, output_file = "countsim_report.html", output_dir = "./")
+countsimQCReport(ddsList = countsimExample, outputFile = "countsimReport.html", outputDir = "./", description = "This is a comparison of three count data sets.")
 ```
 
 For more detailed information about how to use the package, see the vignette:
