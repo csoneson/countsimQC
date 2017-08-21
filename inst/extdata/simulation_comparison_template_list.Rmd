@@ -99,16 +99,37 @@ makeDF <- function(df, column) {
     ks_res <- as.data.frame(t(sapply(1:nrow(ks_df), function(i) {
       kst <- ks.test(df[, column][df$dataset == ks_df$dataset1[i]], 
                      df[, column][df$dataset == ks_df$dataset2[i]])
-      c(statistic = round(kst$statistic, 3), pvalue = round(kst$p.value, 3))
+      ## Calculate area between ecdfs
+      e1 <- ecdf(df[, column][df$dataset == ks_df$dataset1[i]])
+      e2 <- ecdf(df[, column][df$dataset == ks_df$dataset2[i]])
+      xv <- sort(unique(df[, column]))
+      ediff <- abs(e1(xv) - e2(xv))
+      earea <- caTools::trapz((xv - min(xv))/(max(xv) - min(xv)), ediff)
+      c(statistic = round(kst$statistic, 3), pvalue = round(kst$p.value, 3),
+        diffarea = round(earea, 3))
     })))
     ks_df$`K-S statistic` <- ks_res$statistic
     ks_df$`K-S p-value` <- ks_res$pvalue
+    ks_df$`Area between ECDFs` <- ks_res$diffarea
     DT::datatable(ks_df, options = list(
       columnDefs = list(list(className = "dt-center", targets = 3:ncol(ks_df)))
     ))
   } 
 }
 ```
+
+#### Design formulae
+
+The following model formulae were used to calculate dispersions for the
+different data sets.
+
+```{r, comment = NA}
+## Print design information
+for (ds in names(ddsList)) {
+  cat(ds, ": ", as.character(DESeq2::design(ddsList[[ds]])), "\n")
+}
+```
+
 
 ```{r, message = FALSE}
 message("Calculating dispersions. This can take some time, please be patient.")
@@ -293,7 +314,8 @@ estimates.
 ```{r BCVedgeR, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
 plots[["BCVedgeR"]] <- 
   ggplot(featureDF %>% dplyr::arrange(AveLogCPM), 
-         aes(x = AveLogCPM, y = Tagwise)) + geom_point(size = 0.25) + 
+         aes(x = AveLogCPM, y = Tagwise)) + 
+  geom_point(size = 0.25, alpha = 0.5) + 
   facet_wrap(~dataset, nrow = colRow[2]) + 
   geom_line(aes(y = Trend), color = "blue", size = 1.5) + 
   geom_line(aes(y = Common), color = "red", size = 1.5) +
@@ -312,7 +334,8 @@ estimates.
 ```{r dispersionDESeq2, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
 plots[["dispersionDESeq2"]] <- 
   ggplot(featureDF %>% dplyr::arrange(baseMean), 
-         aes(x = baseMean, y = dispGeneEst)) + geom_point(size = 0.25) + 
+         aes(x = baseMean, y = dispGeneEst)) + 
+  geom_point(size = 0.25, alpha = 0.5) + 
   facet_wrap(~dataset, nrow = colRow[2]) + scale_x_log10() + scale_y_log10() +  
   geom_point(aes(y = dispFinal), color = "lightblue", shape = 21) + 
   geom_line(aes(y = dispFit), color = "red", size = 1.5) + 
@@ -336,7 +359,8 @@ log2(CPM) estimates across all samples, calculated using the `cpm` function from
 ```{r meanVarSepScatter, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
 plots[["meanVarSepScatter"]] <- 
   ggplot(featureDF, aes(x = average_log2_cpm, y = variance_log2_cpm)) + 
-  geom_point(size = 0.75) + facet_wrap(~dataset, nrow = colRow[2]) + 
+  geom_point(size = 0.75, alpha = 0.5) + 
+  facet_wrap(~dataset, nrow = colRow[2]) + 
   xlab("Mean of log2(CPM)") + ylab("Variance of log2(CPM)") + 
   thm
 plots[["meanVarSepScatter"]]
@@ -991,7 +1015,8 @@ sample.
 
 ```{r libsizeFraczeroSepScatter, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
 plots[["libsizeFraczeroSepScatter"]] <- 
-  ggplot(sampleDF, aes(x = Libsize, y = Fraczero)) + geom_point(size = 1) + 
+  ggplot(sampleDF, aes(x = Libsize, y = Fraczero)) + 
+  geom_point(size = 1, alpha = 0.5) + 
   facet_wrap(~dataset, nrow = colRow[2]) + 
   xlab("Library size") + ylab("Fraction zeros") + thm
 plots[["libsizeFraczeroSepScatter"]]
@@ -1017,7 +1042,8 @@ per variable.
 
 ```{r logCPMFraczeroSepScatter, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
 plots[["logCPMFraczeroSepScatter"]] <- 
-  ggplot(featureDF, aes(x = AveLogCPM, y = Fraczero)) + geom_point(size = 0.75) + 
+  ggplot(featureDF, aes(x = AveLogCPM, y = Fraczero)) + 
+  geom_point(size = 0.75, alpha = 0.5) + 
   facet_wrap(~dataset, nrow = colRow[2]) + 
   xlab("Average log CPM") + ylab("Fraction zeros") + thm
 plots[["logCPMFraczeroSepScatter"]]

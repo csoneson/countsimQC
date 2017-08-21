@@ -3,6 +3,7 @@ context("Check report generation")
 
 local({
   x <- lapply(countsimExample, function(w) w[1:100, ])
+  x2 <- lapply(countsimExample_dfmat, function(w) w[1:100, ])
   if (file.exists("report_from_test.Rmd")) {
     file.remove("report_from_test.Rmd")
   }
@@ -42,6 +43,13 @@ local({
     expect_error(countsimQCReport(ddsList = y, outputFormat = "html_document",
                                   outputFile = "report_from_test.html",
                                   outputDir = "./", savePlots = TRUE))
+
+    ## matrix/data frame input
+    expect_is(countsimQCReport(ddsList = x2, outputFormat = "html_document",
+                               outputFile = "report_from_test.html",
+                               outputDir = "./", savePlots = TRUE,
+                               forceOverwrite = TRUE), "character")
+
     ## rmd_template
     expect_error(countsimQCReport(ddsList = x, outputFormat = "html_document",
                                   outputFile = "report_from_test.html",
@@ -57,7 +65,7 @@ local({
   })
 
   countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
-                   outputDir = "./", savePlots = TRUE)
+                   outputDir = "./", savePlots = TRUE, forceOverwrite = TRUE)
 
   test_that("Report is not generated if forceOverwrite = FALSE", {
     ## Report should not be generated if it already exists and forceOverwrite = FALSE
