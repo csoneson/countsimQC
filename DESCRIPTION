@@ -1,7 +1,7 @@
 Package: countsimQC
 Type: Package
 Title: Compare Characteristic Features of Count Data Sets
-Version: 0.4.5
+Version: 0.4.6
 Author: Charlotte Soneson
 Maintainer: Charlotte Soneson <charlottesoneson@gmail.com>
 Description: countsimQC provides functionality to create a comprehensive report 
@@ -25,7 +25,8 @@ Imports: rmarkdown,
     genefilter,
     DT,
     GenomeInfoDbData,
-    caTools
+    caTools,
+    randtests
 RoxygenNote: 6.0.1
 Suggests: knitr,
     testthat

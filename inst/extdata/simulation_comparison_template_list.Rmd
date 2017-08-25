@@ -5,6 +5,7 @@ date: ""
 output: 
   html_document:
     toc: true
+    code_folding: show
   pdf_document:
     toc: true
 always_allow_html: yes
@@ -57,19 +58,14 @@ references:
     year: 2010
 ---
 
-## Description
-
-`r I(description)`
-
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = showCode, warning = FALSE, message = FALSE)
 
-# suppressPackageStartupMessages(library(DESeq2))
-# suppressPackageStartupMessages(library(edgeR))
-# suppressPackageStartupMessages(library(dplyr))
-# suppressPackageStartupMessages(library(tidyr))
-# suppressPackageStartupMessages(library(ggplot2))
+## Check whether the emo package is available (not currently used)
+has_emo <- suppressPackageStartupMessages(suppressWarnings(require("emo") == TRUE))
+```
 
+```{r, message = FALSE}
 ## Determine number of rows and columns in facetted plots 
 ## (first element = columns, second element = rows)
 colRow <- grDevices::n2mfrow(length(ddsList))
@@ -84,54 +80,6 @@ thm <- theme_bw() +
         axis.title = element_text(size = 14),
         strip.text = element_text(size = 15))
 
-## Check whether the emo package is available (not currently used)
-has_emo <- suppressPackageStartupMessages(suppressWarnings(require("emo") == TRUE))
-```
-
-```{r}
-## Help function to make data table with K-S statistics and p-values
-makeDF <- function(df, column) {
-  if (length(unique(df$dataset)) > 1) {
-    ## Generate data frame with all pairs of data sets
-    ks_df <- as.data.frame(t(combn(unique(df$dataset), 2))) %>%
-      dplyr::rename(dataset1 = V1, dataset2 = V2)
-    ## Calculate K-S statistic and p-value for each pair of data sets
-    ks_res <- as.data.frame(t(sapply(1:nrow(ks_df), function(i) {
-      kst <- ks.test(df[, column][df$dataset == ks_df$dataset1[i]], 
-                     df[, column][df$dataset == ks_df$dataset2[i]])
-      ## Calculate area between ecdfs
-      e1 <- ecdf(df[, column][df$dataset == ks_df$dataset1[i]])
-      e2 <- ecdf(df[, column][df$dataset == ks_df$dataset2[i]])
-      xv <- sort(unique(df[, column]))
-      ediff <- abs(e1(xv) - e2(xv))
-      earea <- caTools::trapz((xv - min(xv))/(max(xv) - min(xv)), ediff)
-      c(statistic = round(kst$statistic, 3), pvalue = round(kst$p.value, 3),
-        diffarea = round(earea, 3))
-    })))
-    ks_df$`K-S statistic` <- ks_res$statistic
-    ks_df$`K-S p-value` <- ks_res$pvalue
-    ks_df$`Area between ECDFs` <- ks_res$diffarea
-    DT::datatable(ks_df, options = list(
-      columnDefs = list(list(className = "dt-center", targets = 3:ncol(ks_df)))
-    ))
-  } 
-}
-```
-
-#### Design formulae
-
-The following model formulae were used to calculate dispersions for the
-different data sets.
-
-```{r, comment = NA}
-## Print design information
-for (ds in names(ddsList)) {
-  cat(ds, ": ", as.character(DESeq2::design(ddsList[[ds]])), "\n")
-}
-```
-
-
-```{r, message = FALSE}
 message("Calculating dispersions. This can take some time, please be patient.")
 if (is.finite(maxNForDisp)) {
   msg <- paste0("If there are more than ", maxNForDisp, 
@@ -178,9 +126,7 @@ obj <- lapply(ddsList, function(ds) {
   }
   list(dge = dge, dds = dds)
 })
-```
 
-```{r, message = FALSE}
 ## Calculate between-sample correlations
 message("Calculating sample correlations.")
 sampleCorrDF <- lapply(obj, function(x) {
@@ -197,9 +143,7 @@ sampleCorrDF <- lapply(obj, function(x) {
 ns <- sapply(sampleCorrDF, nrow)
 sampleCorrDF <- do.call(rbind, sampleCorrDF) %>% 
   dplyr::mutate(dataset = rep(names(sampleCorrDF), ns))
-```
 
-```{r, message = FALSE}
 ## Calculate between-variable correlations
 message("Calculating variable correlations.")
 featureCorrDF <- lapply(obj, function(x) {
@@ -217,9 +161,7 @@ featureCorrDF <- lapply(obj, function(x) {
 ns <- sapply(featureCorrDF, nrow)
 featureCorrDF <- do.call(rbind, featureCorrDF) %>% 
   dplyr::mutate(dataset = rep(names(featureCorrDF), ns))
-```
 
-```{r}
 ## Summarize sample characteristics
 sampleDF <- lapply(obj, function(x) {
   data.frame(
@@ -231,9 +173,7 @@ sampleDF <- lapply(obj, function(x) {
 ns <- sapply(sampleDF, nrow)
 sampleDF <- do.call(rbind, sampleDF) %>% 
   dplyr::mutate(dataset = rep(names(sampleDF), ns))
-```
 
-```{r}
 ## Summarize variable characteristics
 featureDF <- lapply(obj, function(x) {
   data.frame(
@@ -253,9 +193,7 @@ featureDF <- lapply(obj, function(x) {
 ns <- sapply(featureDF, nrow)
 featureDF <- do.call(rbind, featureDF) %>% 
   dplyr::mutate(dataset = rep(names(featureDF), ns))
-```
 
-```{r}
 ## Summarize data set characteristics
 datasetDF <- do.call(rbind, lapply(obj, function(x) {
   data.frame(
@@ -267,6 +205,60 @@ datasetDF <- do.call(rbind, lapply(obj, function(x) {
   dplyr::mutate(AveLogCPM = 0.8 * max(featureDF$AveLogCPM)) %>%
   dplyr::mutate(Tagwise = 0.9 * max(featureDF$Tagwise)) %>%
   dplyr::mutate(dataset = names(obj))
+
+## Help function to make data table with K-S statistics and p-values
+makeDF <- function(df, column) {
+  if (length(unique(df$dataset)) > 1) {
+    ## Generate data frame with all pairs of data sets
+    ks_df <- data.frame(t(combn(unique(df$dataset), 2)), stringsAsFactors = FALSE) %>%
+      dplyr::rename(dataset1 = X1, dataset2 = X2)
+    ## Calculate K-S statistic and p-value for each pair of data sets
+    ks_res <- as.data.frame(t(sapply(1:nrow(ks_df), function(i) {
+      kst <- ks.test(df[, column][df$dataset == ks_df$dataset1[i]], 
+                     df[, column][df$dataset == ks_df$dataset2[i]])
+      ## Calculate area between ecdfs
+      e1 <- ecdf(df[, column][df$dataset == ks_df$dataset1[i]])
+      e2 <- ecdf(df[, column][df$dataset == ks_df$dataset2[i]])
+      xv <- sort(unique(df[, column]))
+      ediff <- abs(e1(xv) - e2(xv))
+      earea <- caTools::trapz((xv - min(xv))/(max(xv) - min(xv)), ediff)
+      ## Calculate runs test
+      dftmp <- df %>% dplyr::filter(dataset %in% c(ks_df$dataset1[i], ks_df$dataset2[i])) %>%
+        dplyr::arrange_(column)
+      runs_res <- randtests::runs.test(as.numeric(dftmp$dataset == ks_df$dataset1[i]), 
+                                       threshold = 0.5, alternative = "left.sided",
+                                       plot = FALSE)
+      
+      c(statistic = round(kst$statistic, 3), pvalue = round(kst$p.value, 3),
+        diffarea = round(earea, 3), runsstatistic = round(runs_res$statistic, 3),
+        runspvalue = round(runs_res$p.value, 3))
+    })))
+    ks_df$`K-S statistic` <- ks_res$statistic
+    ks_df$`K-S p-value` <- ks_res$pvalue
+    ks_df$`Scaled area between ECDFs` <- ks_res$diffarea
+    ks_df$`Runs statistic` <- ks_res$runsstatistic
+    ks_df$`Runs p-value` <- ks_res$runspvalue
+    DT::datatable(ks_df, options = list(
+      columnDefs = list(list(className = "dt-center", targets = 3:ncol(ks_df)))
+    ))
+  } 
+}
+```
+
+## Description
+
+`r I(description)`
+
+#### Design formulae
+
+The following model formulae were used to calculate dispersions for the
+different data sets.
+
+```{r, comment = NA}
+## Print design information
+for (ds in names(ddsList)) {
+  cat(ds, ": ", as.character(DESeq2::design(ddsList[[ds]])), "\n")
+}
 ```
 
 ## Data set dimensions {.tabset .tabset-pills}
@@ -291,7 +283,7 @@ plots[["nVariables"]] <-
   ggplot(datasetDF, aes(x = dataset, y = nVars, fill = dataset)) + 
   geom_bar(stat = "identity", alpha = 0.5) + 
   xlab("") + ylab("Number of variables (rows)") + 
-thm + theme(axis.text.x = element_text(size = 15, angle = 90, hjust = 1, vjust = 0.5))
+  thm + theme(axis.text.x = element_text(size = 15, angle = 90, hjust = 1, vjust = 0.5))
 plots[["nVariables"]]
 ```
 

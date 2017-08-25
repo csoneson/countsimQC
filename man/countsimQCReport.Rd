@@ -10,13 +10,15 @@ countsimQCReport(ddsList, outputFile, outputDir = "./", outputFormat = NULL,
   maxNForDisp = Inf, ...)
 }
 \arguments{
-\item{ddsList}{Named list of \code{DESeqDataSets} to compare. See the
-\code{DESeq2} Bioconductor package
+\item{ddsList}{Named list of \code{DESeqDataSets} or count matrices to
+compare. See the \code{DESeq2} Bioconductor package
 (http://bioconductor.org/packages/release/bioc/html/DESeq2.html) for more
 information about the \code{DESeqDataSet} class. Each \code{DESeqDataSet}
 object in the list should contain a count matrix, a data frame with sample
 information and a design formula. The sample information and design formula
-will be used to calculate dispersions appropriately.}
+will be used to calculate dispersions appropriately. If count matrices are
+provided, it is assumed that all columns represent replicate samples, and
+the design formula ~1 will be used.}
 
 \item{outputFile}{The file name of the final report. The extension must match
 the selected \code{outputFormat} (i.e., either .html or .pdf).}

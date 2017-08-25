@@ -1,3 +1,10 @@
+countsim!C v0.4.6 (2017-08-25)
+=================
+
+Changes:
+
+* Allow code folding when showCode = TRUE
+
 countsimQC v0.4.5 (2017-08-21)
 =================
 
