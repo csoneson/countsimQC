@@ -5,6 +5,7 @@ date: ""
 output: 
   html_document:
     toc: true
+    toc_float: true
     code_folding: show
   pdf_document:
     toc: true
@@ -56,30 +57,92 @@ references:
   URL: https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25
   issued:
     year: 2010
+- id: WaldWolfowitz1940
+  title: On a test whether two samples are from the same population
+  author:
+  - family: Wald
+    given: Abraham
+  - family: Wolfowitz
+    given: Jacob
+  container-title: The Annals of Mathematical Statistics
+  volume: 11
+  page: 147-162
+  type: article-journal
+  URL: https://projecteuclid.org/euclid.aoms/1177731909
+  issued:
+    year: 1940
+- id: Kolmogorov1933
+  title: Sulla determinazione empirica di una legge di distribuzione
+  author:
+  - family: Kolmogorov
+    given: Andrey
+  container-title: Giornale dell'Istituto Italiano degli Attuari
+  volume: 4
+  page: 83-91
+  type: article-journal
+  issued:
+    year: 1933
+- id: Smirnov1948
+  title: Table for estimating the goodness of fit of empirical distributions
+  author:
+  - family: Smirnov
+    given: Nikolai Vasilyevich
+  container-title: Annals of Mathematical Statistics
+  volume: 19
+  page: 279-281
+  type: article-journal
+  URL: https://projecteuclid.org/euclid.aoms/1177730256
+  issued:
+    year: 1948
+- id: Rousseeuw1987silhouette
+  title: Silhouettes a graphical aid to the interpretation and validation of cluster analysis
+  author:
+  - family: Rousseeuw
+    given: Peter J
+  container-title: Journal of Computational and Applied Mathematics
+  volumn: 20
+  page: 53-65
+  type: article-journal
+  URL: http://www.sciencedirect.com/science/article/pii/0377042787901257
+  issued:
+    year: 1987
+- id: Chen2014Dispersion
+  title: Differential expression analysis of complex RNA-seq experiments using edgeR
+  author:
+  - family: Chen
+    given: Yunshun
+  - family: Lun
+    given: Aaron TL
+  - family: Smyth
+    given: Gordon K
+  container-title: In Statistical Analysis of Next Generation Sequence Data. Somnath Datta and Daniel S Nettleton (eds), Springer, New York
+  URL: https://link.springer.com/chapter/10.1007%2F978-3-319-07212-8_3
+  issued:
+    year: 2014
 ---
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = showCode, warning = FALSE, message = FALSE)
-
-## Check whether the emo package is available (not currently used)
-has_emo <- suppressPackageStartupMessages(suppressWarnings(require("emo") == TRUE))
 ```
 
-```{r, message = FALSE}
-## Determine number of rows and columns in facetted plots 
+```{r preparation, message = FALSE}
+## Determine the number of rows and columns in facetted plots 
 ## (first element = columns, second element = rows)
 colRow <- grDevices::n2mfrow(length(ddsList))
 
 ## Set height/width of each panel in multi-panel plots
 panelSize <- 4
 
+## Initialize plot list
 plots <- list()
 
+## Define plot theme
 thm <- theme_bw() + 
   theme(axis.text = element_text(size = 15),
         axis.title = element_text(size = 14),
         strip.text = element_text(size = 15))
 
+## ----------------------- Calculate dispersions ----------------------- ##
 message("Calculating dispersions. This can take some time, please be patient.")
 if (is.finite(maxNForDisp)) {
   msg <- paste0("If there are more than ", maxNForDisp, 
@@ -88,81 +151,20 @@ if (is.finite(maxNForDisp)) {
 } else {
   msg <- ""
 }
-obj <- lapply(ddsList, function(ds) {
-  ## --- edgeR
-  dge <- edgeR::DGEList(counts = counts(ds))
-  des <- model.matrix(design(ds), data = SummarizedExperiment::colData(ds))
-  dge <- edgeR::calcNormFactors(dge)
-  if (ncol(dge) > maxNForDisp) {
-    set.seed(123)
-    keepSamples <- sample(seq_len(ncol(dge)), maxNForDisp, replace = FALSE)
-    dgetmp <- dge[, keepSamples]
-    destmp <- des[keepSamples, ]
-    destmp <- destmp[, colSums(destmp) > 0]
-    dgetmp <- edgeR::estimateDisp(dgetmp, design = destmp)
-    stopifnot(all(rownames(dge) == rownames(dgetmp)))
-    dge$tagwise.dispersion <- dgetmp$tagwise.dispersion
-    dge$common.dispersion <- dgetmp$common.dispersion
-    dge$trended.dispersion <- dgetmp$trended.dispersion
-    dge$prior.df <- dgetmp$prior.df
-    dge$AveLogCPM <- edgeR::aveLogCPM(dge)
-  } else {
-    dge <- edgeR::estimateDisp(dge, design = des)
-  }
-  ## --- DESeq2
-  dds <- DESeq2::estimateSizeFactors(ds, type = "poscounts")
-  if (ncol(dds) > maxNForDisp) {
-    set.seed(123)
-    keepSamples <- sample(seq_len(ncol(dds)), maxNForDisp, replace = FALSE)
-    ddstmp <- dds[, keepSamples]
-    ddstmp <- DESeq2::estimateDispersions(ddstmp, quiet = TRUE)
-    stopifnot(all(rownames(dds) == rownames(ddstmp)))
-    rowData(dds)$dispGeneEst <- rowData(ddstmp)$dispGeneEst
-    rowData(dds)$dispFit <- rowData(ddstmp)$dispFit
-    rowData(dds)$dispersion <- rowData(ddstmp)$dispersion
-    rowData(dds)$baseMean <- rowMeans(counts(dds, normalized = TRUE))
-  } else {
-    dds <- DESeq2::estimateDispersions(dds, quiet = TRUE)
-  }
-  list(dge = dge, dds = dds)
-})
+obj <- calculateDispersionsddsList(ddsList = ddsList, 
+                                   maxNForDisp = maxNForDisp, seed = seed)
 
-## Calculate between-sample correlations
+## --------------- Calculate between-sample correlations --------------- ##
 message("Calculating sample correlations.")
-sampleCorrDF <- lapply(obj, function(x) {
-  cpms <- edgeR::cpm(x$dge, prior.count = 2, log = TRUE)
-  if (ncol(cpms) > subsampleSize) {
-    set.seed(123)
-    cpms <- cpms[, sample(seq_len(ncol(cpms)), subsampleSize, replace = FALSE)]
-  }
-  corrs <- cor(cpms, use = "pairwise.complete.obs", method = "spearman")
-  data.frame(
-    Correlation = corrs[upper.tri(corrs)]
-  )
-})
-ns <- sapply(sampleCorrDF, nrow)
-sampleCorrDF <- do.call(rbind, sampleCorrDF) %>% 
-  dplyr::mutate(dataset = rep(names(sampleCorrDF), ns))
+sampleCorrDF <- calculateSampleCorrs(ddsList = obj, 
+                                     maxNForCorr = maxNForCorr, seed = seed)
 
-## Calculate between-variable correlations
+## -------------- Calculate between-variable correlations -------------- ##
 message("Calculating variable correlations.")
-featureCorrDF <- lapply(obj, function(x) {
-  cpms <- edgeR::cpm(x$dge, prior.count = 2, log = TRUE)
-  cpms <- cpms[genefilter::rowVars(cpms) > 0, ]
-  if (nrow(cpms) > subsampleSize) {
-    set.seed(123)
-    cpms <- cpms[sample(seq_len(nrow(cpms)), subsampleSize, replace = FALSE), ]
-  }
-  corrs <- cor(t(cpms), use = "pairwise.complete.obs", method = "spearman")
-  data.frame(
-    Correlation = corrs[upper.tri(corrs)]
-  )
-})
-ns <- sapply(featureCorrDF, nrow)
-featureCorrDF <- do.call(rbind, featureCorrDF) %>% 
-  dplyr::mutate(dataset = rep(names(featureCorrDF), ns))
-
-## Summarize sample characteristics
+featureCorrDF <- calculateFeatureCorrs(ddsList = obj, 
+                                       maxNForCorr = maxNForCorr, seed = seed)
+  
+## ----------------- Summarize sample characteristics ------------------ ##
 sampleDF <- lapply(obj, function(x) {
   data.frame(
     Libsize = colSums(x$dge$counts),
@@ -174,7 +176,7 @@ ns <- sapply(sampleDF, nrow)
 sampleDF <- do.call(rbind, sampleDF) %>% 
   dplyr::mutate(dataset = rep(names(sampleDF), ns))
 
-## Summarize variable characteristics
+## ---------------- Summarize variable characteristics ----------------- ##
 featureDF <- lapply(obj, function(x) {
   data.frame(
     Tagwise = sqrt(x$dge$tagwise.dispersion),
@@ -194,7 +196,7 @@ ns <- sapply(featureDF, nrow)
 featureDF <- do.call(rbind, featureDF) %>% 
   dplyr::mutate(dataset = rep(names(featureDF), ns))
 
-## Summarize data set characteristics
+## ----------------- Summarize data set characteristics ---------------- ##
 datasetDF <- do.call(rbind, lapply(obj, function(x) {
   data.frame(
     prior_df = paste0("prior.df = ", round(x$dge$prior.df, 2)),
@@ -205,44 +207,6 @@ datasetDF <- do.call(rbind, lapply(obj, function(x) {
   dplyr::mutate(AveLogCPM = 0.8 * max(featureDF$AveLogCPM)) %>%
   dplyr::mutate(Tagwise = 0.9 * max(featureDF$Tagwise)) %>%
   dplyr::mutate(dataset = names(obj))
-
-## Help function to make data table with K-S statistics and p-values
-makeDF <- function(df, column) {
-  if (length(unique(df$dataset)) > 1) {
-    ## Generate data frame with all pairs of data sets
-    ks_df <- data.frame(t(combn(unique(df$dataset), 2)), stringsAsFactors = FALSE) %>%
-      dplyr::rename(dataset1 = X1, dataset2 = X2)
-    ## Calculate K-S statistic and p-value for each pair of data sets
-    ks_res <- as.data.frame(t(sapply(1:nrow(ks_df), function(i) {
-      kst <- ks.test(df[, column][df$dataset == ks_df$dataset1[i]], 
-                     df[, column][df$dataset == ks_df$dataset2[i]])
-      ## Calculate area between ecdfs
-      e1 <- ecdf(df[, column][df$dataset == ks_df$dataset1[i]])
-      e2 <- ecdf(df[, column][df$dataset == ks_df$dataset2[i]])
-      xv <- sort(unique(df[, column]))
-      ediff <- abs(e1(xv) - e2(xv))
-      earea <- caTools::trapz((xv - min(xv))/(max(xv) - min(xv)), ediff)
-      ## Calculate runs test
-      dftmp <- df %>% dplyr::filter(dataset %in% c(ks_df$dataset1[i], ks_df$dataset2[i])) %>%
-        dplyr::arrange_(column)
-      runs_res <- randtests::runs.test(as.numeric(dftmp$dataset == ks_df$dataset1[i]), 
-                                       threshold = 0.5, alternative = "left.sided",
-                                       plot = FALSE)
-      
-      c(statistic = round(kst$statistic, 3), pvalue = round(kst$p.value, 3),
-        diffarea = round(earea, 3), runsstatistic = round(runs_res$statistic, 3),
-        runspvalue = round(runs_res$p.value, 3))
-    })))
-    ks_df$`K-S statistic` <- ks_res$statistic
-    ks_df$`K-S p-value` <- ks_res$pvalue
-    ks_df$`Scaled area between ECDFs` <- ks_res$diffarea
-    ks_df$`Runs statistic` <- ks_res$runsstatistic
-    ks_df$`Runs p-value` <- ks_res$runspvalue
-    DT::datatable(ks_df, options = list(
-      columnDefs = list(list(className = "dt-center", targets = 3:ncol(ks_df)))
-    ))
-  } 
-}
 ```
 
 ## Description
@@ -251,8 +215,10 @@ makeDF <- function(df, column) {
 
 #### Design formulae
 
-The following model formulae were used to calculate dispersions for the
-different data sets.
+The following model formulae were used in the dispersion calculations for the 
+different data sets. Note that if a count matrix or data frame was provided in
+place of a *DESeqDataSet* for some data set, the corresponding design formula is
+set to `~1`, thus assuming that all samples are to be treated as replicates.
 
 ```{r, comment = NA}
 ## Print design information
@@ -263,7 +229,8 @@ for (ds in names(ddsList)) {
 
 ## Data set dimensions {.tabset .tabset-pills}
 
-The number of samples (columns) and variables (rows) in each data set. 
+These bar plots show the number of samples (columns) and variables (rows) in
+each data set.
 
 ### Number of samples (columns)
 
@@ -272,7 +239,7 @@ plots[["nSamples"]] <-
   ggplot(datasetDF, aes(x = dataset, y = nSamples, fill = dataset)) + 
   geom_bar(stat = "identity", alpha = 0.5) + 
   xlab("") + ylab("Number of samples (columns)") + 
-  thm + theme(axis.text.x = element_text(size = 15, angle = 90, hjust = 1, vjust = 0.5))
+  thm + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 plots[["nSamples"]]
 ```
 
@@ -283,25 +250,27 @@ plots[["nVariables"]] <-
   ggplot(datasetDF, aes(x = dataset, y = nVars, fill = dataset)) + 
   geom_bar(stat = "identity", alpha = 0.5) + 
   xlab("") + ylab("Number of variables (rows)") + 
-  thm + theme(axis.text.x = element_text(size = 15, angle = 90, hjust = 1, vjust = 0.5))
+  thm + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5))
 plots[["nVariables"]]
 ```
 
 ## Dispersion/BCV plots {.tabset .tabset-pills}
 
-The association between the average abundance and the dispersion or "biological 
-coefficient of variation" (sqrt(dispersion)), as calculated by
-[edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html)
-[@Robinson2010edgeR] and
-[DESeq2](http://bioconductor.org/packages/release/bioc/html/DESeq2.html) 
-[@Love2014DESeq2]. In the edgeR plot, the estimate of the prior degrees of
+Disperson/BCV plots show the association between the average abundance and the
+dispersion or "biological coefficient of variation" (sqrt(dispersion)), as
+calculated by 
+[`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html) 
+[@Robinson2010edgeR] and 
+[`DESeq2`](http://bioconductor.org/packages/release/bioc/html/DESeq2.html) 
+[@Love2014DESeq2]. In the `edgeR` plot, the estimate of the prior degrees of 
 freedom is indicated. `r I(msg)`
 
 ### edgeR
 
 The black dots represent the tagwise dispersion estimates, the red line the 
-common dispersion and the blue curve represents the trended dispersion
-estimates.
+common dispersion and the blue curve represents the trended dispersion 
+estimates. For further information about the dispersion estimation in `edgeR`,
+see @Chen2014Dispersion.
 
 ```{r BCVedgeR, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
 plots[["BCVedgeR"]] <- 
@@ -317,11 +286,24 @@ plots[["BCVedgeR"]] <-
 plots[["BCVedgeR"]]
 ```
 
+### Pairwise comparisons - edgeR
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average log CPM and tagwise dispersion", minvalue = 0, maxvalue = 1)$tabledesc2d)`
+
+
+```{r BCVedgeRTests}
+if (calculateStatistics)
+  makeDF(df = featureDF, column = c("AveLogCPM", "Tagwise"), 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+```
+
 ### DESeq2
 
-The black dots are the gene-wise dispersion estimates, the red curve the fitted
+The black dots are the gene-wise dispersion estimates, the red curve the fitted 
 mean-dispersion relationship and the blue circles represent the final dispersion
-estimates.
+estimates.For further information about the dispersion estimation in `DESeq2`,
+see @Love2014DESeq2.
 
 ```{r dispersionDESeq2, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
 plots[["dispersionDESeq2"]] <- 
@@ -336,14 +318,26 @@ plots[["dispersionDESeq2"]] <-
 plots[["dispersionDESeq2"]]
 ```
 
+### Pairwise comparisons - DESeq2
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "base mean and genewise dispersion", minvalue = 0, maxvalue = 1)$tabledesc2d)`
+
+```{r dispersionDESeq2Tests}
+if (calculateStatistics)
+  makeDF(df = featureDF, column = c("baseMean", "dispGeneEst"), 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+```
+
 ## Mean-variance plots {.tabset .tabset-pills}
 
-The relation between the empirical mean and variance. The difference between 
-these mean-variance plots and the mean-dispersion plots above is that the plots 
-in this section do not take the information about the experimental design and 
-sample grouping into account, but simply display the mean and variance of
-log2(CPM) estimates across all samples, calculated using the `cpm` function from
-[edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html) 
+These scatter plots show the relation between the empirical mean and variance of
+the variables. The difference between these mean-variance plots and the 
+mean-dispersion plots above is that the plots in this section do not take the 
+information about the experimental design and sample grouping into account, but 
+simply display the mean and variance of log2(CPM) estimates across all samples, 
+calculated using the `cpm` function from 
+[`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html) 
 [@Robinson2010edgeR], with a prior count of 2.
 
 ### Separate scatter plots
@@ -369,10 +363,21 @@ plots[["meanVarOverlaidScatter"]] <-
 plots[["meanVarOverlaidScatter"]]
 ```
 
+### Pairwise comparisons
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average and variance of the log CPM", minvalue = 0, maxvalue = 1)$tabledesc2d)` 
+
+```{r meanVarTests}
+if (calculateStatistics)
+  makeDF(df = featureDF, column = c("average_log2_cpm", "variance_log2_cpm"), 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+```
+
 ## Library sizes {.tabset .tabset-pills}
 
-The distribution of the total count per sample, i.e., the column sums of the
-respective data matrices.
+These plots illustrate the distribution of the total read count per sample,
+i.e., the column sums of the respective data matrices.
 
 ### Separate histograms
 
@@ -421,7 +426,8 @@ plots[["libsizeBox"]] <-
   ggplot(sampleDF, aes(x = dataset, y = Libsize, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
   geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
-  ylab("Library size") + xlab("") + thm
+  ylab("Library size") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["libsizeBox"]]
 ```
 
@@ -431,7 +437,8 @@ plots[["libsizeBox"]]
 plots[["libsizeViolin"]] <- 
   ggplot(sampleDF, aes(x = dataset, y = Libsize, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
-  ylab("Library size") + xlab("") + thm
+  ylab("Library size") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["libsizeViolin"]]
 ```
 
@@ -443,15 +450,25 @@ plots[["libsizeEcdf"]] <-
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Library size") + thm
 plots[["libsizeEcdf"]]
+```
 
-makeDF(sampleDF, "Libsize")
+### Pairwise comparisons
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "library size", minvalue = min(sampleDF$Libsize), maxvalue = max(sampleDF$Libsize))$tabledesc)`
+
+```{r libsizeTests}
+if (calculateStatistics)
+  makeDF(df = sampleDF, column = "Libsize", 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
 ```
 
 ## TMM normalization factors {.tabset .tabset-pills}
 
-The TMM normalization factors [@Robinson2010TMM], intended to adjust for
-differences in RNA composition, as calculated by
-[edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html)
+The plots below show the distribution of the TMM normalization factors
+[@Robinson2010TMM], intended to adjust for differences in RNA composition, as
+calculated by 
+[`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html) 
 [@Robinson2010edgeR].
 
 ### Separate histograms
@@ -501,7 +518,8 @@ plots[["tmmBox"]] <-
   ggplot(sampleDF, aes(x = dataset, y = TMM, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
   geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
-  ylab("TMM normalization factor") + xlab("") + thm
+  ylab("TMM normalization factor") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["tmmBox"]]
 ```
 
@@ -511,7 +529,8 @@ plots[["tmmBox"]]
 plots[["tmmViolin"]] <- 
   ggplot(sampleDF, aes(x = dataset, y = TMM, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
-  ylab("TMM normalization factor") + xlab("") + thm
+  ylab("TMM normalization factor") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["tmmViolin"]]
 ```
 
@@ -523,14 +542,24 @@ plots[["tmmEcdf"]] <-
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("TMM normalization factor") + thm
 plots[["tmmEcdf"]]
+```
 
-makeDF(sampleDF, "TMM")
+### Pairwise comparisons
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "TMM factor", minvalue = min(sampleDF$TMM), maxvalue = max(sampleDF$TMM))$tabledesc)`
+
+```{r tmmTests}
+if (calculateStatistics)
+  makeDF(df = sampleDF, column = "TMM", 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
 ```
 
 ## Effective library sizes {.tabset .tabset-pills}
 
-The distribution of the total count per sample multiplied by the TMM
-normalization factor.
+These plots show the distribution of the "effective library sizes", defined as
+the total count per sample multiplied by the corresponding TMM normalization
+factor.
 
 ### Separate histograms
 
@@ -579,7 +608,8 @@ plots[["effLibsizeBox"]] <-
   ggplot(sampleDF, aes(x = dataset, y = EffLibsize, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
   geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
-  ylab("Effective library size") + xlab("") + thm
+  ylab("Effective library size") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["effLibsizeBox"]]
 ```
 
@@ -589,7 +619,8 @@ plots[["effLibsizeBox"]]
 plots[["effLibsizeViolin"]] <- 
   ggplot(sampleDF, aes(x = dataset, y = EffLibsize, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
-  ylab("Effective library size") + xlab("") + thm
+  ylab("Effective library size") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["effLibsizeViolin"]]
 ```
 
@@ -601,13 +632,24 @@ plots[["effLibsizeEcdf"]] <-
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Effective library size") + thm
 plots[["effLibsizeEcdf"]]
+```
 
-makeDF(sampleDF, "EffLibsize")
+### Pairwise comparisons
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "effective library size", minvalue = min(sampleDF$EffLibsize), maxvalue = max(sampleDF$EffLibsize))$tabledesc)`
+
+
+```{r effLibsizeTests}
+if (calculateStatistics)
+  makeDF(df = sampleDF, column = "EffLibsize", 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
 ```
 
 ## Expression distributions (average log CPM) {.tabset .tabset-pills}
 
-The distribution of average abundance values for the variables. 
+The plots in this section show the distribution of average abundance values for
+the variables. The abundances are log CPM values calculated by `edgeR`.
 
 ### Separate histograms
 
@@ -656,7 +698,8 @@ plots[["logCPMBox"]] <-
   ggplot(featureDF, aes(x = dataset, y = AveLogCPM, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
   geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
-  ylab("Average log CPM") + xlab("") + thm
+  ylab("Average log CPM") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["logCPMBox"]]
 ```
 
@@ -666,7 +709,8 @@ plots[["logCPMBox"]]
 plots[["logCPMViolin"]] <- 
   ggplot(featureDF, aes(x = dataset, y = AveLogCPM, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
-  ylab("Average log CPM") + xlab("") + thm
+  ylab("Average log CPM") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["logCPMViolin"]]
 ```
 
@@ -678,13 +722,24 @@ plots[["logCPMEcdf"]] <-
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Average log CPM") + thm
 plots[["logCPMEcdf"]]
+```
 
-makeDF(featureDF, "AveLogCPM")
+### Pairwise comparisons
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average log CPM", minvalue = min(featureDF$AveLogCPM), maxvalue = max(featureDF$AveLogCPM))$tabledesc)`
+
+
+```{r logCPMTests}
+if (calculateStatistics)
+  makeDF(df = featureDF, column = "AveLogCPM", 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
 ```
 
 ## Fraction zeros per sample {.tabset .tabset-pills}
 
-The distribution of the fraction of zeros observed per sample. 
+These plots show the distribution of the fraction of zeros observed per sample
+(column) in the count matrices.
 
 ### Separate histograms
 
@@ -733,7 +788,8 @@ plots[["fraczeroSampleBox"]] <-
   ggplot(sampleDF, aes(x = dataset, y = Fraczero, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
   geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
-  ylab("Fraction zeros per sample") + xlab("") + thm
+  ylab("Fraction zeros per sample") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["fraczeroSampleBox"]]
 ```
 
@@ -743,7 +799,8 @@ plots[["fraczeroSampleBox"]]
 plots[["fraczeroSampleViolin"]] <- 
   ggplot(sampleDF, aes(x = dataset, y = Fraczero, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
-  ylab("Fraction zeros per sample") + xlab("") + thm
+  ylab("Fraction zeros per sample") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["fraczeroSampleViolin"]]
 ```
 
@@ -755,13 +812,24 @@ plots[["fraczeroSampleEcdf"]] <-
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Fraction zeros per sample") + thm
 plots[["fraczeroSampleEcdf"]]
+```
 
-makeDF(sampleDF, "Fraczero")
+### Pairwise comparisons
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "fraction zeros", minvalue = min(sampleDF$Fraczero), maxvalue = max(sampleDF$Fraczero))$tabledesc)`
+ 
+
+```{r fraczeroSampleTests}
+if (calculateStatistics)
+  makeDF(df = sampleDF, column = "Fraczero", 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
 ```
 
 ## Fraction zeros per feature {.tabset .tabset-pills}
 
-The distribution of the fraction of zeros observed per variable. 
+These plots illustrate the distribution of the fraction of zeros observed per
+variable (row) in the count matrices.
 
 ### Separate histograms
 
@@ -810,7 +878,8 @@ plots[["fraczeroFeatureBox"]] <-
   ggplot(featureDF, aes(x = dataset, y = Fraczero, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
   geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
-  ylab("Fraction zeros per feature") + xlab("") + thm
+  ylab("Fraction zeros per feature") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["fraczeroFeatureBox"]]
 ```
 
@@ -820,7 +889,8 @@ plots[["fraczeroFeatureBox"]]
 plots[["fraczeroFeatureViolin"]] <- 
   ggplot(featureDF, aes(x = dataset, y = Fraczero, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
-  ylab("Fraction zeros per feature") + xlab("") + thm
+  ylab("Fraction zeros per feature") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["fraczeroFeatureViolin"]]
 ```
 
@@ -832,17 +902,27 @@ plots[["fraczeroFeatureEcdf"]] <-
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Fraction zeros per feature") + thm
 plots[["fraczeroFeatureEcdf"]]
+```
 
-makeDF(featureDF, "Fraczero")
+### Pairwise comparisons
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "fraction zeros", minvalue = min(featureDF$Fraczero), maxvalue = max(featureDF$Fraczero))$tabledesc)`
+
+
+```{r fraczeroFeatureTests}
+if (calculateStatistics)
+  makeDF(df = featureDF, column = "Fraczero", 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
 ```
 
 ## Sample-sample correlations {.tabset .tabset-pills}
 
-The distribution of Spearman correlation coefficients for all pairs of samples, 
-calculated on the log-CPM values obtained via the `cpm` function from `edgeR`, 
-with a prior.count of 2. If there are more than `r subsampleSize` samples in a
-data set, the pairwise correlations between `r subsampleSize` randomly selected
-samples are shown.
+The plots below show the distribution of Spearman correlation coefficients for
+pairs of samples, calculated from the log(CPM) values obtained via the `cpm`
+function from `edgeR`, with a prior.count of 2. If there are more than `r
+maxNForCorr` samples in a data set, the pairwise correlations between `r
+maxNForCorr` randomly selected samples are shown.
 
 ### Separate histograms
 
@@ -891,7 +971,8 @@ plots[["sampleCorrBox"]] <-
   ggplot(sampleCorrDF, aes(x = dataset, y = Correlation, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
   geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
-  ylab("Sample-sample correlation") + xlab("") + thm
+  ylab("Sample-sample correlation") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["sampleCorrBox"]]
 ```
 
@@ -901,7 +982,8 @@ plots[["sampleCorrBox"]]
 plots[["sampleCorrViolin"]] <- 
   ggplot(sampleCorrDF, aes(x = dataset, y = Correlation, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
-  ylab("Sample-sample correlation") + xlab("") + thm
+  ylab("Sample-sample correlation") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["sampleCorrViolin"]]
 ```
 
@@ -913,17 +995,28 @@ plots[["sampleCorrEcdf"]] <-
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Sample-sample correlation") + thm
 plots[["sampleCorrEcdf"]]
+```
 
-makeDF(sampleCorrDF, "Correlation")
+### Pairwise comparisons
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample pair", aspect = "Spearman correlation", minvalue = min(sampleCorrDF$Correlation), maxvalue = max(sampleCorrDF$Correlation))$tabledesc)`
+ 
+
+```{r sampleCorrTests}
+if (calculateStatistics)
+  makeDF(df = sampleCorrDF, column = "Correlation", 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
 ```
 
 ## Variable-variable correlations {.tabset .tabset-pills}
 
-The distribution of Spearman correlation coefficients for all pairs of samples, 
-calculated on the log-CPM values obtained via the `cpm` function from `edgeR`, 
-with a prior.count of 2. Only non-constant variables are considered, and if 
-there are more than `r subsampleSize` such variables in a data set, the pairwise
-correlations between `r subsampleSize` randomly selected variables are shown.
+These plots illustrate the distribution of Spearman correlation coefficients for
+pairs of variables, calculated from the log(CPM) values obtained via the `cpm`
+function from `edgeR`, with a prior.count of 2. Only non-constant variables are
+considered, and if there are more than `r maxNForCorr` such variables in a
+data set, the pairwise correlations between `r maxNForCorr` randomly selected
+variables are shown.
 
 ### Separate histograms
 
@@ -972,7 +1065,8 @@ plots[["featureCorrBox"]] <-
   ggplot(featureCorrDF, aes(x = dataset, y = Correlation, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
   geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
-  ylab("Variable-variable correlation") + xlab("") + thm
+  ylab("Variable-variable correlation") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["featureCorrBox"]]
 ```
 
@@ -982,7 +1076,8 @@ plots[["featureCorrBox"]]
 plots[["featureCorrViolin"]] <- 
   ggplot(featureCorrDF, aes(x = dataset, y = Correlation, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
-  ylab("Variable-variable correlation") + xlab("") + thm
+  ylab("Variable-variable correlation") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["featureCorrViolin"]]
 ```
 
@@ -994,14 +1089,24 @@ plots[["featureCorrEcdf"]] <-
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
   xlab("Variable-variable correlation") + thm
 plots[["featureCorrEcdf"]]
+```
 
-makeDF(featureCorrDF, "Correlation")
+### Pairwise comparisons
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature pair", aspect = "Spearman correlation", minvalue = min(featureCorrDF$Correlation), maxvalue = max(featureCorrDF$Correlation))$tabledesc)`
+ 
+
+```{r featureCorrTests}
+if (calculateStatistics)
+  makeDF(df = featureCorrDF, column = "Correlation", 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
 ```
 
 ## Library size vs fraction zeros {.tabset .tabset-pills}
 
-The association between the total count and the fraction of zeros observed per
-sample.
+These scatter plots show the association between the total count (column sums)
+and the fraction of zeros observed per sample.
 
 ### Separate scatter plots
 
@@ -1025,10 +1130,22 @@ plots[["libsizeFraczeroOverlaidScatter"]] <-
 plots[["libsizeFraczeroOverlaidScatter"]]
 ```
 
+### Pairwise comparisons
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "library size and fraction of zeros", minvalue = 0, maxvalue = 1)$tabledesc2d)` 
+
+```{r libsizeFraczeroTests}
+if (calculateStatistics)
+  makeDF(df = sampleDF, column = c("Libsize", "Fraczero"), 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+```
+
 ## Mean expression vs fraction zeros {.tabset .tabset-pills}
 
-The association between the average abundance and the fraction of zeros observed
-per variable.
+These scatter plots show the association between the average abundance and the 
+fraction of zeros observed per variable. The abundance is defined as the
+log(CPM) values as calculated by `edgeR`.
 
 ### Separate scatter plots
 
@@ -1049,6 +1166,17 @@ plots[["logCPMFraczeroOverlaidScatter"]] <-
   geom_point(size = 0.75, alpha = 0.5) + 
   xlab("Average log CPM") + ylab("Fraction zeros") + thm
 plots[["logCPMFraczeroOverlaidScatter"]]
+```
+
+### Pairwise comparisons
+
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average log CPM and fraction of zeros", minvalue = 0, maxvalue = 1)$tabledesc2d)` 
+
+```{r logCPMFraczeroTests}
+if (calculateStatistics)
+  makeDF(df = featureDF, column = c("AveLogCPM", "Fraczero"), 
+         permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
+         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
 ```
 
 

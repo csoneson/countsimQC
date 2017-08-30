@@ -16,7 +16,7 @@ plots stored in this file.}
 "png", "bmp", "svg" or "wmf" (windows only) (will be provided to the
 \code{ggsave} function from the \code{ggplot2} package).}
 
-\item{outputDir}{The output directory where the plots will be generated.}
+\item{outputDir}{The output directory where the plots should be generated.}
 
 \item{nDatasets}{The number of data sets that are compared in the figures.
 This is needed to set the size of the plots correctly.}

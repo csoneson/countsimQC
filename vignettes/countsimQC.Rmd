@@ -21,7 +21,7 @@ application is in situations where a synthetic count data set has been generated
 using a real count data set as an underlying source of parameters, in which case
 it is often important to verify that the final synthetic data captures the main 
 features of the original data set. However, the package can be used to create a 
-visual overview of any collection of count data sets.
+visual overview of any collection of one or more count data sets.
 
 In this vignette we will show how to generate a comparative report from a 
 collection of two simulated data sets and the original, underlying real data 
@@ -41,21 +41,43 @@ data(countsimExample)
 countsimExample
 ```
 
-Next, we generate the report using the `countsimQCReport()` function. 
+Next, we generate the report using the `countsimQCReport()` function. Depending
+on the level of detail and the type of information that are required for the
+final report, this function can be run in different "modes":
+
+- by setting `calculateStatistics = FALSE`, only plots will be generated. This
+is the fastest way of running `countsimQCReport()`, and in many cases generates
+enough information for the user to make a visual evaluation of the count data
+set(s).
+- by setting `calculateStatistics = TRUE` and `permutationPvalues = FALSE`, some
+quantitative pairwise comparisons between data sets will be performed. In
+particular, the Kolmogorov-Smirnov test and the Wald-Wolfowitz runs test will be
+used to compare distributions, and additional statistics will be calculated to
+evaluate how similar the evaluated aspects are between pairs of data sets.
+- by setting `calculateStatistics = TRUE` and `permutationPvalues = TRUE`,
+permutation of data set labels will be used to evaluate the significance of the
+statistics calculated in the previous point.
+
+Here, for the sake of speed, we calculate statistics for a small subset of the
+observations (`subsampleSize = 25`) and refrain from calculateing permutation
+p-values.
 
 ```{r, results = "hide", warning = FALSE}
-countsimQCReport(ddsList = countsimExample, showCode = FALSE, 
-                 outputFormat = "html_document", 
-                 outputFile = "countsim_report.html", outputDir = "./", 
-                 savePlots = TRUE, forceOverwrite = TRUE,
-                 description = "This is my test report.")
+countsimQCReport(ddsList = countsimExample, outputFile = "countsim_report.html", 
+                 outputDir = "./", outputFormat = "html_document", 
+                 showCode = FALSE, forceOverwrite = TRUE,
+                 savePlots = TRUE, description = "This is my test report.", 
+                 maxNForCorr = 25, maxNForDisp = Inf, 
+                 calculateStatistics = TRUE, subsampleSize = 25,
+                 kfrac = 0.01, kmin = 5, 
+                 permutationPvalues = FALSE, nPermutations = NULL)
 ```
 
-This function can generate either an HTML file (by setting `outputFormat = 
-"html_document"` or `outputFormat=NULL`) or a pdf file (by setting 
-`outputFormat = "pdf_document"`). The `description` argument can be used to
-provide a more extensive description of the data set(s) that are included in the
-report.
+The `countsimQCReport()` function can generate either an HTML file (by setting
+`outputFormat = "html_document"` or `outputFormat = NULL`) or a pdf file (by
+setting `outputFormat = "pdf_document"`). The `description` argument can be used
+to provide a more extensive description of the data set(s) that are included in
+the report.
 
 If the argument `savePlots` is set to TRUE, an .rds file containing the 
 individual ggplot objects will be generated. These objects can be used to
@@ -72,7 +94,6 @@ if (!dir.exists("figures")) dir.create("figures")
 generateIndividualPlots(ggplots, device = "pdf", nDatasets = 3, 
                         outputDir = "./figures")
 ```
-
 
 ## Session info
 

@@ -1,4 +1,5 @@
 # countsimQC
+[![Travis-CI Build Status](https://travis-ci.org/csoneson/countsimQC.svg?branch=master)](https://travis-ci.org/csoneson/countsimQC)
 
 `countsimQC` is an R package that provides functionality to create a 
 comprehensive report comparing many different characteristics of multiple 

@@ -2,8 +2,8 @@ library(countsimQC)
 context("Check report generation")
 
 local({
-  x <- lapply(countsimExample, function(w) w[1:100, ])
-  x2 <- lapply(countsimExample_dfmat, function(w) w[1:100, ])
+  x <- lapply(countsimExample, function(w) w[1:50, ])
+  x2 <- lapply(countsimExample_dfmat, function(w) w[1:50, ])
   if (file.exists("report_from_test.Rmd")) {
     file.remove("report_from_test.Rmd")
   }
@@ -47,7 +47,8 @@ local({
     ## matrix/data frame input
     expect_is(countsimQCReport(ddsList = x2, outputFormat = "html_document",
                                outputFile = "report_from_test.html",
-                               outputDir = "./", savePlots = TRUE,
+                               outputDir = "./", savePlots = FALSE,
+                               calculateStatistics = FALSE,
                                forceOverwrite = TRUE), "character")
 
     ## rmd_template
@@ -65,7 +66,8 @@ local({
   })
 
   countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
-                   outputDir = "./", savePlots = TRUE, forceOverwrite = TRUE)
+                   outputDir = "./", savePlots = TRUE, forceOverwrite = TRUE,
+                   permutationPvalues = TRUE, nPermutations = 3)
 
   test_that("Report is not generated if forceOverwrite = FALSE", {
     ## Report should not be generated if it already exists and forceOverwrite = FALSE
@@ -76,6 +78,7 @@ local({
     ## Report should be generated if it already exists and forceOverwrite = TRUE
     expect_is(countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
                                outputDir = "./", savePlots = TRUE,
+                               calculateStatistics = FALSE,
                                forceOverwrite = TRUE), "character")
 
     ## Report should not be generated if the ggplots object exists and forceOverwrite = FALSE
@@ -87,12 +90,14 @@ local({
     ## Report should be generated even if the ggplots object exists, if savePlots = FALSE
     expect_is(countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
                                outputDir = "./", savePlots = FALSE,
+                               calculateStatistics = FALSE,
                                forceOverwrite = FALSE), "character")
 
     ## pdf report should be generated even if the html report exists
     expect_is(countsimQCReport(ddsList = x, outputFormat = "pdf_document",
                                outputFile = "report_from_test.pdf",
                                outputDir = "./", savePlots = FALSE,
+                               calculateStatistics = FALSE,
                                forceOverwrite = FALSE), "character")
   })
 })

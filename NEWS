@@ -1,4 +1,14 @@
-countsim!C v0.4.6 (2017-08-25)
+countsimQC v0.5.0 (2017-08-30)
+=================
+
+Changes:
+
+* Add a number of quantitative evaluation criteria and tests for pairwise comparison of data sets
+* The argument `subsampleSize` to the `countsimQCReport()` function now determines the number of observations for which (time-consuming) statistics are calculated
+* A new argument `maxNForCorr` is added to the `countsimQCReport()` function to indicate the number of observations for which pairwise correlations are calculated
+* Improvements in documentation
+
+countsimQC v0.4.6 (2017-08-25)
 =================
 
 Changes:

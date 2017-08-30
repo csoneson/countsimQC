@@ -33,13 +33,30 @@
 #'   the generated report. This will be included in the beginning of the report.
 #'   If set to NULL, a default description listing the number and names of the
 #'   included data sets will be used.
-#' @param subsampleSize The maximal number of samples (variables) for which
+#' @param maxNForCorr The maximal number of samples (variables) for which
 #'   pairwise correlation coefficients will be calculated. If the number of
 #'   samples (variables) exceeds this number, they will be randomly subsampled.
 #' @param maxNForDisp The maximal number of samples that will be used to
 #'   estimate dispersions. By default, all samples are used. This can be lowered
 #'   to speed up calculations (and obtain approximate results) for large data
 #'   sets.
+#' @param calculateStatistics Whether to calculate quantitative pairwise
+#'   statistics for comparing data sets in addition to generating the plots.
+#' @param subsampleSize The number of randomly selected observations (samples,
+#'   variables or pairs of samples or variables) for which certain
+#'   (time-consuming) statistics will be calculated. Only used if
+#'   \code{calculateStatistics} = TRUE.
+#' @param seed The random seed to use in subsampling steps (for calculation of
+#'   dispersions, pairwise correlations and time-consuming pairwise data set
+#'   comparison statistics).
+#' @param kmin,kfrac For statistics that require the extraction of the k nearest
+#'   neighbors of a given point, the number of neighbors will be max(kmin, kfrac
+#'   * nrow(df))
+#' @param permutationPvalues Whether to calculate permutation p-values for
+#'   selected pairwise data set comparison statistics.
+#' @param nPermutations The number of permutations to perform when calculating
+#'   permutation p-values for data set comparison statistics. Only used if
+#'   \code{permutationPvalues} = TRUE.
 #' @param ... Other arguments that will be passed to \code{rmarkdown::render}.
 #'
 #' @author Charlotte Soneson
@@ -68,12 +85,16 @@
 #' countsimQCReport(countsimExample, outputDir = "./",
 #'                  outputFile = "example.html")
 #' }
-#'
+#' @include makeDF.R
 countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
                              outputFormat = NULL, showCode = FALSE,
                              rmdTemplate = NULL, forceOverwrite = FALSE,
                              savePlots = FALSE, description = NULL,
-                             subsampleSize = 500, maxNForDisp = Inf, ...){
+                             maxNForCorr = 500, maxNForDisp = Inf,
+                             calculateStatistics = TRUE, subsampleSize = 500,
+                             seed = 123, kfrac = 0.01, kmin = 5,
+                             permutationPvalues = FALSE, nPermutations = NULL,
+                             ...){
   ## This function was inspired by code from Nicholas Hamilton, provided at
   ## http://stackoverflow.com/questions/37097535/generate-report-in-r
 
