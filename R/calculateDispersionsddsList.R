@@ -53,6 +53,7 @@ calculateDispersionsddsList <- function(ddsList, maxNForDisp, seed = 123) {
       set.seed(seed)
       keepSamples <- sample(seq_len(ncol(dds)), maxNForDisp, replace = FALSE)
       ddstmp <- dds[, keepSamples]
+      colData(ddstmp) <- droplevels(colData(ddstmp))
       ddstmp <- DESeq2::estimateDispersions(ddstmp, quiet = TRUE)
       stopifnot(all(rownames(dds) == rownames(ddstmp)))
       rowData(dds)$dispGeneEst <- rowData(ddstmp)$dispGeneEst
