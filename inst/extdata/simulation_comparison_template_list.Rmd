@@ -288,7 +288,7 @@ plots[["BCVedgeR"]]
 
 ### Pairwise comparisons - edgeR
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average log CPM and tagwise dispersion", minvalue = 0, maxvalue = 1)$tabledesc2d)`
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average log CPM and tagwise dispersion", minvalue = 0, maxvalue = 1, permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc2d)`
 
 
 ```{r BCVedgeRTests}
@@ -320,7 +320,7 @@ plots[["dispersionDESeq2"]]
 
 ### Pairwise comparisons - DESeq2
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "base mean and genewise dispersion", minvalue = 0, maxvalue = 1)$tabledesc2d)`
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "base mean and genewise dispersion", minvalue = 0, maxvalue = 1, permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc2d)`
 
 ```{r dispersionDESeq2Tests}
 if (calculateStatistics)
@@ -365,7 +365,7 @@ plots[["meanVarOverlaidScatter"]]
 
 ### Pairwise comparisons
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average and variance of the log CPM", minvalue = 0, maxvalue = 1)$tabledesc2d)` 
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average and variance of the log CPM", minvalue = 0, maxvalue = 1, permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc2d)` 
 
 ```{r meanVarTests}
 if (calculateStatistics)
@@ -454,7 +454,7 @@ plots[["libsizeEcdf"]]
 
 ### Pairwise comparisons
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "library size", minvalue = min(sampleDF$Libsize), maxvalue = max(sampleDF$Libsize))$tabledesc)`
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "library size", minvalue = min(sampleDF$Libsize), maxvalue = max(sampleDF$Libsize), permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc)`
 
 ```{r libsizeTests}
 if (calculateStatistics)
@@ -546,7 +546,7 @@ plots[["tmmEcdf"]]
 
 ### Pairwise comparisons
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "TMM factor", minvalue = min(sampleDF$TMM), maxvalue = max(sampleDF$TMM))$tabledesc)`
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "TMM factor", minvalue = min(sampleDF$TMM), maxvalue = max(sampleDF$TMM), permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc)`
 
 ```{r tmmTests}
 if (calculateStatistics)
@@ -636,7 +636,7 @@ plots[["effLibsizeEcdf"]]
 
 ### Pairwise comparisons
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "effective library size", minvalue = min(sampleDF$EffLibsize), maxvalue = max(sampleDF$EffLibsize))$tabledesc)`
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "effective library size", minvalue = min(sampleDF$EffLibsize), maxvalue = max(sampleDF$EffLibsize), permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc)`
 
 
 ```{r effLibsizeTests}
@@ -726,7 +726,7 @@ plots[["logCPMEcdf"]]
 
 ### Pairwise comparisons
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average log CPM", minvalue = min(featureDF$AveLogCPM), maxvalue = max(featureDF$AveLogCPM))$tabledesc)`
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average log CPM", minvalue = min(featureDF$AveLogCPM), maxvalue = max(featureDF$AveLogCPM), permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc)`
 
 
 ```{r logCPMTests}
@@ -816,7 +816,7 @@ plots[["fraczeroSampleEcdf"]]
 
 ### Pairwise comparisons
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "fraction zeros", minvalue = min(sampleDF$Fraczero), maxvalue = max(sampleDF$Fraczero))$tabledesc)`
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "fraction zeros", minvalue = min(sampleDF$Fraczero), maxvalue = max(sampleDF$Fraczero), permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc)`
  
 
 ```{r fraczeroSampleTests}
@@ -906,7 +906,7 @@ plots[["fraczeroFeatureEcdf"]]
 
 ### Pairwise comparisons
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "fraction zeros", minvalue = min(featureDF$Fraczero), maxvalue = max(featureDF$Fraczero))$tabledesc)`
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "fraction zeros", minvalue = min(featureDF$Fraczero), maxvalue = max(featureDF$Fraczero), permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc)`
 
 
 ```{r fraczeroFeatureTests}
@@ -999,7 +999,7 @@ plots[["sampleCorrEcdf"]]
 
 ### Pairwise comparisons
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample pair", aspect = "Spearman correlation", minvalue = min(sampleCorrDF$Correlation), maxvalue = max(sampleCorrDF$Correlation))$tabledesc)`
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample pair", aspect = "Spearman correlation", minvalue = min(sampleCorrDF$Correlation), maxvalue = max(sampleCorrDF$Correlation), permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc)`
  
 
 ```{r sampleCorrTests}
@@ -1093,7 +1093,7 @@ plots[["featureCorrEcdf"]]
 
 ### Pairwise comparisons
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature pair", aspect = "Spearman correlation", minvalue = min(featureCorrDF$Correlation), maxvalue = max(featureCorrDF$Correlation))$tabledesc)`
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature pair", aspect = "Spearman correlation", minvalue = min(featureCorrDF$Correlation), maxvalue = max(featureCorrDF$Correlation), permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc)`
  
 
 ```{r featureCorrTests}
@@ -1132,7 +1132,7 @@ plots[["libsizeFraczeroOverlaidScatter"]]
 
 ### Pairwise comparisons
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "library size and fraction of zeros", minvalue = 0, maxvalue = 1)$tabledesc2d)` 
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "library size and fraction of zeros", minvalue = 0, maxvalue = 1, permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc2d)` 
 
 ```{r libsizeFraczeroTests}
 if (calculateStatistics)
@@ -1170,7 +1170,7 @@ plots[["logCPMFraczeroOverlaidScatter"]]
 
 ### Pairwise comparisons
 
-`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average log CPM and fraction of zeros", minvalue = 0, maxvalue = 1)$tabledesc2d)` 
+`r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average log CPM and fraction of zeros", minvalue = 0, maxvalue = 1, permutationPvalues = permutationPvalues, nPermutations = nPermutations)$tabledesc2d)` 
 
 ```{r logCPMFraczeroTests}
 if (calculateStatistics)

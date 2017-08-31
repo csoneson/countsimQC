@@ -5,7 +5,7 @@
 \title{Define table descriptions}
 \usage{
 defineTableDesc(calculateStatistics, subsampleSize, kfrac, kmin, obstype,
-  aspect, minvalue, maxvalue)
+  aspect, minvalue, maxvalue, permutationPvalues, nPermutations)
 }
 \arguments{
 \item{calculateStatistics}{Whether or not statistics and p-values are
@@ -25,6 +25,12 @@ neighbors of a given point, the number of neighbors will be max(kmin, kfrac
 \item{minvalue, maxvalue}{The minimal and maximal value of the aspect of
 interest, used for scaling of the x axis when calculating the area between
 the eCDFs}
+
+\item{permutationPvalues}{Whether or not to calculate p-values of statistics
+via permutation}
+
+\item{nPermutations}{The number of permutations (only used if
+permutationPvalues = TRUE)}
 }
 \value{
 A list with two text strings in markdown format: one for tables based
