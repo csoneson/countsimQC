@@ -11,7 +11,9 @@ one based on which the synthetic data sets were generated. However, any collecti
 `countsimQC` depends on a number of other R packages. The following commands check whether the dependencies are available and installs them otherwise:
 
 ```
-pkg <- c("rmarkdown", "edgeR", "DESeq2", "dplyr", "tidyr", "ggplot2", "grDevices", "tools", "SummarizedExperiment", "genefilter", "DT", "GenomeInfoDbData", "caTools", "randtests")
+pkg <- c("rmarkdown", "edgeR", "DESeq2", "dplyr", "tidyr", "ggplot2", 
+         "SummarizedExperiment", "genefilter", "DT", "GenomeInfoDbData",
+         "caTools", "randtests")
 pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
 if (length(pkg) > 0) {
 	source("https://bioconductor.org/biocLite.R")
