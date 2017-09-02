@@ -68,3 +68,5 @@ browseVignettes("countsimQC")
 ## Example reports
 
 - [Comparison of 16S microbiome species count matrices for four body subsites from the Human Microbiome Project](http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/HMP_sampled_datasets_countsimQC.html)
+- [Comparison of three real bulk RNA-seq data sets](http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/bulkrnaseq_crossdataset_countsimQC.html)
+- [Comparison of gene- and transcript-level count matrices for a single-cell RNA-seq data set](http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/GSE74596_genevstx_countsimQC.html) 
