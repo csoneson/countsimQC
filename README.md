@@ -64,3 +64,7 @@ For more detailed information about how to use the package, we refer to the vign
 ```
 browseVignettes("countsimQC")
 ```
+
+## Example reports
+
+- [Comparison of 16S microbiome species count matrices for four body subsites from the Human Microbiome Project](http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/HMP_sampled_datasets_countsimQC.html)
