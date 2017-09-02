@@ -920,9 +920,9 @@ if (calculateStatistics)
 
 The plots below show the distribution of Spearman correlation coefficients for
 pairs of samples, calculated from the log(CPM) values obtained via the `cpm`
-function from `edgeR`, with a prior.count of 2. If there are more than `r
-maxNForCorr` samples in a data set, the pairwise correlations between `r
-maxNForCorr` randomly selected samples are shown.
+function from `edgeR`, with a prior.count of 2. If there are more than 
+`r maxNForCorr` samples in a data set, the pairwise correlations between 
+`r maxNForCorr` randomly selected samples are shown.
 
 ### Separate histograms
 
