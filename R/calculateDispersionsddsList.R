@@ -32,7 +32,7 @@ calculateDispersionsddsList <- function(ddsList, maxNForDisp, seed = 123) {
       dgetmp <- dge[, keepSamples]
       destmp <- stats::model.matrix(
         DESeq2::design(ds),
-        data = droplevels(SummarizedExperiment::colData(ds)[keepSamples, ])
+        data = droplevels(SummarizedExperiment::colData(ds)[keepSamples, , drop = FALSE])
       )
       dgetmp <- edgeR::estimateDisp(dgetmp, design = destmp)
       stopifnot(all(rownames(dge) == rownames(dgetmp)))
