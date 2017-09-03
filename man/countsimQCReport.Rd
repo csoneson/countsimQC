@@ -9,7 +9,7 @@ countsimQCReport(ddsList, outputFile, outputDir = "./", outputFormat = NULL,
   savePlots = FALSE, description = NULL, maxNForCorr = 500,
   maxNForDisp = Inf, calculateStatistics = TRUE, subsampleSize = 500,
   seed = 123, kfrac = 0.01, kmin = 5, permutationPvalues = FALSE,
-  nPermutations = NULL, ...)
+  nPermutations = NULL, knitrProgress = FALSE, quiet = FALSE, ...)
 }
 \arguments{
 \item{ddsList}{Named list of \code{DESeqDataSets} or count matrices to
@@ -51,9 +51,9 @@ the generated report. This will be included in the beginning of the report.
 If set to NULL, a default description listing the number and names of the
 included data sets will be used.}
 
-\item{maxNForCorr}{The maximal number of samples (variables) for which
+\item{maxNForCorr}{The maximal number of samples (features) for which
 pairwise correlation coefficients will be calculated. If the number of
-samples (variables) exceeds this number, they will be randomly subsampled.}
+samples (features) exceeds this number, they will be randomly subsampled.}
 
 \item{maxNForDisp}{The maximal number of samples that will be used to
 estimate dispersions. By default, all samples are used. This can be lowered
@@ -64,7 +64,7 @@ sets.}
 statistics for comparing data sets in addition to generating the plots.}
 
 \item{subsampleSize}{The number of randomly selected observations (samples,
-variables or pairs of samples or variables) for which certain
+features or pairs of samples or features) for which certain
 (time-consuming) statistics will be calculated. Only used if
 \code{calculateStatistics} = TRUE.}
 
@@ -82,6 +82,12 @@ selected pairwise data set comparison statistics.}
 \item{nPermutations}{The number of permutations to perform when calculating
 permutation p-values for data set comparison statistics. Only used if
 \code{permutationPvalues} = TRUE.}
+
+\item{knitrProgress}{Whether to show the progress bar when the report is
+generated.}
+
+\item{quiet}{Whether to suppress warnings and progress messages when the
+report is generated.}
 
 \item{...}{Other arguments that will be passed to \code{rmarkdown::render}.}
 }
@@ -108,6 +114,7 @@ data(countsimExample)
 countsimQCReport(countsimExample, outputDir = "./",
                  outputFile = "example.html")
 }
+
 }
 \author{
 Charlotte Soneson

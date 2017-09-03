@@ -33,9 +33,9 @@
 #'   the generated report. This will be included in the beginning of the report.
 #'   If set to NULL, a default description listing the number and names of the
 #'   included data sets will be used.
-#' @param maxNForCorr The maximal number of samples (variables) for which
+#' @param maxNForCorr The maximal number of samples (features) for which
 #'   pairwise correlation coefficients will be calculated. If the number of
-#'   samples (variables) exceeds this number, they will be randomly subsampled.
+#'   samples (features) exceeds this number, they will be randomly subsampled.
 #' @param maxNForDisp The maximal number of samples that will be used to
 #'   estimate dispersions. By default, all samples are used. This can be lowered
 #'   to speed up calculations (and obtain approximate results) for large data
@@ -43,7 +43,7 @@
 #' @param calculateStatistics Whether to calculate quantitative pairwise
 #'   statistics for comparing data sets in addition to generating the plots.
 #' @param subsampleSize The number of randomly selected observations (samples,
-#'   variables or pairs of samples or variables) for which certain
+#'   features or pairs of samples or features) for which certain
 #'   (time-consuming) statistics will be calculated. Only used if
 #'   \code{calculateStatistics} = TRUE.
 #' @param seed The random seed to use in subsampling steps (for calculation of
@@ -57,6 +57,10 @@
 #' @param nPermutations The number of permutations to perform when calculating
 #'   permutation p-values for data set comparison statistics. Only used if
 #'   \code{permutationPvalues} = TRUE.
+#' @param knitrProgress Whether to show the progress bar when the report is
+#'   generated.
+#' @param quiet Whether to suppress warnings and progress messages when the
+#'   report is generated.
 #' @param ... Other arguments that will be passed to \code{rmarkdown::render}.
 #'
 #' @author Charlotte Soneson
@@ -85,7 +89,7 @@
 #' countsimQCReport(countsimExample, outputDir = "./",
 #'                  outputFile = "example.html")
 #' }
-#' @include makeDF.R
+#'
 countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
                              outputFormat = NULL, showCode = FALSE,
                              rmdTemplate = NULL, forceOverwrite = FALSE,
@@ -94,7 +98,7 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
                              calculateStatistics = TRUE, subsampleSize = 500,
                              seed = 123, kfrac = 0.01, kmin = 5,
                              permutationPvalues = FALSE, nPermutations = NULL,
-                             ...){
+                             knitrProgress = FALSE, quiet = FALSE, ...){
   ## This function was inspired by code from Nicholas Hamilton, provided at
   ## http://stackoverflow.com/questions/37097535/generate-report-in-r
 
@@ -161,9 +165,11 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
            "another value of outputFile, or set forceOverwrite = TRUE.",
            call. = FALSE)
     } else {
-      warning("The file ", outputReport,
-              " already exists and will be overwritten, since ",
-              "forceOverwrite = TRUE.", immediate. = TRUE, call. = FALSE)
+      if (!quiet) {
+        warning("The file ", outputReport,
+                " already exists and will be overwritten, since ",
+                "forceOverwrite = TRUE.", immediate. = TRUE, call. = FALSE)
+      }
     }
   }
 
@@ -175,16 +181,20 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
            "Please remove or rename the file, provide another value ",
            "of outputFile, or set forceOverwrite = TRUE.", call. = FALSE)
     } else if (savePlots & forceOverwrite) {
-      warning("The file ", outputPlots,
-              ", where the ggplot objects will be generated, already exists ",
-              "and will be overwritten, since forceOverwrite = TRUE.",
-              immediate. = TRUE, call. = FALSE)
+      if (!quiet) {
+        warning("The file ", outputPlots,
+                ", where the ggplot objects will be generated, already exists ",
+                "and will be overwritten, since forceOverwrite = TRUE.",
+                immediate. = TRUE, call. = FALSE)
+      }
     } else if (!savePlots) {
-      warning("The file ", outputPlots,
-              " already exists, but will not be overwritten ",
-              "since savePlots = FALSE. Note that the ggplots in the ",
-              "existing file may not correspond to the newly ",
-              "generated report.", immediate. = TRUE, call. = FALSE)
+      if (!quiet) {
+        warning("The file ", outputPlots,
+                " already exists, but will not be overwritten ",
+                "since savePlots = FALSE. Note that the ggplots in the ",
+                "existing file may not correspond to the newly ",
+                "generated report.", immediate. = TRUE, call. = FALSE)
+      }
     }
   }
 
@@ -230,6 +240,7 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
   args$input <- outputRmd
   args$output_format <- outputFormat
   args$output_file <- outputFile
+  args$quiet <- !knitrProgress
 
   ## ------------------------------------------------------------------------ ##
   ## ------------------------ Render the report ----------------------------- ##

@@ -5,7 +5,7 @@
 \title{Calculate statistics for pairwise comparison of data sets}
 \usage{
 calculateStats(df, ds1, ds2, column, subsampleSize, permute = FALSE, kmin,
-  kfrac)
+  kfrac, xmin, xmax)
 }
 \arguments{
 \item{df}{The input data frame. Must contain at least a column named
@@ -27,6 +27,9 @@ calculating the statistics.}
 \item{kmin, kfrac}{For statistics that require the extraction of k nearest
 neighbors of a given point, the number of neighbors will be max(kmin, kfrac
 * nrow(df)).}
+
+\item{xmin, xmax}{Smallest and largest value of \code{column}, used to
+normalize the x-axis when calculating the area between the eCDFs.}
 }
 \value{
 A vector with statistics and p-values

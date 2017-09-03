@@ -54,12 +54,14 @@ quantitative pairwise comparisons between data sets will be performed. In
 particular, the Kolmogorov-Smirnov test and the Wald-Wolfowitz runs test will be
 used to compare distributions, and additional statistics will be calculated to
 evaluate how similar the evaluated aspects are between pairs of data sets.
-- by setting `calculateStatistics = TRUE` and `permutationPvalues = TRUE`,
+- by setting `calculateStatistics = TRUE` and `permutationPvalues = TRUE` (and
+giving the requested number of permutations via the `nPermutations` argument),
 permutation of data set labels will be used to evaluate the significance of the
-statistics calculated in the previous point.
+statistics calculated in the previous point. Naturally, this increases the run
+time of the analysis considerably.
 
 Here, for the sake of speed, we calculate statistics for a small subset of the
-observations (`subsampleSize = 25`) and refrain from calculateing permutation
+observations (`subsampleSize = 25`) and refrain from calculating permutation
 p-values.
 
 ```{r, results = "hide", warning = FALSE}
@@ -83,7 +85,7 @@ If the argument `savePlots` is set to TRUE, an .rds file containing the
 individual ggplot objects will be generated. These objects can be used to
 perform fine-tuning of the visualizations if desired. Note, however, that the
 .rds file can become large if the number of data sets is large, or if the
-individual data sets have many samples or variables. The convenience function 
+individual data sets have many samples or features. The convenience function 
 `generateIndividualPlots()` can be used to quickly generate individual figures
 for all plots included in the report, using a variety of devices. For example,
 to generate each plot in pdf format:

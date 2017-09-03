@@ -2,7 +2,7 @@
 % Please edit documentation in R/calculateCorrelations.R
 \name{calculateFeatureCorrs}
 \alias{calculateFeatureCorrs}
-\title{Calculate Spearman correlation between variable pairs}
+\title{Calculate Spearman correlation between feature pairs}
 \usage{
 calculateFeatureCorrs(ddsList, maxNForCorr, seed = 123)
 }
@@ -11,17 +11,17 @@ calculateFeatureCorrs(ddsList, maxNForCorr, seed = 123)
 a list containing a DGEList and a DESeqDataSet, with calculated
 dispersions.}
 
-\item{maxNForCorr}{If the number of variables in a data set exceeds
-\code{maxNForCorr}, \code{maxNForCorr} variables will be randomly selected
+\item{maxNForCorr}{If the number of features in a data set exceeds
+\code{maxNForCorr}, \code{maxNForCorr} features will be randomly selected
 for correlation calculation.}
 
 \item{seed}{The seed for downsampling}
 }
 \value{
-A data frame with pairwise variable correlations for each data set
+A data frame with pairwise feature correlations for each data set
 }
 \description{
-Calculate Spearman correlation between variable pairs
+Calculate Spearman correlation between feature pairs
 }
 \author{
 Charlotte Soneson

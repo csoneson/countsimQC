@@ -1,7 +1,7 @@
 Package: countsimQC
 Type: Package
 Title: Compare Characteristic Features of Count Data Sets
-Version: 0.5.0
+Version: 0.5.1
 Author: Charlotte Soneson
 Maintainer: Charlotte Soneson <charlottesoneson@gmail.com>
 Description: countsimQC provides functionality to create a comprehensive report 

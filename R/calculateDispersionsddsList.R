@@ -20,10 +20,8 @@
 calculateDispersionsddsList <- function(ddsList, maxNForDisp, seed = 123) {
   lapply(ddsList, function(ds) {
     ## --------------------------- edgeR --------------------------- ##
-    ## Define DGEList and design matrix
+    ## Define DGEList
     dge <- edgeR::DGEList(counts = DESeq2::counts(ds))
-    des <- stats::model.matrix(DESeq2::design(ds),
-                               data = SummarizedExperiment::colData(ds))
     ## Calculate normalization factors
     dge <- edgeR::calcNormFactors(dge)
     ## Subset DGEList if the number of samples exceeds maxNForDisp and estimate
@@ -32,8 +30,10 @@ calculateDispersionsddsList <- function(ddsList, maxNForDisp, seed = 123) {
       set.seed(seed)
       keepSamples <- sample(seq_len(ncol(dge)), maxNForDisp, replace = FALSE)
       dgetmp <- dge[, keepSamples]
-      destmp <- des[keepSamples, ]
-      destmp <- destmp[, colSums(destmp) > 0, drop = FALSE]
+      destmp <- stats::model.matrix(
+        DESeq2::design(ds),
+        data = droplevels(SummarizedExperiment::colData(ds)[keepSamples, ])
+      )
       dgetmp <- edgeR::estimateDisp(dgetmp, design = destmp)
       stopifnot(all(rownames(dge) == rownames(dgetmp)))
       dge$tagwise.dispersion <- dgetmp$tagwise.dispersion
@@ -42,6 +42,8 @@ calculateDispersionsddsList <- function(ddsList, maxNForDisp, seed = 123) {
       dge$prior.df <- dgetmp$prior.df
       dge$AveLogCPM <- edgeR::aveLogCPM(dge)
     } else {
+      des <- stats::model.matrix(DESeq2::design(ds),
+                                 data = SummarizedExperiment::colData(ds))
       dge <- edgeR::estimateDisp(dge, design = des)
     }
     ## --------------------------- DESeq2 -------------------------- ##

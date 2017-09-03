@@ -44,13 +44,17 @@ makeDF <- function(df, column, permutationPvalues, nPermutations,
       obs_stats <- calculateStats(df = dftmp, ds1 = ds_df$dataset1[i],
                                   ds2 = ds_df$dataset2[i], column = column,
                                   subsampleSize = subsampleSize,
-                                  permute = FALSE, kmin = kmin, kfrac = kfrac)
+                                  permute = FALSE, kmin = kmin, kfrac = kfrac,
+                                  xmax = max(df[, column], na.rm = TRUE),
+                                  xmin = min(df[, column], na.rm = TRUE))
       if (permutationPvalues) {
         perm_stats <- t(sapply(seq_len(nPermutations), function(s) {
           calculateStats(df = dftmp, ds1 = ds_df$dataset1[i],
                          ds2 = ds_df$dataset2[i], column = column,
                          subsampleSize = subsampleSize,
-                         permute = TRUE, kmin = kmin, kfrac = kfrac)
+                         permute = TRUE, kmin = kmin, kfrac = kfrac,
+                         xmax = max(df[, column], na.rm = TRUE),
+                         xmin = min(df[, column], na.rm = TRUE))
         }))
         ## Permutation p-values
         obs_stats["NNmismatchP"] <-
@@ -123,6 +127,7 @@ makeDF <- function(df, column, permutationPvalues, nPermutations,
 #'   via permutation
 #' @param nPermutations The number of permutations (only used if
 #'   permutationPvalues = TRUE)
+#' @param nDatasets The number of data sets that are being compared
 #'
 #' @return A list with two text strings in markdown format: one for tables based
 #'   on a single data column, and one for tables based on two data columns
@@ -131,14 +136,17 @@ makeDF <- function(df, column, permutationPvalues, nPermutations,
 #'
 defineTableDesc <- function(calculateStatistics, subsampleSize, kfrac, kmin,
                             obstype, aspect, minvalue, maxvalue,
-                            permutationPvalues, nPermutations) {
-  if (calculateStatistics) {
-    if (permutationPvalues) {
-      permtext <- paste0("The permutation p-values below were estimated based on ", nPermutations, " permutations.")
-    } else {
-      permtext <- ""
-    }
-    tabledesc <- paste0("The table below contains a range of quantitative statistics and test results evaluating the degree of similarity between each pair of data sets based on the ", aspect, ". The following statistics and test results are included:
+                            permutationPvalues, nPermutations, nDatasets) {
+  if (nDatasets < 2) {
+    tabledesc <- tabledesc2d <- "No statistics were calculated, since there is only one data set."
+  } else {
+    if (calculateStatistics) {
+      if (permutationPvalues) {
+        permtext <- paste0("The permutation p-values below were estimated based on ", nPermutations, " permutations.")
+      } else {
+        permtext <- ""
+      }
+      tabledesc <- paste0("The table below contains a range of quantitative statistics and test results evaluating the degree of similarity between each pair of data sets based on the ", aspect, ". The following statistics and test results are included:
 
 - *K-S statistic/K-S p-value*: the [Kolmogorov-Smirnov statistic](https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test) [@Kolmogorov1933, @Smirnov1948], i.e., the maximal distance between the two empirical cumulative distribution functions (eCDFs), and the associated p-value.
 - *Scaled area between eCDFs*: the absolute area between the eCDFs for the two data sets. This is calculated by first subtracting one eCDF from the other and taking the absolute value of the differences, followed by scaling the x-axis so that the difference between the largest and smallest value across all data sets is equal to 1 (here, subtracting ", minvalue, " and dividing by ", maxvalue - minvalue, "), and finally calculating the area under the resulting non-negative curve. This gives a scaled area with values in the range [0, 1], where large values indicate large differences between the ", aspect, " distributions.
@@ -149,14 +157,16 @@ defineTableDesc <- function(calculateStatistics, subsampleSize, kfrac, kmin,
 - For the scaled area between eCDFs, NN rejection fraction and average silhouette widths, permutation p-values can be calculated by permuting the data set labels. These values are only available if the 'permutationPvalues' argument to 'countsimQCReport' was set to TRUE. ", permtext,"
 
 It should be noted that the reported statistics in some cases are highly dependent on the number of underlying observations, and especially with a large number of observations, very small p-values can correspond to small effective differences. Thus, interpretation should ideally be guided by both quantitative and qualitative, visual information.")
-    tabledesc2d <- paste0("The table below contains a range of quantitative statistics and test results evaluating the degree of similarity between each pair of data sets based on the ", aspect, ". The following statistics and test results are included:
+      tabledesc2d <- paste0("The table below contains a range of quantitative statistics and test results evaluating the degree of similarity between each pair of data sets based on the ", aspect, ". The following statistics and test results are included:
 
 - *NN rejection fraction*: this statistic is similar to one used by the [kBET](https://github.com/theislab/kBET) R package. First, a subset of R ", obstype, "s are selected (where R is chosen to be the smallest of ", subsampleSize, " and the total number of ", obstype, "s in the two data sets), and for each of these ", obstype, "s the k nearest neighbors are found (where k is chosen to be ", kfrac * 100, "% of the total number of ", obstype, "s from the two data sets, however at least ", kmin, "). Then, a chi-square test is used to evaluate whether the composition of data sets from which the k nearest neighbors of each selected ", obstype, "s comes differs significantly from the overall composition of ", obstype, "s from the two data sets. The NN rejection fraction is the fraction of selected ", obstype, "s for which the chi-square test rejects the null hypothesis at a significance level of 5%.
 - *Average silhouette width*: as for the NN rejection fraction, a subset of R ", obstype, "s are selected. For each of these, the (Euclidean) distances to all other ", obstype, "s are calculated, and the [silhouette width](https://en.wikipedia.org/wiki/Silhouette_(clustering)) [@Rousseeuw1987silhouette] is calculated based on these distances. The final statistic is the average silhouette width for the R ", obstype, "s.
 - *Average local silhouette width*: similar to the average silhouette width, but for each ", obstype, ", only the k' closest ", obstype, "s from a data set are used to calculate the silhouette widths. Here, k' for data set i is defined as k * p_i, where k is as above and p_i is the fraction of the total number of ", obstype, "s that come from data set i.
-- For the scaled area between eCDFs, NN rejection fraction and average silhouette widths, permutation p-values can be calculated by permuting the data set labels. These values are only available if the 'permutationPvalues' argument to 'countsimQCReport' was set to TRUE. ", permtext)
-  } else {
-    tabledesc <- tabledesc2d <- "No statistics were calculated, since the 'calculateStatistics' argument to 'countsimQCReport()' was set to FALSE. To perform pairwise quantitative comparisons between data sets, set this argument to TRUE. Note, however, that this increases the runtime significantly."
+- For the NN rejection fraction and average silhouette widths, permutation p-values can be calculated by permuting the data set labels. These values are only available if the 'permutationPvalues' argument to 'countsimQCReport' was set to TRUE. ", permtext)
+    } else {
+      tabledesc <- tabledesc2d <- "No statistics were calculated, since the 'calculateStatistics' argument to 'countsimQCReport()' was set to FALSE. To perform pairwise quantitative comparisons between data sets, set this argument to TRUE. Note, however, that this increases the runtime significantly."
+    }
   }
+
   list(tabledesc = tabledesc, tabledesc2d = tabledesc2d)
 }

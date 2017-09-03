@@ -16,13 +16,15 @@
 #' @param kmin,kfrac For statistics that require the extraction of k nearest
 #'   neighbors of a given point, the number of neighbors will be max(kmin, kfrac
 #'   * nrow(df)).
+#' @param xmin,xmax Smallest and largest value of \code{column}, used to
+#'   normalize the x-axis when calculating the area between the eCDFs.
 #'
 #' @return A vector with statistics and p-values
 #' @author Charlotte Soneson
 #' @importFrom stats ks.test ecdf chisq.test
 #'
 calculateStats <- function(df, ds1, ds2, column, subsampleSize,
-                           permute = FALSE, kmin, kfrac) {
+                           permute = FALSE, kmin, kfrac, xmin, xmax) {
   ## Remove rows with NA values in column(s) of interest
   df <- df[rowSums(is.na(df[, column, drop = FALSE])) == 0, ]
 
@@ -41,7 +43,7 @@ calculateStats <- function(df, ds1, ds2, column, subsampleSize,
     e2 <- stats::ecdf(df[, column][df$dataset == ds2])
     xv <- sort(unique(df[, column]))
     ediff <- abs(e1(xv) - e2(xv))
-    earea <- caTools::trapz((xv - min(xv))/(max(xv) - min(xv)), ediff)
+    earea <- caTools::trapz((xv - xmin)/(xmax - xmin), ediff)
   }
 
   ## Silhouette width and nearest neighbor distribution for subsample of

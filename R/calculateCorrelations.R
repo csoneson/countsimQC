@@ -30,20 +30,21 @@ calculateSampleCorrs <- function(ddsList, maxNForCorr, seed = 123) {
     dplyr::mutate(dataset = rep(names(sampleCorrDF), ns))
 }
 
-#' Calculate Spearman correlation between variable pairs
+#' Calculate Spearman correlation between feature pairs
 #'
 #' @param ddsList List of lists, with one element per data set. Each element is
 #'   a list containing a DGEList and a DESeqDataSet, with calculated
 #'   dispersions.
-#' @param maxNForCorr If the number of variables in a data set exceeds
-#'   \code{maxNForCorr}, \code{maxNForCorr} variables will be randomly selected
+#' @param maxNForCorr If the number of features in a data set exceeds
+#'   \code{maxNForCorr}, \code{maxNForCorr} features will be randomly selected
 #'   for correlation calculation.
 #' @param seed The seed for downsampling
 #'
-#' @return A data frame with pairwise variable correlations for each data set
+#' @return A data frame with pairwise feature correlations for each data set
 #' @author Charlotte Soneson
 #' @importFrom stats cor
 #' @importFrom edgeR cpm
+#' @importFrom genefilter rowVars
 #'
 calculateFeatureCorrs <- function(ddsList, maxNForCorr, seed = 123) {
   featureCorrDF <- lapply(ddsList, function(x) {
