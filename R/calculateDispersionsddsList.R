@@ -41,10 +41,12 @@ calculateDispersionsddsList <- function(ddsList, maxNForDisp, seed = 123) {
       dge$trended.dispersion <- dgetmp$trended.dispersion
       dge$prior.df <- dgetmp$prior.df
       dge$AveLogCPM <- edgeR::aveLogCPM(dge)
+      dge$AveLogCPMDisp <- dgetmp$AveLogCPM
     } else {
       des <- stats::model.matrix(DESeq2::design(ds),
                                  data = SummarizedExperiment::colData(ds))
       dge <- edgeR::estimateDisp(dge, design = des)
+      dge$AveLogCPMDisp <- dge$AveLogCPM
     }
     ## --------------------------- DESeq2 -------------------------- ##
     ## Calculate size factors
@@ -62,8 +64,10 @@ calculateDispersionsddsList <- function(ddsList, maxNForDisp, seed = 123) {
       rowData(dds)$dispFit <- rowData(ddstmp)$dispFit
       rowData(dds)$dispersion <- rowData(ddstmp)$dispersion
       rowData(dds)$baseMean <- rowMeans(counts(dds, normalized = TRUE))
+      rowData(dds)$baseMeanDisp <- rowData(ddstmp)$baseMean
     } else {
       dds <- DESeq2::estimateDispersions(dds, quiet = TRUE)
+      rowData(dds)$baseMeanDisp <- rowData(dds)$baseMean
     }
     ## Check that the genes are in the same order in the DGEList and
     ## DESeqDataSet

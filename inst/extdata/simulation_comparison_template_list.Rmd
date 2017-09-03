@@ -192,12 +192,14 @@ featureDF <- lapply(obj, function(x) {
     Common = sqrt(x$dge$common.dispersion),
     Trend = sqrt(x$dge$trended.dispersion),
     AveLogCPM = x$dge$AveLogCPM,
+    AveLogCPMDisp = x$dge$AveLogCPMDisp, 
     average_log2_cpm = apply(edgeR::cpm(x$dge, prior.count = 2, log = TRUE), 1, mean), 
     variance_log2_cpm = apply(edgeR::cpm(x$dge, prior.count = 2, log = TRUE), 1, var),
     Fraczero = rowMeans(x$dge$counts == 0),
     dispGeneEst = rowData(x$dds)$dispGeneEst,
     dispFit = rowData(x$dds)$dispFit,
     dispFinal = rowData(x$dds)$dispersion,
+    baseMeanDisp = rowData(x$dds)$baseMeanDisp,
     baseMean = rowData(x$dds)$baseMean
   )
 })
@@ -213,7 +215,7 @@ datasetDF <- do.call(rbind, lapply(obj, function(x) {
     nSamples = ncol(x$dge$counts)
   )
 })) %>% 
-  dplyr::mutate(AveLogCPM = 0.8 * max(featureDF$AveLogCPM)) %>%
+  dplyr::mutate(AveLogCPMDisp = 0.8 * max(featureDF$AveLogCPMDisp)) %>%
   dplyr::mutate(Tagwise = 0.9 * max(featureDF$Tagwise)) %>%
   dplyr::mutate(dataset = names(obj))
 ```
@@ -293,8 +295,8 @@ see @Chen2014Dispersion.
 
 ```{r BCVedgeR, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
 plots[["BCVedgeR"]] <- 
-  ggplot(featureDF %>% dplyr::arrange(AveLogCPM), 
-         aes(x = AveLogCPM, y = Tagwise)) + 
+  ggplot(featureDF %>% dplyr::arrange(AveLogCPMDisp), 
+         aes(x = AveLogCPMDisp, y = Tagwise)) + 
   geom_point(size = 0.25, alpha = 0.5) + 
   facet_wrap(~dataset, nrow = colRow[2]) + 
   geom_line(aes(y = Trend), color = "blue", size = 1.5) + 
@@ -312,7 +314,7 @@ plots[["BCVedgeR"]]
 
 ```{r BCVedgeRTests}
 if (calculateStatistics)
-  makeDF(df = featureDF, column = c("AveLogCPM", "Tagwise"), 
+  makeDF(df = featureDF, column = c("AveLogCPMDisp", "Tagwise"), 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
 ```
@@ -326,8 +328,8 @@ see @Love2014DESeq2.
 
 ```{r dispersionDESeq2, fig.width = panelSize * colRow[1], fig.height = panelSize * colRow[2]}
 plots[["dispersionDESeq2"]] <- 
-  ggplot(featureDF %>% dplyr::arrange(baseMean), 
-         aes(x = baseMean, y = dispGeneEst)) + 
+  ggplot(featureDF %>% dplyr::arrange(baseMeanDisp), 
+         aes(x = baseMeanDisp, y = dispGeneEst)) + 
   geom_point(size = 0.25, alpha = 0.5) + 
   facet_wrap(~dataset, nrow = colRow[2]) + scale_x_log10() + scale_y_log10() +  
   geom_point(aes(y = dispFinal), color = "lightblue", shape = 21) + 
@@ -343,7 +345,7 @@ plots[["dispersionDESeq2"]]
 
 ```{r dispersionDESeq2Tests}
 if (calculateStatistics)
-  makeDF(df = featureDF, column = c("baseMean", "dispGeneEst"), 
+  makeDF(df = featureDF, column = c("baseMeanDisp", "dispGeneEst"), 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
 ```
