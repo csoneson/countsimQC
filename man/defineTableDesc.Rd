@@ -31,6 +31,8 @@ via permutation}
 
 \item{nPermutations}{The number of permutations (only used if
 permutationPvalues = TRUE)}
+
+\item{nDatasets}{The number of data sets that are being compared}
 }
 \value{
 A list with two text strings in markdown format: one for tables based
