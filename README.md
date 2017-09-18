@@ -30,7 +30,7 @@ Once all dependencies are available, `countsimQC` can be installed using the `de
 
 ```
 ## Install devtools if needed
-install.packages(devtools)
+install.packages("devtools")
 
 ## Install countsimQC
 devtools::install_github("csoneson/countsimQC")
