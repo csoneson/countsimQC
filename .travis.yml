@@ -11,3 +11,4 @@ r_check_args: "--no-build-vignettes --no-manual --timings"
 
 bioc_packages:
   - BiocInstaller
+
