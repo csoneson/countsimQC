@@ -7,7 +7,7 @@ count data sets. One important use case is comparing one or more
 synthetic (e.g., RNA-seq) count matrices to a real count matrix, possibly the 
 one based on which the synthetic data sets were generated. However, any collection of one or more count matrices can be visualized and compared.
 
-If you use `countsimQC`, please cite the following paper:
+If you use `countsimQC` for your work, we appreciate if you cite the accompanying paper:
 
 - Soneson C and Robinson MD: [Towards unified quality verification of synthetic count data with countsimQC](https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btx631/4345646/Towards-unified-quality-verification-of-synthetic). Bioinformatics, advance access
 
