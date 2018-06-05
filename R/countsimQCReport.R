@@ -104,6 +104,10 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
 
   if (is.null(outputFormat)) outputFormat <- "html_document"
 
+  ## Check if pandoc is available
+  if (!rmarkdown::pandoc_available())
+    warning("pandoc is not available! The final report will not be generated.")
+
   ## ------------------------------------------------------------------------ ##
   ## --------------------- Check input arguments ---------------------------- ##
   ## ------------------------------------------------------------------------ ##

@@ -9,7 +9,7 @@ one based on which the synthetic data sets were generated. However, any collecti
 
 If you use `countsimQC` for your work, we appreciate if you cite the accompanying paper:
 
-- Soneson C and Robinson MD: [Towards unified quality verification of synthetic count data with countsimQC](https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btx631/4345646/Towards-unified-quality-verification-of-synthetic). Bioinformatics, advance access
+- Soneson C and Robinson MD: [Towards unified quality verification of synthetic count data with countsimQC](https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btx631/4345646/Towards-unified-quality-verification-of-synthetic). Bioinformatics 34(4):691-692 (2018).
 
 ## Installation
 `countsimQC` depends on a number of other R packages. The following commands check whether the dependencies are available and installs them otherwise (note that R version >= 3.4 is required):
