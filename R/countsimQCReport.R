@@ -126,7 +126,7 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
       warning("pandoc-citeproc is not available! The final report will not be generated.")
     } else {
       ## If ignorePandoc is FALSE, stop
-      stop("pandoc is not available!")
+      stop("pandoc-citeproc is not available!")
     }
   }
 
