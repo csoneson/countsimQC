@@ -61,6 +61,11 @@
 #'   generated.
 #' @param quiet Whether to suppress warnings and progress messages when the
 #'   report is generated.
+#' @param ignorePandoc Determines what to do if pandoc or pandoc-citeproc is
+#'   missing (if Sys.which("pandoc") or Sys.which("pandoc-citeproc") is ""). If
+#'   ignorePandoc is TRUE, only a warning is given. The figures will be
+#'   generated, but not the final report. If ignorePandoc is FALSE (default),
+#'   the execution stops immediately.
 #' @param ... Other arguments that will be passed to \code{rmarkdown::render}.
 #'
 #' @author Charlotte Soneson
@@ -98,15 +103,32 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
                              calculateStatistics = TRUE, subsampleSize = 500,
                              seed = 123, kfrac = 0.01, kmin = 5,
                              permutationPvalues = FALSE, nPermutations = NULL,
-                             knitrProgress = FALSE, quiet = FALSE, ...){
+                             knitrProgress = FALSE, quiet = FALSE,
+                             ignorePandoc = FALSE, ...){
   ## This function was inspired by code from Nicholas Hamilton, provided at
   ## http://stackoverflow.com/questions/37097535/generate-report-in-r
 
   if (is.null(outputFormat)) outputFormat <- "html_document"
 
-  ## Check if pandoc is available
-  if (!rmarkdown::pandoc_available())
-    warning("pandoc is not available! The final report will not be generated.")
+  ## Check if pandoc and pandoc-citeproc is available
+  if (Sys.which("pandoc") == "") {
+    if (ignorePandoc) {
+      ## If ignorePandoc is TRUE, just give a warning
+      warning("pandoc is not available! The final report will not be generated.")
+    } else {
+      ## If ignorePandoc is FALSE, stop
+      stop("pandoc is not available!")
+    }
+  }
+  if (Sys.which("pandoc-citeproc") == "") {
+    if (ignorePandoc) {
+      ## If ignorePandoc is TRUE, just give a warning
+      warning("pandoc-citeproc is not available! The final report will not be generated.")
+    } else {
+      ## If ignorePandoc is FALSE, stop
+      stop("pandoc is not available!")
+    }
+  }
 
   ## ------------------------------------------------------------------------ ##
   ## --------------------- Check input arguments ---------------------------- ##

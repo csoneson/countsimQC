@@ -9,7 +9,8 @@ countsimQCReport(ddsList, outputFile, outputDir = "./", outputFormat = NULL,
   savePlots = FALSE, description = NULL, maxNForCorr = 500,
   maxNForDisp = Inf, calculateStatistics = TRUE, subsampleSize = 500,
   seed = 123, kfrac = 0.01, kmin = 5, permutationPvalues = FALSE,
-  nPermutations = NULL, knitrProgress = FALSE, quiet = FALSE, ...)
+  nPermutations = NULL, knitrProgress = FALSE, quiet = FALSE,
+  ignorePandoc = FALSE, ...)
 }
 \arguments{
 \item{ddsList}{Named list of \code{DESeqDataSets} or count matrices to
@@ -88,6 +89,12 @@ generated.}
 
 \item{quiet}{Whether to suppress warnings and progress messages when the
 report is generated.}
+
+\item{ignorePandoc}{Determines what to do if pandoc or pandoc-citeproc is
+missing (if Sys.which("pandoc") or Sys.which("pandoc-citeproc") is ""). If
+ignorePandoc is TRUE, only a warning is given. The figures will be
+generated, but not the final report. If ignorePandoc is FALSE (default),
+the execution stops immediately.}
 
 \item{...}{Other arguments that will be passed to \code{rmarkdown::render}.}
 }
