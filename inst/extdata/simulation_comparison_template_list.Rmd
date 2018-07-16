@@ -147,8 +147,9 @@ thm <- theme_bw() +
         strip.text = element_text(size = 15))
 
 ## ----------------------- Calculate dispersions ----------------------- ##
-if (!quiet)
+if (!quiet) {
   message("Calculating dispersions. This can take some time, please be patient.")
+}
 if (is.finite(maxNForDisp)) {
   msg <- paste0("If there are more than ", maxNForDisp, 
                 " samples in a data set, the dispersions are calculated using ",
@@ -160,20 +161,23 @@ obj <- calculateDispersionsddsList(ddsList = ddsList,
                                    maxNForDisp = maxNForDisp, seed = seed)
 
 ## --------------- Calculate between-sample correlations --------------- ##
-if (!quiet)
+if (!quiet) {
   message("Calculating sample correlations.")
+}
 sampleCorrDF <- calculateSampleCorrs(ddsList = obj, 
                                      maxNForCorr = maxNForCorr, seed = seed)
 
 ## -------------- Calculate between-feature correlations --------------- ##
-if (!quiet)
+if (!quiet) {
   message("Calculating feature correlations.")
+}
 featureCorrDF <- calculateFeatureCorrs(ddsList = obj, 
                                        maxNForCorr = maxNForCorr, seed = seed)
   
 ## ----------------- Summarize sample characteristics ------------------ ##
-if (!quiet)
+if (!quiet) {
   message("Summarizing calculated values.")
+}
 sampleDF <- lapply(obj, function(x) {
   data.frame(
     Libsize = colSums(x$dge$counts),
@@ -241,8 +245,9 @@ for (ds in names(ddsList)) {
 ## Data set dimensions {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing data set dimensions.")
+}
 ```
 
 These bar plots show the number of samples (columns) and features (rows) in
@@ -273,8 +278,9 @@ plots[["nVariables"]]
 ## Dispersion/BCV plots {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing dispersion estimates.")
+}
 ```
 
 Disperson/BCV plots show the association between the average abundance and the
@@ -313,10 +319,11 @@ plots[["BCVedgeR"]]
 
 
 ```{r BCVedgeRTests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = featureDF, column = c("AveLogCPMDisp", "Tagwise"), 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 ### DESeq2
@@ -344,17 +351,19 @@ plots[["dispersionDESeq2"]]
 `r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "base mean and genewise dispersion", minvalue = 0, maxvalue = 1, permutationPvalues = permutationPvalues, nPermutations = nPermutations, nDatasets = nDatasets)$tabledesc2d)`
 
 ```{r dispersionDESeq2Tests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = featureDF, column = c("baseMeanDisp", "dispGeneEst"), 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 ## Mean-variance plots {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing mean-variance relationship.")
+}
 ```
 
 These scatter plots show the relation between the empirical mean and variance of
@@ -394,17 +403,19 @@ plots[["meanVarOverlaidScatter"]]
 `r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average and variance of the log CPM", minvalue = 0, maxvalue = 1, permutationPvalues = permutationPvalues, nPermutations = nPermutations, nDatasets = nDatasets)$tabledesc2d)` 
 
 ```{r meanVarTests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = featureDF, column = c("average_log2_cpm", "variance_log2_cpm"), 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 ## Library sizes {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing library sizes.")
+}
 ```
 
 These plots illustrate the distribution of the total read count per sample,
@@ -488,17 +499,19 @@ plots[["libsizeEcdf"]]
 `r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "library size", minvalue = min(sampleDF$Libsize, na.rm = TRUE), maxvalue = max(sampleDF$Libsize, na.rm = TRUE), permutationPvalues = permutationPvalues, nPermutations = nPermutations, nDatasets = nDatasets)$tabledesc)`
 
 ```{r libsizeTests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = sampleDF, column = "Libsize", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 ## TMM normalization factors {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing TMM normalization factors.")
+}
 ```
 
 The plots below show the distribution of the TMM normalization factors
@@ -585,17 +598,19 @@ plots[["tmmEcdf"]]
 `r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "TMM factor", minvalue = min(sampleDF$TMM, na.rm = TRUE), maxvalue = max(sampleDF$TMM, na.rm = TRUE), permutationPvalues = permutationPvalues, nPermutations = nPermutations, nDatasets = nDatasets)$tabledesc)`
 
 ```{r tmmTests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = sampleDF, column = "TMM", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 ## Effective library sizes {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing effective library sizes.")
+}
 ```
 
 These plots show the distribution of the "effective library sizes", defined as
@@ -681,17 +696,19 @@ plots[["effLibsizeEcdf"]]
 
 
 ```{r effLibsizeTests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = sampleDF, column = "EffLibsize", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 ## Expression distributions (average log CPM) {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing expression distributions.")
+}
 ```
 
 The plots in this section show the distribution of average abundance values for
@@ -776,17 +793,19 @@ plots[["logCPMEcdf"]]
 
 
 ```{r logCPMTests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = featureDF, column = "AveLogCPM", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 ## Fraction zeros per sample {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing fraction zeros per sample.")
+}
 ```
 
 These plots show the distribution of the fraction of zeros observed per sample
@@ -871,17 +890,19 @@ plots[["fraczeroSampleEcdf"]]
  
 
 ```{r fraczeroSampleTests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = sampleDF, column = "Fraczero", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 ## Fraction zeros per feature {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing fraction zeros per feature.")
+}
 ```
 
 These plots illustrate the distribution of the fraction of zeros observed per
@@ -966,17 +987,19 @@ plots[["fraczeroFeatureEcdf"]]
 
 
 ```{r fraczeroFeatureTests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = featureDF, column = "Fraczero", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 ## Sample-sample correlations {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing sample-sample correlations.")
+}
 ```
 
 The plots below show the distribution of Spearman correlation coefficients for
@@ -1064,17 +1087,19 @@ plots[["sampleCorrEcdf"]]
  
 
 ```{r sampleCorrTests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = sampleCorrDF, column = "Correlation", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 ## Feature-feature correlations {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing feature-feature correlations.")
+}
 ```
 
 These plots illustrate the distribution of Spearman correlation coefficients for
@@ -1163,17 +1188,19 @@ plots[["featureCorrEcdf"]]
  
 
 ```{r featureCorrTests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = featureCorrDF, column = "Correlation", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 ## Library size vs fraction zeros {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing library size vs fraction zeros relationship.")
+}
 ```
 
 These scatter plots show the association between the total count (column sums)
@@ -1206,17 +1233,19 @@ plots[["libsizeFraczeroOverlaidScatter"]]
 `r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "sample", aspect = "library size and fraction of zeros", minvalue = 0, maxvalue = 1, permutationPvalues = permutationPvalues, nPermutations = nPermutations, nDatasets = nDatasets)$tabledesc2d)` 
 
 ```{r libsizeFraczeroTests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = sampleDF, column = c("Libsize", "Fraczero"), 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 ## Mean expression vs fraction zeros {.tabset .tabset-pills}
 
 ```{r, include = FALSE}
-if (!quiet)
+if (!quiet) {
   message("Processing expression vs fraction zeros relationship.")
+}
 ```
 
 These scatter plots show the association between the average abundance and the 
@@ -1249,20 +1278,23 @@ plots[["logCPMFraczeroOverlaidScatter"]]
 `r I(defineTableDesc(calculateStatistics = calculateStatistics, subsampleSize = subsampleSize, kfrac = kfrac, kmin = kmin, obstype = "feature", aspect = "average log CPM and fraction of zeros", minvalue = 0, maxvalue = 1, permutationPvalues = permutationPvalues, nPermutations = nPermutations, nDatasets = nDatasets)$tabledesc2d)` 
 
 ```{r logCPMFraczeroTests}
-if (calculateStatistics)
+if (calculateStatistics) {
   makeDF(df = featureDF, column = c("AveLogCPM", "Fraczero"), 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
          subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+}
 ```
 
 
 ```{r, include = FALSE}
-if (savePlots) 
-  if (!quiet)
+if (savePlots) {
+  if (!quiet) {
     message("Saving plots.")
+  }
   saveRDS(plots, 
           file = paste0(outputDir, "/",
                         tools::file_path_sans_ext(basename(outputFile)), "_ggplots.rds"))
+}
 ```
 
 ## Session info
