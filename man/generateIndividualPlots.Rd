@@ -31,10 +31,13 @@ ggplot objects that can be saved when generating a countsimQC report (by
 setting \code{savePlots = TRUE}).
 }
 \examples{
-\dontrun{
+## Load example data
 data(countsimExample)
+\dontrun{
+## Generate report
 countsimQCReport(countsimExample, outputDir = "./",
                  outputFile = "example.html", savePlots = TRUE)
+## Generate individual plots
 generateIndividualPlots("example_ggplots.rds", nDatasets = 3)
 }
 

@@ -12,7 +12,7 @@ Description: countsimQC provides functionality to create a comprehensive report
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.4)
+Depends: R (>= 3.5)
 Imports: rmarkdown (>= 0.9.5),
     edgeR,
     DESeq2 (>= 1.16.0),
@@ -26,8 +26,10 @@ Imports: rmarkdown (>= 0.9.5),
     DT,
     GenomeInfoDbData,
     caTools,
-    randtests
-RoxygenNote: 6.0.1
+    randtests,
+    stats,
+    utils
+RoxygenNote: 6.1.0
 Suggests: knitr,
     testthat
 VignetteBuilder: knitr

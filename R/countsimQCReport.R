@@ -89,8 +89,10 @@
 #'   \code{outputDir} directory.
 #'
 #' @examples
-#' \dontrun{
+#' ## Load example data
 #' data(countsimExample)
+#' \dontrun{
+#' ## Generate report
 #' countsimQCReport(countsimExample, outputDir = "./",
 #'                  outputFile = "example.html")
 #' }
@@ -114,7 +116,8 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
   if (Sys.which("pandoc") == "") {
     if (ignorePandoc) {
       ## If ignorePandoc is TRUE, just give a warning
-      warning("pandoc is not available! The final report will not be generated.")
+      warning("pandoc is not available! ",
+              "The final report will not be generated.")
     } else {
       ## If ignorePandoc is FALSE, stop
       stop("pandoc is not available!")
@@ -123,7 +126,8 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
   if (Sys.which("pandoc-citeproc") == "") {
     if (ignorePandoc) {
       ## If ignorePandoc is TRUE, just give a warning
-      warning("pandoc-citeproc is not available! The final report will not be generated.")
+      warning("pandoc-citeproc is not available! ",
+              "The final report will not be generated.")
     } else {
       ## If ignorePandoc is FALSE, stop
       stop("pandoc-citeproc is not available!")
@@ -167,21 +171,22 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
     if (class(ds) == "DESeqDataSet") {
       ds
     } else {
-      DESeq2::DESeqDataSetFromMatrix(countData = round(as.matrix(ds)),
-                                     colData = data.frame(sample = 1:ncol(ds)),
-                                     design = ~ 1)
+      DESeq2::DESeqDataSetFromMatrix(
+        countData = round(as.matrix(ds)),
+        colData = data.frame(sample = seq_len(ncol(ds))),
+        design = ~ 1)
     }
   })
   stopifnot(all(sapply(ddsList, class) == "DESeqDataSet"))
 
   ## ------------------------- output files --------------------------------- ##
   outputReport <- file.path(outputDir, basename(outputFile))
-  outputPlots <- file.path(outputDir,
-                           paste0(tools::file_path_sans_ext(basename(outputFile)),
-                                  "_ggplots.rds"))
-  outputRmd <- file.path(outputDir,
-                         paste0(tools::file_path_sans_ext(basename(outputFile)),
-                                ".Rmd"))
+  outputPlots <- file.path(
+    outputDir,
+    paste0(tools::file_path_sans_ext(basename(outputFile)), "_ggplots.rds"))
+  outputRmd <- file.path(
+    outputDir,
+    paste0(tools::file_path_sans_ext(basename(outputFile)), ".Rmd"))
 
   ## Report
   if (file.exists(outputReport)) {
@@ -251,11 +256,11 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
   ## ------------------------------------------------------------------------ ##
 
   if (is.null(description)) {
-    description <- sprintf("This report shows the characteristics of %s %s,
-                           named %s.",
-                           length(ddsList),
-                           ifelse(length(ddsList) == 1, "data set", "data sets"),
-                           paste(names(ddsList), collapse = ", "))
+    description <- sprintf(
+      "This report shows the characteristics of %s %s, named %s.",
+      length(ddsList),
+      ifelse(length(ddsList) == 1, "data set", "data sets"),
+      paste(names(ddsList), collapse = ", "))
   }
 
   ## ------------------------------------------------------------------------ ##

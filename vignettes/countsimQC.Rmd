@@ -65,7 +65,7 @@ observations (`subsampleSize = 25`) and refrain from calculating permutation
 p-values.
 
 ```{r, results = "hide", warning = FALSE}
-countsimQCReport(ddsList = countsimExample, outputFile = "countsim_report.html", 
+countsimQCReport(ddsList = countsimExample, outputFile = "countsim_report.html",
                  outputDir = "./", outputFormat = "html_document", 
                  showCode = FALSE, forceOverwrite = TRUE,
                  savePlots = TRUE, description = "This is my test report.", 

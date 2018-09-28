@@ -62,12 +62,14 @@ calculateStats <- function(df, ds1, ds2, column, subsampleSize,
 
       ## Distances to all observations
       dists <- sqrt(rowSums((sweep(df[, column, drop = FALSE],
-                                   2, unlist(df[j, column, drop = FALSE]), "-")) ^ 2))
+                                   2, unlist(df[j, column,
+                                                drop = FALSE]), "-")) ^ 2))
       dists_this <- dists[df$dataset == df$dataset[j]]
       dists_other <- dists[df$dataset != df$dataset[j]]
 
       ## Silhouette width
-      silh <- (mean(dists_other, na.rm = TRUE) - mean(dists_this, na.rm = TRUE)) /
+      silh <- (mean(dists_other, na.rm = TRUE) -
+                 mean(dists_this, na.rm = TRUE)) /
         max(mean(dists_other, na.rm = TRUE), mean(dists_this, na.rm = TRUE))
 
       ## Local silhouette width
@@ -78,8 +80,10 @@ calculateStats <- function(df, ds1, ds2, column, subsampleSize,
         sort(dists_other)[seq_len(max(kmin, kfrac * nrow(df)) *
                                     (1 - overallprop[df$dataset[j]]))]
       silh_local <-
-        (mean(dists_other_local, na.rm = TRUE) - mean(dists_this_local, na.rm = TRUE)) /
-        max(mean(dists_other_local, na.rm = TRUE), mean(dists_this_local, na.rm = TRUE))
+        (mean(dists_other_local, na.rm = TRUE) -
+           mean(dists_this_local, na.rm = TRUE)) /
+        max(mean(dists_other_local, na.rm = TRUE),
+            mean(dists_this_local, na.rm = TRUE))
       if (all(c(dists_this_local, dists_other_local) == 0))
         silh_local <- 0
 

@@ -24,10 +24,13 @@
 #'   output directory.
 #'
 #' @examples
-#' \dontrun{
+#' ## Load example data
 #' data(countsimExample)
+#' \dontrun{
+#' ## Generate report
 #' countsimQCReport(countsimExample, outputDir = "./",
 #'                  outputFile = "example.html", savePlots = TRUE)
+#' ## Generate individual plots
 #' generateIndividualPlots("example_ggplots.rds", nDatasets = 3)
 #' }
 #'

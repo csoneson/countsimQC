@@ -34,12 +34,13 @@ calculateSampleCorrs <- function(ddsList, maxNForCorr, seed = 123) {
       set.seed(seed)
       cpms <- cpms[, sample(seq_len(ncol(cpms)), maxNForCorr, replace = FALSE)]
     }
-    corrs <- stats::cor(cpms, use = "pairwise.complete.obs", method = "spearman")
+    corrs <- stats::cor(cpms, use = "pairwise.complete.obs",
+                        method = "spearman")
     data.frame(
       Correlation = corrs[upper.tri(corrs)]
     )
   })
-  ns <- sapply(sampleCorrDF, nrow)
+  ns <- vapply(sampleCorrDF, nrow, numeric(1))
   do.call(rbind, sampleCorrDF) %>%
     dplyr::mutate(dataset = rep(names(sampleCorrDF), ns))
 }
@@ -82,12 +83,13 @@ calculateFeatureCorrs <- function(ddsList, maxNForCorr, seed = 123) {
       set.seed(seed)
       cpms <- cpms[sample(seq_len(nrow(cpms)), maxNForCorr, replace = FALSE), ]
     }
-    corrs <- stats::cor(t(cpms), use = "pairwise.complete.obs", method = "spearman")
+    corrs <- stats::cor(t(cpms), use = "pairwise.complete.obs",
+                        method = "spearman")
     data.frame(
       Correlation = corrs[upper.tri(corrs)]
     )
   })
-  ns <- sapply(featureCorrDF, nrow)
+  ns <- vapply(featureCorrDF, nrow, numeric(1))
   do.call(rbind, featureCorrDF) %>%
     dplyr::mutate(dataset = rep(names(featureCorrDF), ns))
 
