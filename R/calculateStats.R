@@ -84,8 +84,9 @@ calculateStats <- function(df, ds1, ds2, column, subsampleSize,
            mean(dists_this_local, na.rm = TRUE)) /
         max(mean(dists_other_local, na.rm = TRUE),
             mean(dists_this_local, na.rm = TRUE))
-      if (all(c(dists_this_local, dists_other_local) == 0))
+      if (all(c(dists_this_local, dists_other_local) == 0)) {
         silh_local <- 0
+      }
 
       ## Chi-square test comparing distribution of data set labels among
       ## nearest neighbors to the overall distribution

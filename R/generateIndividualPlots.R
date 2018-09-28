@@ -21,7 +21,7 @@
 #' @importFrom grDevices n2mfrow
 #' @importFrom methods is
 #'
-#' @return No value is returned, but plots are generated in the designated
+#' @return Nothing is returned, but plots are generated in the designated
 #'   output directory.
 #'
 #' @examples
