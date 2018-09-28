@@ -34,8 +34,10 @@ please see the
 Bioconductor package.
 
 ```{r}
-suppressPackageStartupMessages(library(countsimQC))
-suppressPackageStartupMessages(library(DESeq2))
+suppressPackageStartupMessages({
+  library(countsimQC)
+  library(DESeq2)
+})
 
 data(countsimExample)
 countsimExample
