@@ -46,9 +46,6 @@
 #'   features or pairs of samples or features) for which certain
 #'   (time-consuming) statistics will be calculated. Only used if
 #'   \code{calculateStatistics} = TRUE.
-#' @param seed The random seed to use in subsampling steps (for calculation of
-#'   dispersions, pairwise correlations and time-consuming pairwise data set
-#'   comparison statistics).
 #' @param kmin,kfrac For statistics that require the extraction of the k nearest
 #'   neighbors of a given point, the number of neighbors will be max(kmin, kfrac
 #'   * nrow(df))
@@ -103,7 +100,7 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
                              savePlots = FALSE, description = NULL,
                              maxNForCorr = 500, maxNForDisp = Inf,
                              calculateStatistics = TRUE, subsampleSize = 500,
-                             seed = 123, kfrac = 0.01, kmin = 5,
+                             kfrac = 0.01, kmin = 5,
                              permutationPvalues = FALSE, nPermutations = NULL,
                              knitrProgress = FALSE, quiet = FALSE,
                              ignorePandoc = FALSE, ...){

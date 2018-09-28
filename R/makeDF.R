@@ -14,7 +14,6 @@
 #' @param subsampleSize The number of observations for which certain
 #'   (time-consuming) statistics will be calculated. The observations will be
 #'   selected randomly among the rows of \code{df}
-#' @param seed The random seed to use
 #' @param kmin,kfrac For statistics that require the extraction of k nearest
 #'   neighbors of a given point, the number of neighbors will be max(kmin, kfrac
 #'   * nrow(df))
@@ -27,7 +26,7 @@
 #' @importFrom utils combn
 #'
 makeDF <- function(df, column, permutationPvalues, nPermutations,
-                   subsampleSize, seed, kmin, kfrac) {
+                   subsampleSize, kmin, kfrac) {
   ## Generate data frame with comparisons of all pairs of data sets
   if (length(unique(df$dataset)) > 1) {
     ## Initialize data frame by populating it with all data set pairs
@@ -40,7 +39,6 @@ makeDF <- function(df, column, permutationPvalues, nPermutations,
       dftmp <- df %>% dplyr::filter(dataset %in%
                                       c(ds_df$dataset1[i], ds_df$dataset2[i]))
 
-      set.seed(seed)
       obs_stats <- calculateStats(df = dftmp, ds1 = ds_df$dataset1[i],
                                   ds2 = ds_df$dataset2[i], column = column,
                                   subsampleSize = subsampleSize,

@@ -4,7 +4,7 @@
 \alias{calculateSampleCorrs}
 \title{Calculate Spearman correlation between sample pairs}
 \usage{
-calculateSampleCorrs(ddsList, maxNForCorr, seed = 123)
+calculateSampleCorrs(ddsList, maxNForCorr)
 }
 \arguments{
 \item{ddsList}{List of lists, with one element per data set. Each element is
@@ -15,26 +15,12 @@ dispersions (e.g., output from \code{\link{calculateDispersionsddsList}}).}
 calculation. If the number of samples in a data set exceeds
 \code{maxNForCorr}, \code{maxNForCorr} samples will be randomly selected
 for calculation of correlations.}
-
-\item{seed}{The random seed used for downsampling/selection of samples.}
 }
 \value{
 A data frame with pairwise sample correlations for each data set
 }
 \description{
-This function is typically not called directly by the user, but is used when
-generating the countsimQC report.
-}
-\examples{
-data(countsimExample)
-## Subset genes to speed up calculations
-sub <- lapply(countsimExample, function(x) x[1:100, ])
-## Calculate dispersions
-obj <- calculateDispersionsddsList(ddsList = sub,
-                                   maxNForDisp = 5, seed = 123)
-## Calculate sample correlations
-corrs <- calculateSampleCorrs(obj, maxNForCorr = 5, seed = 123)
-
+Calculate Spearman correlation between sample pairs
 }
 \author{
 Charlotte Soneson

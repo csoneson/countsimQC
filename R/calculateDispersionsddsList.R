@@ -7,7 +7,6 @@
 #' @param maxNForDisp If any data set contains more than \code{maxNForDisp}
 #'   samples, \code{maxNForDisp} of them will be randomly sampled before the
 #'   dispersions are calculated, in order to speed up calculations
-#' @param seed The seed set for sampling
 #'
 #' @return A list of the same length as the input list. Each element in the list
 #'   is itself a list, containing a DGEList and a DESeqDataSet with calculated
@@ -17,7 +16,7 @@
 #' @import edgeR DESeq2 SummarizedExperiment
 #' @importFrom stats model.matrix
 #'
-calculateDispersionsddsList <- function(ddsList, maxNForDisp, seed = 123) {
+calculateDispersionsddsList <- function(ddsList, maxNForDisp) {
   lapply(ddsList, function(ds) {
     ## --------------------------- edgeR --------------------------- ##
     ## Define DGEList
@@ -27,7 +26,6 @@ calculateDispersionsddsList <- function(ddsList, maxNForDisp, seed = 123) {
     ## Subset DGEList if the number of samples exceeds maxNForDisp and estimate
     ## dispersion
     if (ncol(dge) > maxNForDisp) {
-      set.seed(seed)
       keepSamples <- sample(seq_len(ncol(dge)), maxNForDisp, replace = FALSE)
       dgetmp <- dge[, keepSamples]
       destmp <- stats::model.matrix(
@@ -55,7 +53,6 @@ calculateDispersionsddsList <- function(ddsList, maxNForDisp, seed = 123) {
     ## Subset DESeqDataSet if the number of samples exceeds maxNForDisp and
     ## estimate dispersion
     if (ncol(dds) > maxNForDisp) {
-      set.seed(seed)
       keepSamples <- sample(seq_len(ncol(dds)), maxNForDisp, replace = FALSE)
       ddstmp <- dds[, keepSamples]
       colData(ddstmp) <- droplevels(colData(ddstmp))
