@@ -47,7 +47,7 @@ generateIndividualPlots <- function(ggplotsRds, device = "png",
     stop("The provided ggplotsRds object, or the object stored ",
          "in the ggplotsRds file, must be a list.")
   }
-  if (!all(vapply(ggplotsRds, function(w) is(w, "ggplot"), FALSE)))
+  if (!all(vapply(ggplotsRds, function(w) is(w, "ggplot"), FALSE))) {
     stop("The elements of the provided ggplotsRds object, or the object ",
          "stored in the ggplotsRds file, must be ggplot objects. ")
   }
