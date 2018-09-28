@@ -150,22 +150,27 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
   ## --------------------------- ddsList ----------------------------------- ##
   ## Raise an error if ddsList is not a named list of DESeqDataSets/data
   ## frames/matrices
-  if (class(ddsList) != "list")
+  if (!is(ddsList, "list")) {
     stop("ddsList must be a list.", call. = FALSE)
+  }
   if (length(setdiff(unique(names(ddsList)),
-                     c("", NA, NULL))) != length(ddsList))
+                     c("", NA, NULL))) != length(ddsList)) {
     stop("ddsList must be a named list, ",
          "with a unique name for each element.", call. = FALSE)
-  if (!all(sapply(ddsList, class) %in% c("DESeqDataSet", "data.frame", "matrix")))
-    stop("All elements of ddsList must be DESeqDataSet objects, data.frames or ",
-         "matrices. See the DESeq2 Bioconductor package ",
+  }
+  if (!all(vapply(ddsList, function(w) {
+    is(w, "DESeqDataSet") | is(w, "data.frame") | is(w, "matrix")
+  }, FALSE))) {
+    stop("All elements of ddsList must be DESeqDataSet objects, data.frames ",
+         "or matrices. See the DESeq2 Bioconductor package ",
          "(http://bioconductor.org/packages/release/bioc/html/DESeq2.html) ",
          "for more information about the DESeqDataSet class.", call. = FALSE)
+  }
 
   ## If some objects are data frames or matrices, convert them into
   ## DESeqDataSets
   ddsList <- lapply(ddsList, function(ds) {
-    if (class(ds) == "DESeqDataSet") {
+    if (is(ds, "DESeqDataSet")) {
       ds
     } else {
       DESeq2::DESeqDataSetFromMatrix(
@@ -174,7 +179,7 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
         design = ~ 1)
     }
   })
-  stopifnot(all(sapply(ddsList, class) == "DESeqDataSet"))
+  stopifnot(all(vapply(ddsList, function(w) is(w, "DESeqDataSet"), FALSE)))
 
   ## ------------------------- output files --------------------------------- ##
   outputReport <- file.path(outputDir, basename(outputFile))
