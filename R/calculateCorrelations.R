@@ -15,16 +15,22 @@
 #'
 calculateSampleCorrs <- function(ddsList, maxNForCorr) {
   sampleCorrDF <- lapply(ddsList, function(x) {
+    ## Calculate logCPMs
     cpms <- edgeR::cpm(x$dge, prior.count = 2, log = TRUE)
+
+    ## Subsample columns if required
     if (ncol(cpms) > maxNForCorr) {
       cpms <- cpms[, sample(seq_len(ncol(cpms)), maxNForCorr, replace = FALSE)]
     }
+
+    ## Calculate Spearman correlations
     corrs <- stats::cor(cpms, use = "pairwise.complete.obs",
                         method = "spearman")
     data.frame(
       Correlation = corrs[upper.tri(corrs)]
     )
   })
+  ## Merge correlations from all data sets
   ns <- vapply(sampleCorrDF, nrow, 0)
   do.call(rbind, sampleCorrDF) %>%
     dplyr::mutate(dataset = rep(names(sampleCorrDF), ns))
@@ -48,17 +54,23 @@ calculateSampleCorrs <- function(ddsList, maxNForCorr) {
 #'
 calculateFeatureCorrs <- function(ddsList, maxNForCorr) {
   featureCorrDF <- lapply(ddsList, function(x) {
+    ## Calculate logCPMs, keep only non-constant features
     cpms <- edgeR::cpm(x$dge, prior.count = 2, log = TRUE)
     cpms <- cpms[genefilter::rowVars(cpms) > 0, ]
+
+    ## Subsample rows if required
     if (nrow(cpms) > maxNForCorr) {
       cpms <- cpms[sample(seq_len(nrow(cpms)), maxNForCorr, replace = FALSE), ]
     }
+
+    ## Calculate Spearman correlations
     corrs <- stats::cor(t(cpms), use = "pairwise.complete.obs",
                         method = "spearman")
     data.frame(
       Correlation = corrs[upper.tri(corrs)]
     )
   })
+  ## Merge correlations from all data sets
   ns <- vapply(featureCorrDF, nrow, 0)
   do.call(rbind, featureCorrDF) %>%
     dplyr::mutate(dataset = rep(names(featureCorrDF), ns))
