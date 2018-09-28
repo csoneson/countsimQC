@@ -28,14 +28,15 @@ Imports: rmarkdown (>= 0.9.5),
     caTools,
     randtests,
     stats,
-    utils
+    utils,
+    methods
 RoxygenNote: 6.1.0
 Suggests: knitr,
     testthat
 VignetteBuilder: knitr
 biocViews: Microbiome, RNASeq, SingleCell, ExperimentalDesign, QualityControl, 
     ReportWriting, Visualization
-Collate: 
+Collate:
     'calculateCorrelations.R'
     'calculateDispersionsddsList.R'
     'calculateStats.R'

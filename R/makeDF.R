@@ -35,7 +35,7 @@ makeDF <- function(df, column, permutationPvalues, nPermutations,
       dplyr::rename(dataset1 = X1, dataset2 = X2)
 
     ## Calculate statistics for each pair of data sets
-    ds_res <- as.data.frame(t(sapply(seq_len(nrow(ds_df)), function(i) {
+    ds_res <- as.data.frame(t(vapply(seq_len(nrow(ds_df)), function(i) {
       dftmp <- df %>% dplyr::filter(dataset %in%
                                       c(ds_df$dataset1[i], ds_df$dataset2[i]))
 
@@ -46,14 +46,14 @@ makeDF <- function(df, column, permutationPvalues, nPermutations,
                                   xmax = max(df[, column], na.rm = TRUE),
                                   xmin = min(df[, column], na.rm = TRUE))
       if (permutationPvalues) {
-        perm_stats <- t(sapply(seq_len(nPermutations), function(s) {
+        perm_stats <- t(vapply(seq_len(nPermutations), function(s) {
           calculateStats(df = dftmp, ds1 = ds_df$dataset1[i],
                          ds2 = ds_df$dataset2[i], column = column,
                          subsampleSize = subsampleSize,
                          permute = TRUE, kmin = kmin, kfrac = kfrac,
                          xmax = max(df[, column], na.rm = TRUE),
                          xmin = min(df[, column], na.rm = TRUE))
-        }))
+        }, defaultStats(length(column), withP = FALSE)))
         ## Permutation p-values
         obs_stats["NNmismatchP"] <-
           signif(mean(c(obs_stats["NNmismatch"], perm_stats[, "NNmismatch"]) >=
@@ -71,7 +71,7 @@ makeDF <- function(df, column, permutationPvalues, nPermutations,
                         obs_stats["diffarea"]), 3)
       }
       obs_stats
-    })))
+    }, defaultStats(length(column), withP = permutationPvalues))))
 
     ## Populate the output table
     if (length(column) == 1) {

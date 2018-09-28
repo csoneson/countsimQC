@@ -25,7 +25,7 @@ calculateSampleCorrs <- function(ddsList, maxNForCorr) {
       Correlation = corrs[upper.tri(corrs)]
     )
   })
-  ns <- vapply(sampleCorrDF, nrow, numeric(1))
+  ns <- vapply(sampleCorrDF, nrow, 0)
   do.call(rbind, sampleCorrDF) %>%
     dplyr::mutate(dataset = rep(names(sampleCorrDF), ns))
 }
@@ -59,7 +59,7 @@ calculateFeatureCorrs <- function(ddsList, maxNForCorr) {
       Correlation = corrs[upper.tri(corrs)]
     )
   })
-  ns <- vapply(featureCorrDF, nrow, numeric(1))
+  ns <- vapply(featureCorrDF, nrow, 0)
   do.call(rbind, featureCorrDF) %>%
     dplyr::mutate(dataset = rep(names(featureCorrDF), ns))
 

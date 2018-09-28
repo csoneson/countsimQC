@@ -80,6 +80,7 @@
 #' @importFrom tools file_ext file_path_sans_ext
 #' @importFrom caTools trapz
 #' @importFrom randtests runs.test
+#' @importFrom methods is
 #' @import SummarizedExperiment DESeq2 edgeR dplyr tidyr ggplot2
 #' @import genefilter DT GenomeInfoDbData
 #' @return No value is returned, but a report is generated in the
@@ -137,15 +138,17 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
 
   ## ------------------------ outputFormat --------------------------------- ##
   ## Raise an error if outputFormat is not one of the allowed
-  if (!(outputFormat %in% c("pdf_document", "html_document")))
+  if (!(outputFormat %in% c("pdf_document", "html_document"))) {
     stop("The provided outputFormat is currently not supported. Please use ",
          "either 'html_document' (or NULL) or 'pdf_document'.", call. = FALSE)
+  }
 
   ## Raise an error if the output format and file name extension don't match
-  if (outputFormat != paste0(tools::file_ext(outputFile), "_document"))
+  if (outputFormat != paste0(tools::file_ext(outputFile), "_document")) {
     stop(paste0("File name extension of outputFile doesn't agree with the ",
                 "outputFormat, should be .",
                 gsub("_document$", "", outputFormat)), call. = FALSE)
+  }
 
   ## --------------------------- ddsList ----------------------------------- ##
   ## Raise an error if ddsList is not a named list of DESeqDataSets/data

@@ -100,4 +100,8 @@ local({
                                calculateStatistics = FALSE,
                                forceOverwrite = FALSE), "character")
   })
+
+  file.remove("report_from_test.html")
+  file.remove("report_from_test.pdf")
+  file.remove("report_from_test_ggplots.rds")
 })

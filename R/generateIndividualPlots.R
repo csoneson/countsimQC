@@ -19,6 +19,7 @@
 #' @export
 #'
 #' @importFrom grDevices n2mfrow
+#' @importFrom methods is
 #'
 #' @return No value is returned, but plots are generated in the designated
 #'   output directory.
@@ -66,8 +67,8 @@ generateIndividualPlots <- function(ggplotsRds, device = "png",
 
   colRow <- grDevices::n2mfrow(nDatasets)
   for (pl in names(ggplotsRds)) {
-    if (any(sapply(c("BCVedgeR", "dispersionDESeq2", "SepHist", "SepScatter"),
-                   function(x) length(grep(x, pl)) > 0))) {
+    if (any(vapply(c("BCVedgeR", "dispersionDESeq2", "SepHist", "SepScatter"),
+                   function(x) length(grep(x, pl)) > 0, FALSE))) {
       ggsave(plot = ggplotsRds[[pl]], filename = paste0(pl, ".", device),
              path = outputDir, width = 4 * colRow[1],
              height = 4 * colRow[2], units = "in")
