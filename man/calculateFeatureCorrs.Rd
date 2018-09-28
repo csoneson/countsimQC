@@ -4,18 +4,17 @@
 \alias{calculateFeatureCorrs}
 \title{Calculate Spearman correlation between feature pairs}
 \usage{
-calculateFeatureCorrs(ddsList, maxNForCorr, seed = 123)
+calculateFeatureCorrs(ddsList, maxNForCorr)
 }
 \arguments{
 \item{ddsList}{List of lists, with one element per data set. Each element is
 a list containing a DGEList and a DESeqDataSet, with calculated
-dispersions.}
+dispersions (e.g., output from \code{\link{calculateDispersionsddsList}}).}
 
-\item{maxNForCorr}{If the number of features in a data set exceeds
+\item{maxNForCorr}{Maximal number of features to use for calculation of
+correlations. If the number of features in a data set exceeds
 \code{maxNForCorr}, \code{maxNForCorr} features will be randomly selected
-for correlation calculation.}
-
-\item{seed}{The seed for downsampling}
+for calculation of correlations.}
 }
 \value{
 A data frame with pairwise feature correlations for each data set

@@ -4,7 +4,7 @@
 \alias{calculateDispersionsddsList}
 \title{Calculate dispersions}
 \usage{
-calculateDispersionsddsList(ddsList, maxNForDisp, seed = 123)
+calculateDispersionsddsList(ddsList, maxNForDisp)
 }
 \arguments{
 \item{ddsList}{A list of DESeqDataSets}
@@ -12,8 +12,6 @@ calculateDispersionsddsList(ddsList, maxNForDisp, seed = 123)
 \item{maxNForDisp}{If any data set contains more than \code{maxNForDisp}
 samples, \code{maxNForDisp} of them will be randomly sampled before the
 dispersions are calculated, in order to speed up calculations}
-
-\item{seed}{The seed set for sampling}
 }
 \value{
 A list of the same length as the input list. Each element in the list

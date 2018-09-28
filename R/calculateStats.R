@@ -52,22 +52,24 @@ calculateStats <- function(df, ds1, ds2, column, subsampleSize,
   overallprop <- table(factor(df$dataset, levels = c(ds1, ds2)))
   overallprop <- overallprop/sum(overallprop)
   nrep <- 1
-  chisilh <- t(sapply(seq_len(nrep), function(m) {
+  chisilh <- t(vapply(seq_len(nrep), function(m) {
     ## Select subset of observations for calculation of silhouette widths and
     ## nearest neighbor distributions
     idx <- sample(seq_len(nrow(df)), min(nrow(df), subsampleSize))
 
     ## For each selected observation, calculate statistics
-    tmp <- t(sapply(idx, function(j) {
+    tmp <- t(vapply(idx, function(j) {
 
       ## Distances to all observations
       dists <- sqrt(rowSums((sweep(df[, column, drop = FALSE],
-                                   2, unlist(df[j, column, drop = FALSE]), "-")) ^ 2))
+                                   2, unlist(df[j, column,
+                                                drop = FALSE]), "-")) ^ 2))
       dists_this <- dists[df$dataset == df$dataset[j]]
       dists_other <- dists[df$dataset != df$dataset[j]]
 
       ## Silhouette width
-      silh <- (mean(dists_other, na.rm = TRUE) - mean(dists_this, na.rm = TRUE)) /
+      silh <- (mean(dists_other, na.rm = TRUE) -
+                 mean(dists_this, na.rm = TRUE)) /
         max(mean(dists_other, na.rm = TRUE), mean(dists_this, na.rm = TRUE))
 
       ## Local silhouette width
@@ -78,10 +80,13 @@ calculateStats <- function(df, ds1, ds2, column, subsampleSize,
         sort(dists_other)[seq_len(max(kmin, kfrac * nrow(df)) *
                                     (1 - overallprop[df$dataset[j]]))]
       silh_local <-
-        (mean(dists_other_local, na.rm = TRUE) - mean(dists_this_local, na.rm = TRUE)) /
-        max(mean(dists_other_local, na.rm = TRUE), mean(dists_this_local, na.rm = TRUE))
-      if (all(c(dists_this_local, dists_other_local) == 0))
+        (mean(dists_other_local, na.rm = TRUE) -
+           mean(dists_this_local, na.rm = TRUE)) /
+        max(mean(dists_other_local, na.rm = TRUE),
+            mean(dists_this_local, na.rm = TRUE))
+      if (all(c(dists_this_local, dists_other_local) == 0)) {
         silh_local <- 0
+      }
 
       ## Chi-square test comparing distribution of data set labels among
       ## nearest neighbors to the overall distribution
@@ -90,11 +95,11 @@ calculateStats <- function(df, ds1, ds2, column, subsampleSize,
                                   p = overallprop)$p.value
       ## Return values
       c(silh = silh, chisqp = chisqp, silh_local = silh_local)
-    }))
-    c(silh = mean(tmp[, "silh"]),
-      silhlocal = mean(tmp[, "silh_local"]),
-      chisqp = mean(tmp[, "chisqp"] <= 0.05))
-  }))
+    }, c(silh = NA_real_, chisqp = NA_real_, silh_local = NA_real_)))
+    c(silh = mean(tmp[, "silh"], na.rm = TRUE),
+      silhlocal = mean(tmp[, "silh_local"], na.rm = TRUE),
+      chisqp = mean(tmp[, "chisqp"] <= 0.05, na.rm = TRUE))
+  }, c(silh = NA_real_, silhlocal = NA_real_, chisqp = NA_real_)))
 
   ## Runs test
   if (length(column) == 1) {
@@ -117,4 +122,34 @@ calculateStats <- function(df, ds1, ds2, column, subsampleSize,
     c(NNmismatch = signif(mean(chisilh[, "chisqp"]), 3),
       avesilh = signif(mean(chisilh[, "silh"]), 3),
       avesilhlocal = signif(mean(chisilh[, "silhlocal"]), 3))
+}
+
+#' Return a vector of NA scores
+#'
+#' @param n Number of columns to use for the comparison
+#' @param withP Whether or not to include p-value columns
+#'
+#' @return A vector with NA values for all applicable statistics
+#' @author Charlotte Soneson
+#'
+defaultStats <- function(n, withP = FALSE) {
+  if (n == 1) {
+    if (withP) {
+      c(ksstatistic = NA_real_, kspvalue = NA_real_, diffarea = NA_real_,
+        runsstatistic = NA_real_, runspvalue = NA_real_, NNmismatch = NA_real_,
+        avesilh = NA_real_, avesilhlocal = NA_real_, NNmismatchP = NA_real_,
+        avesilhP = NA_real_, avesilhlocalP = NA_real_, diffareaP = NA_real_)
+    } else {
+      c(ksstatistic = NA_real_, kspvalue = NA_real_, diffarea = NA_real_,
+        runsstatistic = NA_real_, runspvalue = NA_real_, NNmismatch = NA_real_,
+        avesilh = NA_real_, avesilhlocal = NA_real_)
+    }
+  } else {
+    if (withP) {
+      c(NNmismatch = NA_real_, avesilh = NA_real_, avesilhlocal = NA_real_,
+        NNmismatchP = NA_real_, avesilhP = NA_real_, avesilhlocalP = NA_real_)
+    } else {
+      c(NNmismatch = NA_real_, avesilh = NA_real_, avesilhlocal = NA_real_)
+    }
+  }
 }

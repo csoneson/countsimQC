@@ -22,7 +22,7 @@ plots stored in this file.}
 This is needed to set the size of the plots correctly.}
 }
 \value{
-No value is returned, but plots are generated in the designated
+Nothing is returned, but plots are generated in the designated
   output directory.
 }
 \description{
@@ -31,10 +31,13 @@ ggplot objects that can be saved when generating a countsimQC report (by
 setting \code{savePlots = TRUE}).
 }
 \examples{
-\dontrun{
+## Load example data
 data(countsimExample)
+\dontrun{
+## Generate report
 countsimQCReport(countsimExample, outputDir = "./",
                  outputFile = "example.html", savePlots = TRUE)
+## Generate individual plots
 generateIndividualPlots("example_ggplots.rds", nDatasets = 3)
 }
 

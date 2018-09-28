@@ -1,7 +1,7 @@
 Package: countsimQC
 Type: Package
 Title: Compare Characteristic Features of Count Data Sets
-Version: 0.5.4
+Version: 0.99.0
 Author: Charlotte Soneson
 Maintainer: Charlotte Soneson <charlottesoneson@gmail.com>
 Description: countsimQC provides functionality to create a comprehensive report 
@@ -12,7 +12,7 @@ Description: countsimQC provides functionality to create a comprehensive report
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.4)
+Depends: R (>= 3.5)
 Imports: rmarkdown (>= 0.9.5),
     edgeR,
     DESeq2 (>= 1.16.0),
@@ -26,14 +26,17 @@ Imports: rmarkdown (>= 0.9.5),
     DT,
     GenomeInfoDbData,
     caTools,
-    randtests
-RoxygenNote: 6.0.1
+    randtests,
+    stats,
+    utils,
+    methods
+RoxygenNote: 6.1.0
 Suggests: knitr,
     testthat
 VignetteBuilder: knitr
 biocViews: Microbiome, RNASeq, SingleCell, ExperimentalDesign, QualityControl, 
     ReportWriting, Visualization
-Collate: 
+Collate:
     'calculateCorrelations.R'
     'calculateDispersionsddsList.R'
     'calculateStats.R'

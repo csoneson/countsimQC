@@ -46,9 +46,6 @@
 #'   features or pairs of samples or features) for which certain
 #'   (time-consuming) statistics will be calculated. Only used if
 #'   \code{calculateStatistics} = TRUE.
-#' @param seed The random seed to use in subsampling steps (for calculation of
-#'   dispersions, pairwise correlations and time-consuming pairwise data set
-#'   comparison statistics).
 #' @param kmin,kfrac For statistics that require the extraction of the k nearest
 #'   neighbors of a given point, the number of neighbors will be max(kmin, kfrac
 #'   * nrow(df))
@@ -83,14 +80,17 @@
 #' @importFrom tools file_ext file_path_sans_ext
 #' @importFrom caTools trapz
 #' @importFrom randtests runs.test
+#' @importFrom methods is
 #' @import SummarizedExperiment DESeq2 edgeR dplyr tidyr ggplot2
 #' @import genefilter DT GenomeInfoDbData
 #' @return No value is returned, but a report is generated in the
 #'   \code{outputDir} directory.
 #'
 #' @examples
-#' \dontrun{
+#' ## Load example data
 #' data(countsimExample)
+#' \dontrun{
+#' ## Generate report
 #' countsimQCReport(countsimExample, outputDir = "./",
 #'                  outputFile = "example.html")
 #' }
@@ -101,7 +101,7 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
                              savePlots = FALSE, description = NULL,
                              maxNForCorr = 500, maxNForDisp = Inf,
                              calculateStatistics = TRUE, subsampleSize = 500,
-                             seed = 123, kfrac = 0.01, kmin = 5,
+                             kfrac = 0.01, kmin = 5,
                              permutationPvalues = FALSE, nPermutations = NULL,
                              knitrProgress = FALSE, quiet = FALSE,
                              ignorePandoc = FALSE, ...){
@@ -114,7 +114,8 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
   if (Sys.which("pandoc") == "") {
     if (ignorePandoc) {
       ## If ignorePandoc is TRUE, just give a warning
-      warning("pandoc is not available! The final report will not be generated.")
+      warning("pandoc is not available! ",
+              "The final report will not be generated.")
     } else {
       ## If ignorePandoc is FALSE, stop
       stop("pandoc is not available!")
@@ -123,7 +124,8 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
   if (Sys.which("pandoc-citeproc") == "") {
     if (ignorePandoc) {
       ## If ignorePandoc is TRUE, just give a warning
-      warning("pandoc-citeproc is not available! The final report will not be generated.")
+      warning("pandoc-citeproc is not available! ",
+              "The final report will not be generated.")
     } else {
       ## If ignorePandoc is FALSE, stop
       stop("pandoc-citeproc is not available!")
@@ -136,52 +138,60 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
 
   ## ------------------------ outputFormat --------------------------------- ##
   ## Raise an error if outputFormat is not one of the allowed
-  if (!(outputFormat %in% c("pdf_document", "html_document")))
+  if (!(outputFormat %in% c("pdf_document", "html_document"))) {
     stop("The provided outputFormat is currently not supported. Please use ",
          "either 'html_document' (or NULL) or 'pdf_document'.", call. = FALSE)
+  }
 
   ## Raise an error if the output format and file name extension don't match
-  if (outputFormat != paste0(tools::file_ext(outputFile), "_document"))
+  if (outputFormat != paste0(tools::file_ext(outputFile), "_document")) {
     stop(paste0("File name extension of outputFile doesn't agree with the ",
                 "outputFormat, should be .",
                 gsub("_document$", "", outputFormat)), call. = FALSE)
+  }
 
   ## --------------------------- ddsList ----------------------------------- ##
   ## Raise an error if ddsList is not a named list of DESeqDataSets/data
   ## frames/matrices
-  if (class(ddsList) != "list")
+  if (!is(ddsList, "list")) {
     stop("ddsList must be a list.", call. = FALSE)
+  }
   if (length(setdiff(unique(names(ddsList)),
-                     c("", NA, NULL))) != length(ddsList))
+                     c("", NA, NULL))) != length(ddsList)) {
     stop("ddsList must be a named list, ",
          "with a unique name for each element.", call. = FALSE)
-  if (!all(sapply(ddsList, class) %in% c("DESeqDataSet", "data.frame", "matrix")))
-    stop("All elements of ddsList must be DESeqDataSet objects, data.frames or ",
-         "matrices. See the DESeq2 Bioconductor package ",
+  }
+  if (!all(vapply(ddsList, function(w) {
+    is(w, "DESeqDataSet") | is(w, "data.frame") | is(w, "matrix")
+  }, FALSE))) {
+    stop("All elements of ddsList must be DESeqDataSet objects, data.frames ",
+         "or matrices. See the DESeq2 Bioconductor package ",
          "(http://bioconductor.org/packages/release/bioc/html/DESeq2.html) ",
          "for more information about the DESeqDataSet class.", call. = FALSE)
+  }
 
   ## If some objects are data frames or matrices, convert them into
   ## DESeqDataSets
   ddsList <- lapply(ddsList, function(ds) {
-    if (class(ds) == "DESeqDataSet") {
+    if (is(ds, "DESeqDataSet")) {
       ds
     } else {
-      DESeq2::DESeqDataSetFromMatrix(countData = round(as.matrix(ds)),
-                                     colData = data.frame(sample = 1:ncol(ds)),
-                                     design = ~ 1)
+      DESeq2::DESeqDataSetFromMatrix(
+        countData = round(as.matrix(ds)),
+        colData = data.frame(sample = seq_len(ncol(ds))),
+        design = ~ 1)
     }
   })
-  stopifnot(all(sapply(ddsList, class) == "DESeqDataSet"))
+  stopifnot(all(vapply(ddsList, function(w) is(w, "DESeqDataSet"), FALSE)))
 
   ## ------------------------- output files --------------------------------- ##
   outputReport <- file.path(outputDir, basename(outputFile))
-  outputPlots <- file.path(outputDir,
-                           paste0(tools::file_path_sans_ext(basename(outputFile)),
-                                  "_ggplots.rds"))
-  outputRmd <- file.path(outputDir,
-                         paste0(tools::file_path_sans_ext(basename(outputFile)),
-                                ".Rmd"))
+  outputPlots <- file.path(
+    outputDir,
+    paste0(tools::file_path_sans_ext(basename(outputFile)), "_ggplots.rds"))
+  outputRmd <- file.path(
+    outputDir,
+    paste0(tools::file_path_sans_ext(basename(outputFile)), ".Rmd"))
 
   ## Report
   if (file.exists(outputReport)) {
@@ -251,11 +261,11 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
   ## ------------------------------------------------------------------------ ##
 
   if (is.null(description)) {
-    description <- sprintf("This report shows the characteristics of %s %s,
-                           named %s.",
-                           length(ddsList),
-                           ifelse(length(ddsList) == 1, "data set", "data sets"),
-                           paste(names(ddsList), collapse = ", "))
+    description <- sprintf(
+      "This report shows the characteristics of %s %s, named %s.",
+      length(ddsList),
+      ifelse(length(ddsList) == 1, "data set", "data sets"),
+      paste(names(ddsList), collapse = ", "))
   }
 
   ## ------------------------------------------------------------------------ ##

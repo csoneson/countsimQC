@@ -19,15 +19,19 @@
 #' @export
 #'
 #' @importFrom grDevices n2mfrow
+#' @importFrom methods is
 #'
-#' @return No value is returned, but plots are generated in the designated
+#' @return Nothing is returned, but plots are generated in the designated
 #'   output directory.
 #'
 #' @examples
-#' \dontrun{
+#' ## Load example data
 #' data(countsimExample)
+#' \dontrun{
+#' ## Generate report
 #' countsimQCReport(countsimExample, outputDir = "./",
 #'                  outputFile = "example.html", savePlots = TRUE)
+#' ## Generate individual plots
 #' generateIndividualPlots("example_ggplots.rds", nDatasets = 3)
 #' }
 #'
@@ -37,14 +41,14 @@ generateIndividualPlots <- function(ggplotsRds, device = "png",
   ## --------------------- Check input arguments ---------------------------- ##
   ## ------------------------------------------------------------------------ ##
 
-  if (class(ggplotsRds) == "character") {
+  if (is(ggplotsRds, "character")) {
     ggplotsRds <- readRDS(ggplotsRds)
   }
-  if (class(ggplotsRds) != "list") {
+  if (!is(ggplotsRds, "list")) {
     stop("The provided ggplotsRds object, or the object stored ",
          "in the ggplotsRds file, must be a list.")
   }
-  if (!all("ggplot" %in% sapply(ggplotsRds, class))) {
+  if (!all(vapply(ggplotsRds, function(w) is(w, "ggplot"), FALSE))) {
     stop("The elements of the provided ggplotsRds object, or the object ",
          "stored in the ggplotsRds file, must be ggplot objects. ")
   }
@@ -63,8 +67,8 @@ generateIndividualPlots <- function(ggplotsRds, device = "png",
 
   colRow <- grDevices::n2mfrow(nDatasets)
   for (pl in names(ggplotsRds)) {
-    if (any(sapply(c("BCVedgeR", "dispersionDESeq2", "SepHist", "SepScatter"),
-                   function(x) length(grep(x, pl)) > 0))) {
+    if (any(vapply(c("BCVedgeR", "dispersionDESeq2", "SepHist", "SepScatter"),
+                   function(x) length(grep(x, pl)) > 0, FALSE))) {
       ggsave(plot = ggplotsRds[[pl]], filename = paste0(pl, ".", device),
              path = outputDir, width = 4 * colRow[1],
              height = 4 * colRow[2], units = "in")

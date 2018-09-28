@@ -4,13 +4,13 @@
 \alias{countsimQCReport}
 \title{Generate countsimQC report}
 \usage{
-countsimQCReport(ddsList, outputFile, outputDir = "./", outputFormat = NULL,
-  showCode = FALSE, rmdTemplate = NULL, forceOverwrite = FALSE,
-  savePlots = FALSE, description = NULL, maxNForCorr = 500,
-  maxNForDisp = Inf, calculateStatistics = TRUE, subsampleSize = 500,
-  seed = 123, kfrac = 0.01, kmin = 5, permutationPvalues = FALSE,
-  nPermutations = NULL, knitrProgress = FALSE, quiet = FALSE,
-  ignorePandoc = FALSE, ...)
+countsimQCReport(ddsList, outputFile, outputDir = "./",
+  outputFormat = NULL, showCode = FALSE, rmdTemplate = NULL,
+  forceOverwrite = FALSE, savePlots = FALSE, description = NULL,
+  maxNForCorr = 500, maxNForDisp = Inf, calculateStatistics = TRUE,
+  subsampleSize = 500, kfrac = 0.01, kmin = 5,
+  permutationPvalues = FALSE, nPermutations = NULL,
+  knitrProgress = FALSE, quiet = FALSE, ignorePandoc = FALSE, ...)
 }
 \arguments{
 \item{ddsList}{Named list of \code{DESeqDataSets} or count matrices to
@@ -69,10 +69,6 @@ features or pairs of samples or features) for which certain
 (time-consuming) statistics will be calculated. Only used if
 \code{calculateStatistics} = TRUE.}
 
-\item{seed}{The random seed to use in subsampling steps (for calculation of
-dispersions, pairwise correlations and time-consuming pairwise data set
-comparison statistics).}
-
 \item{kmin, kfrac}{For statistics that require the extraction of the k nearest
 neighbors of a given point, the number of neighbors will be max(kmin, kfrac
 * nrow(df))}
@@ -116,8 +112,10 @@ When the function is called, the template file (specified by
   output folder will be deleted once the report is generated.
 }
 \examples{
-\dontrun{
+## Load example data
 data(countsimExample)
+\dontrun{
+## Generate report
 countsimQCReport(countsimExample, outputDir = "./",
                  outputFile = "example.html")
 }

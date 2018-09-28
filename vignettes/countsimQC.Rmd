@@ -34,8 +34,10 @@ please see the
 Bioconductor package.
 
 ```{r}
-suppressPackageStartupMessages(library(countsimQC))
-suppressPackageStartupMessages(library(DESeq2))
+suppressPackageStartupMessages({
+  library(countsimQC)
+  library(DESeq2)
+})
 
 data(countsimExample)
 countsimExample
@@ -65,7 +67,7 @@ observations (`subsampleSize = 25`) and refrain from calculating permutation
 p-values.
 
 ```{r, results = "hide", warning = FALSE}
-countsimQCReport(ddsList = countsimExample, outputFile = "countsim_report.html", 
+countsimQCReport(ddsList = countsimExample, outputFile = "countsim_report.html",
                  outputDir = "./", outputFormat = "html_document", 
                  showCode = FALSE, forceOverwrite = TRUE,
                  savePlots = TRUE, description = "This is my test report.", 

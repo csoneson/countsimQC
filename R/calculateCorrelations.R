@@ -2,30 +2,36 @@
 #'
 #' @param ddsList List of lists, with one element per data set. Each element is
 #'   a list containing a DGEList and a DESeqDataSet, with calculated
-#'   dispersions.
-#' @param maxNForCorr If the number of samples in a data set exceeds
+#'   dispersions (e.g., output from \code{\link{calculateDispersionsddsList}}).
+#' @param maxNForCorr Maximal number of samples to use for correlation
+#'   calculation. If the number of samples in a data set exceeds
 #'   \code{maxNForCorr}, \code{maxNForCorr} samples will be randomly selected
-#'   for correlation calculation.
-#' @param seed The seed for downsampling
+#'   for calculation of correlations.
 #'
 #' @return A data frame with pairwise sample correlations for each data set
 #' @author Charlotte Soneson
 #' @importFrom stats cor
 #' @importFrom edgeR cpm
 #'
-calculateSampleCorrs <- function(ddsList, maxNForCorr, seed = 123) {
+calculateSampleCorrs <- function(ddsList, maxNForCorr) {
   sampleCorrDF <- lapply(ddsList, function(x) {
+    ## Calculate logCPMs
     cpms <- edgeR::cpm(x$dge, prior.count = 2, log = TRUE)
+
+    ## Subsample columns if required
     if (ncol(cpms) > maxNForCorr) {
-      set.seed(seed)
       cpms <- cpms[, sample(seq_len(ncol(cpms)), maxNForCorr, replace = FALSE)]
     }
-    corrs <- stats::cor(cpms, use = "pairwise.complete.obs", method = "spearman")
+
+    ## Calculate Spearman correlations
+    corrs <- stats::cor(cpms, use = "pairwise.complete.obs",
+                        method = "spearman")
     data.frame(
       Correlation = corrs[upper.tri(corrs)]
     )
   })
-  ns <- sapply(sampleCorrDF, nrow)
+  ## Merge correlations from all data sets
+  ns <- vapply(sampleCorrDF, nrow, 0)
   do.call(rbind, sampleCorrDF) %>%
     dplyr::mutate(dataset = rep(names(sampleCorrDF), ns))
 }
@@ -34,11 +40,11 @@ calculateSampleCorrs <- function(ddsList, maxNForCorr, seed = 123) {
 #'
 #' @param ddsList List of lists, with one element per data set. Each element is
 #'   a list containing a DGEList and a DESeqDataSet, with calculated
-#'   dispersions.
-#' @param maxNForCorr If the number of features in a data set exceeds
+#'   dispersions (e.g., output from \code{\link{calculateDispersionsddsList}}).
+#' @param maxNForCorr Maximal number of features to use for calculation of
+#'   correlations. If the number of features in a data set exceeds
 #'   \code{maxNForCorr}, \code{maxNForCorr} features will be randomly selected
-#'   for correlation calculation.
-#' @param seed The seed for downsampling
+#'   for calculation of correlations.
 #'
 #' @return A data frame with pairwise feature correlations for each data set
 #' @author Charlotte Soneson
@@ -46,20 +52,26 @@ calculateSampleCorrs <- function(ddsList, maxNForCorr, seed = 123) {
 #' @importFrom edgeR cpm
 #' @importFrom genefilter rowVars
 #'
-calculateFeatureCorrs <- function(ddsList, maxNForCorr, seed = 123) {
+calculateFeatureCorrs <- function(ddsList, maxNForCorr) {
   featureCorrDF <- lapply(ddsList, function(x) {
+    ## Calculate logCPMs, keep only non-constant features
     cpms <- edgeR::cpm(x$dge, prior.count = 2, log = TRUE)
     cpms <- cpms[genefilter::rowVars(cpms) > 0, ]
+
+    ## Subsample rows if required
     if (nrow(cpms) > maxNForCorr) {
-      set.seed(seed)
       cpms <- cpms[sample(seq_len(nrow(cpms)), maxNForCorr, replace = FALSE), ]
     }
-    corrs <- stats::cor(t(cpms), use = "pairwise.complete.obs", method = "spearman")
+
+    ## Calculate Spearman correlations
+    corrs <- stats::cor(t(cpms), use = "pairwise.complete.obs",
+                        method = "spearman")
     data.frame(
       Correlation = corrs[upper.tri(corrs)]
     )
   })
-  ns <- sapply(featureCorrDF, nrow)
+  ## Merge correlations from all data sets
+  ns <- vapply(featureCorrDF, nrow, 0)
   do.call(rbind, featureCorrDF) %>%
     dplyr::mutate(dataset = rep(names(featureCorrDF), ns))
 

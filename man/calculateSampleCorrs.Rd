@@ -4,18 +4,17 @@
 \alias{calculateSampleCorrs}
 \title{Calculate Spearman correlation between sample pairs}
 \usage{
-calculateSampleCorrs(ddsList, maxNForCorr, seed = 123)
+calculateSampleCorrs(ddsList, maxNForCorr)
 }
 \arguments{
 \item{ddsList}{List of lists, with one element per data set. Each element is
 a list containing a DGEList and a DESeqDataSet, with calculated
-dispersions.}
+dispersions (e.g., output from \code{\link{calculateDispersionsddsList}}).}
 
-\item{maxNForCorr}{If the number of samples in a data set exceeds
+\item{maxNForCorr}{Maximal number of samples to use for correlation
+calculation. If the number of samples in a data set exceeds
 \code{maxNForCorr}, \code{maxNForCorr} samples will be randomly selected
-for correlation calculation.}
-
-\item{seed}{The seed for downsampling}
+for calculation of correlations.}
 }
 \value{
 A data frame with pairwise sample correlations for each data set

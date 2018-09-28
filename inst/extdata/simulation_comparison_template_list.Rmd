@@ -158,21 +158,21 @@ if (is.finite(maxNForDisp)) {
   msg <- ""
 }
 obj <- calculateDispersionsddsList(ddsList = ddsList, 
-                                   maxNForDisp = maxNForDisp, seed = seed)
+                                   maxNForDisp = maxNForDisp)
 
 ## --------------- Calculate between-sample correlations --------------- ##
 if (!quiet) {
   message("Calculating sample correlations.")
 }
 sampleCorrDF <- calculateSampleCorrs(ddsList = obj, 
-                                     maxNForCorr = maxNForCorr, seed = seed)
+                                     maxNForCorr = maxNForCorr)
 
 ## -------------- Calculate between-feature correlations --------------- ##
 if (!quiet) {
   message("Calculating feature correlations.")
 }
 featureCorrDF <- calculateFeatureCorrs(ddsList = obj, 
-                                       maxNForCorr = maxNForCorr, seed = seed)
+                                       maxNForCorr = maxNForCorr)
   
 ## ----------------- Summarize sample characteristics ------------------ ##
 if (!quiet) {
@@ -322,7 +322,7 @@ plots[["BCVedgeR"]]
 if (calculateStatistics) {
   makeDF(df = featureDF, column = c("AveLogCPMDisp", "Tagwise"), 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 
@@ -354,7 +354,7 @@ plots[["dispersionDESeq2"]]
 if (calculateStatistics) {
   makeDF(df = featureDF, column = c("baseMeanDisp", "dispGeneEst"), 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 
@@ -406,7 +406,7 @@ plots[["meanVarOverlaidScatter"]]
 if (calculateStatistics) {
   makeDF(df = featureDF, column = c("average_log2_cpm", "variance_log2_cpm"), 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 
@@ -502,7 +502,7 @@ plots[["libsizeEcdf"]]
 if (calculateStatistics) {
   makeDF(df = sampleDF, column = "Libsize", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 
@@ -601,7 +601,7 @@ plots[["tmmEcdf"]]
 if (calculateStatistics) {
   makeDF(df = sampleDF, column = "TMM", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 
@@ -699,7 +699,7 @@ plots[["effLibsizeEcdf"]]
 if (calculateStatistics) {
   makeDF(df = sampleDF, column = "EffLibsize", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 
@@ -796,7 +796,7 @@ plots[["logCPMEcdf"]]
 if (calculateStatistics) {
   makeDF(df = featureDF, column = "AveLogCPM", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 
@@ -893,7 +893,7 @@ plots[["fraczeroSampleEcdf"]]
 if (calculateStatistics) {
   makeDF(df = sampleDF, column = "Fraczero", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 
@@ -990,7 +990,7 @@ plots[["fraczeroFeatureEcdf"]]
 if (calculateStatistics) {
   makeDF(df = featureDF, column = "Fraczero", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 
@@ -1090,7 +1090,7 @@ plots[["sampleCorrEcdf"]]
 if (calculateStatistics) {
   makeDF(df = sampleCorrDF, column = "Correlation", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 
@@ -1191,7 +1191,7 @@ plots[["featureCorrEcdf"]]
 if (calculateStatistics) {
   makeDF(df = featureCorrDF, column = "Correlation", 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 
@@ -1236,7 +1236,7 @@ plots[["libsizeFraczeroOverlaidScatter"]]
 if (calculateStatistics) {
   makeDF(df = sampleDF, column = c("Libsize", "Fraczero"), 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 
@@ -1281,7 +1281,7 @@ plots[["logCPMFraczeroOverlaidScatter"]]
 if (calculateStatistics) {
   makeDF(df = featureDF, column = c("AveLogCPM", "Fraczero"), 
          permutationPvalues = permutationPvalues, nPermutations = nPermutations, 
-         subsampleSize = subsampleSize, seed = seed, kmin = kmin, kfrac = kfrac)
+         subsampleSize = subsampleSize, kmin = kmin, kfrac = kfrac)
 }
 ```
 

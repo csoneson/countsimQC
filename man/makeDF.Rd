@@ -4,7 +4,7 @@
 \alias{makeDF}
 \title{Construct data frame with pairwise statistics}
 \usage{
-makeDF(df, column, permutationPvalues, nPermutations, subsampleSize, seed, kmin,
+makeDF(df, column, permutationPvalues, nPermutations, subsampleSize, kmin,
   kfrac)
 }
 \arguments{
@@ -23,8 +23,6 @@ permutationPvalues = TRUE)}
 \item{subsampleSize}{The number of observations for which certain
 (time-consuming) statistics will be calculated. The observations will be
 selected randomly among the rows of \code{df}}
-
-\item{seed}{The random seed to use}
 
 \item{kmin, kfrac}{For statistics that require the extraction of k nearest
 neighbors of a given point, the number of neighbors will be max(kmin, kfrac
