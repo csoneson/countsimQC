@@ -22,7 +22,7 @@ plots stored in this file.}
 This is needed to set the size of the plots correctly.}
 }
 \value{
-No value is returned, but plots are generated in the designated
+Nothing is returned, but plots are generated in the designated
   output directory.
 }
 \description{
