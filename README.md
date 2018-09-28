@@ -17,7 +17,9 @@ accompanying paper:
 `countsimQC` depends on a number of other R packages. The following commands 
 check whether the dependencies are available and installs them otherwise 
 (note that R version >= 3.5 and Bioconductor version >= 3.8 are required in 
-order to use the `BiocManager` package):
+order to use the `BiocManager` package). If you have an older version of R
+(3.4), you can still install `countsimQC` v0.5.4 (see "Releases"). Please see
+the `NEWS` file for differences between versions.
 
 ```
 ## Install `BiocManager` if needed
