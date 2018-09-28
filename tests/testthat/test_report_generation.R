@@ -67,7 +67,7 @@ local({
 
   countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
                    outputDir = "./", savePlots = TRUE, forceOverwrite = TRUE,
-                   permutationPvalues = TRUE, nPermutations = 3)
+                   calculateStatistics = FALSE, permutationPvalues = FALSE)
 
   test_that("Report is not generated if forceOverwrite = FALSE", {
     ## Report should not be generated if it already exists and forceOverwrite = FALSE

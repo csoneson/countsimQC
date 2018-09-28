@@ -12,7 +12,7 @@ local({
                       rep(11, 6))
   })
 
-  ## Correlations
+  ## Sample correlations
   ## With calculateSampleCorrs
   set.seed(1)
   sample_corrs <- calculateSampleCorrs(x, maxNForCorr = 3)
@@ -29,6 +29,7 @@ local({
                             method = "spearman", use = "pairwise.complete.obs"))
   })
 
+  ## Feature correlations
   ## With calculateFeatureCorrs
   set.seed(1)
   feature_corrs <- calculateFeatureCorrs(x, maxNForCorr = 3)
@@ -46,4 +47,40 @@ local({
                             method = "spearman", use = "pairwise.complete.obs"))
   })
 
+  ## Stats
+  sampleDF <- lapply(x, function(w) {
+    data.frame(
+      Libsize = colSums(w$dge$counts),
+      Fraczero = colMeans(w$dge$counts == 0),
+      TMM = w$dge$samples$norm.factors
+    ) %>% dplyr::mutate(EffLibsize = Libsize * TMM)
+  })
+  ns <- sapply(sampleDF, nrow)
+  sampleDF <- do.call(rbind, sampleDF) %>%
+    dplyr::mutate(dataset = rep(names(sampleDF), ns))
+
+  test_that("Summary stats are correct", {
+    expect_equal(subset(sampleDF, dataset == "Sim1")$Fraczero[1],
+                 mean(x$Sim1$dge$counts[, 1] == 0))
+    expect_equal(subset(sampleDF, dataset == "Sim2")$Libsize[1],
+                 sum(x$Sim2$dge$counts[, 1]))
+    expect_equal(subset(sampleDF, dataset == "Sim2")$TMM[1],
+                 edgeR::calcNormFactors(x$Sim2$dge$counts)[1])
+    expect_equal(subset(sampleDF, dataset == "Sim2")$EffLibsize[1],
+                 edgeR::calcNormFactors(x$Sim2$dge$counts)[1] *
+                   sum(x$Sim2$dge$counts[, 1]))
+  })
+
+  statDF <- makeDF(df = sampleDF, column = "TMM",
+                   permutationPvalues = FALSE, nPermutations = 0,
+                   subsampleSize = 11, kmin = 3, kfrac = 0.1)$x$data
+
+  test_that("Derived stats are correct", {
+    expect_equivalent(signif(stats::ks.test(sampleDF$TMM[sampleDF$dataset == "Original"],
+                                            sampleDF$TMM[sampleDF$dataset == "Sim1"])$stat, 3),
+                      statDF$`K-S statistic`[statDF$dataset1 == "Original" & statDF$dataset2 == "Sim1"])
+    expect_equivalent(signif(stats::ks.test(sampleDF$TMM[sampleDF$dataset == "Original"],
+                                            sampleDF$TMM[sampleDF$dataset == "Sim1"])$p.value, 3),
+                      statDF$`K-S p-value`[statDF$dataset1 == "Original" & statDF$dataset2 == "Sim1"])
+  })
 })
