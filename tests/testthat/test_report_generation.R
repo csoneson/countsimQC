@@ -65,15 +65,15 @@ local({
     file.remove("test_generated.Rmd")
   })
 
-  countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
-                   outputDir = "./", savePlots = TRUE, forceOverwrite = TRUE,
-                   calculateStatistics = FALSE, permutationPvalues = FALSE)
+  # countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
+  #                  outputDir = "./", savePlots = TRUE, forceOverwrite = TRUE,
+  #                  calculateStatistics = FALSE, permutationPvalues = FALSE)
 
-  test_that("Report is not generated if forceOverwrite = FALSE", {
+  # test_that("Report is not generated if forceOverwrite = FALSE", {
     ## Report should not be generated if it already exists and forceOverwrite = FALSE
-    expect_error(countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
-                                  outputDir = "./", savePlots = TRUE,
-                                  forceOverwrite = FALSE))
+    # expect_error(countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
+    #                               outputDir = "./", savePlots = TRUE,
+    #                               forceOverwrite = FALSE))
 
     ## Report should be generated if it already exists and forceOverwrite = TRUE
     # expect_is(countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
@@ -82,10 +82,10 @@ local({
     #                            forceOverwrite = TRUE), "character")
 
     ## Report should not be generated if the ggplots object exists and forceOverwrite = FALSE
-    file.remove("./report_from_test.html")
-    expect_error(countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
-                                  outputDir = "./", savePlots = TRUE,
-                                  forceOverwrite = FALSE))
+    # file.remove("./report_from_test.html")
+    # expect_error(countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
+    #                               outputDir = "./", savePlots = TRUE,
+    #                               forceOverwrite = FALSE))
 
     ## Report should be generated even if the ggplots object exists, if savePlots = FALSE
     # expect_is(countsimQCReport(ddsList = x, outputFile = "report_from_test.html",
@@ -99,9 +99,15 @@ local({
     #                            outputDir = "./", savePlots = FALSE,
     #                            calculateStatistics = FALSE,
     #                            forceOverwrite = FALSE), "character")
-  })
+  # })
 
-  file.remove("report_from_test.html")
-  file.remove("report_from_test.pdf")
-  file.remove("report_from_test_ggplots.rds")
+  if (file.exists("report_from_test.html")) {
+    file.remove("report_from_test.html")
+  }
+  if (file.exists("report_from_test.pdf")) {
+    file.remove("report_from_test.pdf")
+  }
+  if (file.exists("report_from_test_ggplots.rds")) {
+    file.remove("report_from_test_ggplots.rds")
+  }
 })
