@@ -67,8 +67,9 @@ observations (`subsampleSize = 25`) and refrain from calculating permutation
 p-values.
 
 ```{r, results = "hide", warning = FALSE}
+tempDir <- tempdir()
 countsimQCReport(ddsList = countsimExample, outputFile = "countsim_report.html",
-                 outputDir = "./", outputFormat = "html_document", 
+                 outputDir = tempDir, outputFormat = "html_document", 
                  showCode = FALSE, forceOverwrite = TRUE,
                  savePlots = TRUE, description = "This is my test report.", 
                  maxNForCorr = 25, maxNForDisp = Inf, 
@@ -93,10 +94,12 @@ for all plots included in the report, using a variety of devices. For example,
 to generate each plot in pdf format:
 
 ```{r, warning = FALSE}
-ggplots <- readRDS("countsim_report_ggplots.rds")
-if (!dir.exists("figures")) dir.create("figures")
+ggplots <- readRDS(file.path(tempDir, "countsim_report_ggplots.rds"))
+if (!dir.exists(file.path(tempDir, "figures"))) {
+  dir.create(file.path(tempDir, "figures"))
+}
 generateIndividualPlots(ggplots, device = "pdf", nDatasets = 3, 
-                        outputDir = "./figures")
+                        outputDir = file.path(tempDir, "figures"))
 ```
 
 ## Session info
