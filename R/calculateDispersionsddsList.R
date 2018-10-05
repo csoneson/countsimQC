@@ -12,7 +12,9 @@
 #'   is itself a list, containing a DGEList and a DESeqDataSet with calculated
 #'   dispersions.
 #'
+#' @keyword internal
 #' @author Charlotte Soneson
+#'
 #' @import edgeR DESeq2 SummarizedExperiment
 #' @importFrom stats model.matrix
 #'

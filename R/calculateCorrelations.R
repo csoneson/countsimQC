@@ -9,7 +9,10 @@
 #'   for calculation of correlations.
 #'
 #' @return A data frame with pairwise sample correlations for each data set
+#'
+#' @keyword internal
 #' @author Charlotte Soneson
+#'
 #' @importFrom stats cor
 #' @importFrom edgeR cpm
 #'

@@ -22,6 +22,8 @@
 #'   data sets, based on the provided \code{column}
 #'
 #' @author Charlotte Soneson
+#' @keyword internal
+#'
 #' @import dplyr
 #' @importFrom utils combn
 #'

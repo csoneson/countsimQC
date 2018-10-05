@@ -20,7 +20,10 @@
 #'   normalize the x-axis when calculating the area between the eCDFs.
 #'
 #' @return A vector with statistics and p-values
+#'
+#' @keyword internal
 #' @author Charlotte Soneson
+#'
 #' @importFrom stats ks.test ecdf chisq.test
 #'
 calculateStats <- function(df, ds1, ds2, column, subsampleSize,
