@@ -11,7 +11,6 @@ Description: countsimQC provides functionality to create a comprehensive report
     simulations. However, any collection of count matrices can be compared.
 License: GPL (>=2)
 Encoding: UTF-8
-LazyData: true
 Depends: R (>= 3.5)
 Imports: rmarkdown (>= 0.9.5),
     edgeR,
