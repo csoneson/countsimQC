@@ -2,69 +2,70 @@ library(countsimQC)
 context("Check report generation")
 
 local({
+  tempDir <- tempdir()
   data(countsimExample)
   x <- lapply(countsimExample, function(w) w[1:50, ])
-  if (file.exists("report_from_test.Rmd")) {
-    file.remove("report_from_test.Rmd")
+  if (file.exists(file.path(tempDir, "report_from_test.Rmd"))) {
+    file.remove(file.path(tempDir, "report_from_test.Rmd"))
   }
-  if (file.exists("report_from_test.html")) {
-    file.remove("report_from_test.html")
+  if (file.exists(file.path(tempDir, "report_from_test.html"))) {
+    file.remove(file.path(tempDir, "report_from_test.html"))
   }
-  if (file.exists("report_from_test.pdf")) {
-    file.remove("report_from_test.pdf")
+  if (file.exists(file.path(tempDir, "report_from_test.pdf"))) {
+    file.remove(file.path(tempDir, "report_from_test.pdf"))
   }
-  if (file.exists("report_from_test_ggplots.rds")) {
-    file.remove("report_from_test_ggplots.rds")
+  if (file.exists(file.path(tempDir, "report_from_test_ggplots.rds"))) {
+    file.remove(file.path(tempDir, "report_from_test_ggplots.rds"))
   }
 
   test_that("Input argument errors are recognized", {
     ## outputFormat
     expect_error(countsimQCReport(ddsList = x, outputFormat = "html",
                                   outputFile = "report_from_test.html",
-                                  outputDir = "./", savePlots = TRUE))
+                                  outputDir = tempDir, savePlots = TRUE))
     expect_error(countsimQCReport(ddsList = x, outputFormat = "html_document",
                                   outputFile = "report_from_test.pdf",
-                                  outputDir = "./", savePlots = TRUE))
+                                  outputDir = tempDir, savePlots = TRUE))
     ## ddsList
     expect_error(countsimQCReport(ddsList = x[[1]], outputFormat = "html_document",
                                   outputFile = "report_from_test.html",
-                                  outputDir = "./", savePlots = TRUE))
+                                  outputDir = tempDir, savePlots = TRUE))
     expect_error(countsimQCReport(ddsList = list(A = 1:3),
                                   outputFormat = "html_document",
                                   outputFile = "report_from_test.html",
-                                  outputDir = "./", savePlots = TRUE))
+                                  outputDir = tempDir, savePlots = TRUE))
     y <- x
     names(y) <- NULL
     expect_error(countsimQCReport(ddsList = y, outputFormat = "html_document",
                                   outputFile = "report_from_test.html",
-                                  outputDir = "./", savePlots = TRUE))
+                                  outputDir = tempDir, savePlots = TRUE))
     y <- x
     names(y) <- c("A", "A", "B")
     expect_error(countsimQCReport(ddsList = y, outputFormat = "html_document",
                                   outputFile = "report_from_test.html",
-                                  outputDir = "./", savePlots = TRUE))
+                                  outputDir = tempDir, savePlots = TRUE))
 
     ## rmd_template
     expect_error(countsimQCReport(ddsList = x, outputFormat = "html_document",
                                   outputFile = "report_from_test.html",
-                                  outputDir = "./", savePlots = TRUE,
+                                  outputDir = tempDir, savePlots = TRUE,
                                   rmdTemplate = "nonexistent.Rmd"))
 
     ## existing rmd output
-    file.create("test_generated.Rmd")
+    file.create(file.path(tempDir, "test_generated.Rmd"))
     expect_error(countsimQCReport(ddsList = x, outputFormat = "html_document",
                                   outputFile = "test_generated.html",
-                                  outputDir = "./", savePlots = TRUE))
-    file.remove("test_generated.Rmd")
+                                  outputDir = tempDir, savePlots = TRUE))
+    file.remove(file.path(tempDir, "test_generated.Rmd"))
   })
 
-  if (file.exists("report_from_test.html")) {
-    file.remove("report_from_test.html")
+  if (file.exists(file.path(tempDir, "report_from_test.html"))) {
+    file.remove(file.path(tempDir, "report_from_test.html"))
   }
-  if (file.exists("report_from_test.pdf")) {
-    file.remove("report_from_test.pdf")
+  if (file.exists(file.path(tempDir, "report_from_test.pdf"))) {
+    file.remove(file.path(tempDir, "report_from_test.pdf"))
   }
-  if (file.exists("report_from_test_ggplots.rds")) {
-    file.remove("report_from_test_ggplots.rds")
+  if (file.exists(file.path(tempDir, "report_from_test_ggplots.rds"))) {
+    file.remove(file.path(tempDir, "report_from_test_ggplots.rds"))
   }
 })
