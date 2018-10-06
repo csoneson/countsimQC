@@ -15,6 +15,8 @@ vignette: >
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Introduction
+
 The `countsimQC` package provides a simple way to compare the characteristic 
 features of a collection of (e.g., RNA-seq) count data sets. An important
 application is in situations where a synthetic count data set has been generated
@@ -23,12 +25,14 @@ it is often important to verify that the final synthetic data captures the main
 features of the original data set. However, the package can be used to create a 
 visual overview of any collection of one or more count data sets.
 
+## Data preparation
+
 In this vignette we will show how to generate a comparative report from a 
 collection of two simulated data sets and the original, underlying real data 
 set. First, we load the object containing the three data sets. The object is a 
 named list, where each element is a `DESeqDataSet` object, containing the count 
 matrix, a sample information data frame and a model formula (necessary to 
-calculate dispersions). For more information about the `DESeqDataSet` object, 
+calculate dispersions). For more information about the `DESeqDataSet` class, 
 please see the
 [`DESeq2`](http://bioconductor.org/packages/release/bioc/html/DESeq2.html)
 Bioconductor package.
@@ -42,6 +46,8 @@ suppressPackageStartupMessages({
 data(countsimExample)
 countsimExample
 ```
+
+## Report generation
 
 Next, we generate the report using the `countsimQCReport()` function. Depending
 on the level of detail and the type of information that are required for the
@@ -84,6 +90,8 @@ setting `outputFormat = "pdf_document"`). The `description` argument can be used
 to provide a more extensive description of the data set(s) that are included in
 the report.
 
+## Generation of individual figures
+
 If the argument `savePlots` is set to TRUE, an .rds file containing the 
 individual ggplot objects will be generated. These objects can be used to
 perform fine-tuning of the visualizations if desired. Note, however, that the
@@ -100,6 +108,35 @@ if (!dir.exists(file.path(tempDir, "figures"))) {
 }
 generateIndividualPlots(ggplots, device = "pdf", nDatasets = 3, 
                         outputDir = file.path(tempDir, "figures"))
+```
+
+## Input data format
+
+In the example above, all data sets were provided as `DESeqDataSet` objects. The
+advantage of this is that it allows the specification of the experimental
+design, which is used in the dispersion calculations. `countsimQC` also allows a
+data set to be provided as either a `data.frame` or a `matrix`. However, in
+these situations, it will be assumed that all samples are replicates (i.e., a
+design `~1`). An example is provided in the `countsimExample_dfmat` data set,
+provided with the package.
+
+```{r}
+data(countsimExample_dfmat)
+names(countsimExample_dfmat)
+lapply(countsimExample_dfmat, class)
+```
+
+```{r, results = "hide", warning = FALSE, eval = FALSE}
+tempDir <- tempdir()
+countsimQCReport(ddsList = countsimExample_dfmat, 
+                 outputFile = "countsim_report_dfmat.html",
+                 outputDir = tempDir, outputFormat = "html_document", 
+                 showCode = FALSE, forceOverwrite = TRUE,
+                 savePlots = TRUE, description = "This is my test report.", 
+                 maxNForCorr = 25, maxNForDisp = Inf, 
+                 calculateStatistics = TRUE, subsampleSize = 25,
+                 kfrac = 0.01, kmin = 5, 
+                 permutationPvalues = FALSE, nPermutations = NULL)
 ```
 
 ## Session info
