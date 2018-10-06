@@ -31,16 +31,18 @@ dds_orig <- DESeqDataSetFromMatrix(
 ## splat
 params <- splatEstimate(countsnz)
 sim <- splatSimulate(params, method = "groups", group.prob = c(table(group))/length(group))
-dds_splat <- DESeqDataSetFromMatrix(countData = counts(sim),
-                                    colData = colData(sim),
-                                    design = ~ Group)
+dds_splat <- DESeqDataSetFromMatrix(
+  countData = round(counts(sim) * mean(colSums(counts(dds_orig)))/mean(colSums(counts(sim)))),
+  colData = colData(sim),
+  design = ~ Group)
 
 ## Lun
 params <- lunEstimate(countsnz)
 sim <- lunSimulate(params, groupCells = c(table(group)))
-dds_lun <- DESeqDataSetFromMatrix(countData = counts(sim),
-                                  colData = colData(sim),
-                                  design = ~ Group)
+dds_lun <- DESeqDataSetFromMatrix(
+  countData = round(counts(sim) * mean(colSums(counts(dds_orig)))/mean(colSums(counts(sim)))),
+  colData = colData(sim),
+  design = ~ Group)
 
 countsimExample <- list(Original = dds_orig[1:10000, c(1:5, 84:89)],
                         Sim1 = dds_splat[1:10000, c(1:5, 84:89)],
