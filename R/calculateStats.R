@@ -133,6 +133,8 @@ calculateStats <- function(df, ds1, ds2, column, subsampleSize,
 #' @param withP Whether or not to include p-value columns
 #'
 #' @return A vector with NA values for all applicable statistics
+#'
+#' @keywords internal
 #' @author Charlotte Soneson
 #'
 defaultStats <- function(n, withP = FALSE) {

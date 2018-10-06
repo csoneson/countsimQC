@@ -20,3 +20,4 @@ Return a vector of NA scores
 \author{
 Charlotte Soneson
 }
+\keyword{internal}

@@ -50,7 +50,10 @@ calculateSampleCorrs <- function(ddsList, maxNForCorr) {
 #'   for calculation of correlations.
 #'
 #' @return A data frame with pairwise feature correlations for each data set
+#'
+#' @keywords internal
 #' @author Charlotte Soneson
+#'
 #' @importFrom stats cor
 #' @importFrom edgeR cpm
 #' @importFrom genefilter rowVars

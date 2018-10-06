@@ -134,6 +134,7 @@ makeDF <- function(df, column, permutationPvalues, nPermutations,
 #' @return A list with two text strings in markdown format: one for tables based
 #'   on a single data column, and one for tables based on two data columns
 #'
+#' @keywords internal
 #' @author Charlotte Soneson
 #'
 defineTableDesc <- function(calculateStatistics, subsampleSize, kfrac, kmin,

@@ -25,3 +25,4 @@ Calculate Spearman correlation between feature pairs
 \author{
 Charlotte Soneson
 }
+\keyword{internal}
