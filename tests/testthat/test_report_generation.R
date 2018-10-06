@@ -2,6 +2,7 @@ library(countsimQC)
 context("Check report generation")
 
 local({
+  data(countsimExample)
   x <- lapply(countsimExample, function(w) w[1:50, ])
   if (file.exists("report_from_test.Rmd")) {
     file.remove("report_from_test.Rmd")

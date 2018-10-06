@@ -2,6 +2,7 @@ library(countsimQC)
 context("Check individual functions")
 
 local({
+  data(countsimExample)
   x <- lapply(countsimExample, function(w) w[1:50, ])
   x <- calculateDispersionsddsList(x, maxNForDisp = Inf)
 
