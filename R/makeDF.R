@@ -22,7 +22,7 @@
 #'   data sets, based on the provided \code{column}
 #'
 #' @author Charlotte Soneson
-#' @keyword internal
+#' @keywords internal
 #'
 #' @import dplyr
 #' @importFrom utils combn

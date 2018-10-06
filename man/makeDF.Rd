@@ -39,3 +39,4 @@ comparison of data sets.
 \author{
 Charlotte Soneson
 }
+\keyword{internal}

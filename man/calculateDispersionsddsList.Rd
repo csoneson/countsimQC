@@ -25,3 +25,4 @@ both edgeR and DESeq2.
 \author{
 Charlotte Soneson
 }
+\keyword{internal}

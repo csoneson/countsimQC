@@ -40,3 +40,4 @@ Calculate a range of statistics and p-values for comparison of two data sets.
 \author{
 Charlotte Soneson
 }
+\keyword{internal}

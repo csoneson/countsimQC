@@ -25,3 +25,4 @@ Calculate Spearman correlation between sample pairs
 \author{
 Charlotte Soneson
 }
+\keyword{internal}

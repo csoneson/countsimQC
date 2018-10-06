@@ -21,7 +21,7 @@
 #'
 #' @return A vector with statistics and p-values
 #'
-#' @keyword internal
+#' @keywords internal
 #' @author Charlotte Soneson
 #'
 #' @importFrom stats ks.test ecdf chisq.test
