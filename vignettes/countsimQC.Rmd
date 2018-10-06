@@ -37,7 +37,7 @@ please see the
 [`DESeq2`](http://bioconductor.org/packages/release/bioc/html/DESeq2.html)
 Bioconductor package.
 
-```{r}
+```{r, warning = FALSE}
 suppressPackageStartupMessages({
   library(countsimQC)
   library(DESeq2)
@@ -72,7 +72,7 @@ Here, for the sake of speed, we calculate statistics for a small subset of the
 observations (`subsampleSize = 25`) and refrain from calculating permutation
 p-values.
 
-```{r, results = "hide", warning = FALSE}
+```{r, results = "hide", warning = FALSE, message = FALSE}
 tempDir <- tempdir()
 countsimQCReport(ddsList = countsimExample, outputFile = "countsim_report.html",
                  outputDir = tempDir, outputFormat = "html_document", 
