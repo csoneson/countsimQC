@@ -1,0 +1,19 @@
+citHeader("To cite countsimQC in publications use:")
+
+citEntry(entry = "Article",
+  title        = "Towards unified quality verification of synthetic count data with countsimQC",
+  author       = personList(as.person("Charlotte Soneson"),
+                   as.person("Mark D Robinson")),
+  journal      = "Bioinformatics",
+  year         = "2018",
+  volume       = "34",
+  number       = "4",
+  pages        = "691--692",
+  url          = "https://academic.oup.com/bioinformatics/article/34/4/691/4345646",
+
+  textVersion  =
+  paste("Charlotte Soneson & Mark D Robinson (2018).",
+        "Towards unified quality verification of synthetic count data with countsimQC.",
+        "Bioinformatics, 34(4), 691-692.",
+        "URL https://academic.oup.com/bioinformatics/article/34/4/691/4345646.")
+)
