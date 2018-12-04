@@ -34,7 +34,7 @@ Suggests: knitr,
     testthat
 VignetteBuilder: knitr
 biocViews: Microbiome, RNASeq, SingleCell, ExperimentalDesign, QualityControl, 
-    ReportWriting, Visualization
+    ReportWriting, Visualization, ImmunoOncology
 Collate:
     'calculateCorrelations.R'
     'calculateDispersionsddsList.R'
