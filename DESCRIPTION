@@ -1,7 +1,7 @@
 Package: countsimQC
 Type: Package
 Title: Compare Characteristic Features of Count Data Sets
-Version: 1.0.0
+Version: 1.0.1
 Author: Charlotte Soneson
 Maintainer: Charlotte Soneson <charlottesoneson@gmail.com>
 Description: countsimQC provides functionality to create a comprehensive report 
@@ -33,7 +33,7 @@ RoxygenNote: 6.1.0
 Suggests: knitr,
     testthat
 VignetteBuilder: knitr
-biocViews: Microbiome, RNASeq, SingleCell, ExperimentalDesign, QualityControl, 
+biocViews: ImmunoOncology, Microbiome, RNASeq, SingleCell, ExperimentalDesign, QualityControl, 
     ReportWriting, Visualization
 Collate:
     'calculateCorrelations.R'
