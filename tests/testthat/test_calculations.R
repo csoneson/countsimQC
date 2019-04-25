@@ -65,11 +65,11 @@ local({
                  mean(x$Sim1$dge$counts[, 1] == 0))
     expect_equal(subset(sampleDF, dataset == "Sim2")$Libsize[1],
                  sum(x$Sim2$dge$counts[, 1]))
-    expect_equal(subset(sampleDF, dataset == "Sim2")$TMM[1],
-                 edgeR::calcNormFactors(x$Sim2$dge$counts)[1])
-    expect_equal(subset(sampleDF, dataset == "Sim2")$EffLibsize[1],
-                 edgeR::calcNormFactors(x$Sim2$dge$counts)[1] *
-                   sum(x$Sim2$dge$counts[, 1]))
+    expect_equivalent(subset(sampleDF, dataset == "Sim2")$TMM[1],
+                      edgeR::calcNormFactors(x$Sim2$dge$counts)[1])
+    expect_equivalent(subset(sampleDF, dataset == "Sim2")$EffLibsize[1],
+                      edgeR::calcNormFactors(x$Sim2$dge$counts)[1] *
+                        sum(x$Sim2$dge$counts[, 1]))
   })
 
   statDF <- makeDF(df = sampleDF, column = "TMM",
