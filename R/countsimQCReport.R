@@ -116,7 +116,8 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
     if (ignorePandoc) {
       ## If ignorePandoc is TRUE, just give a warning
       warning("pandoc is not available! ",
-              "The final report will not be generated.")
+              "The final report will not be generated.",
+              immediate. = TRUE)
       runPandoc <- FALSE
     } else {
       ## If ignorePandoc is FALSE, stop
@@ -127,7 +128,8 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
     if (ignorePandoc) {
       ## If ignorePandoc is TRUE, just give a warning
       warning("pandoc-citeproc is not available! ",
-              "The final report will not be generated.")
+              "The final report will not be generated.",
+              immediate. = TRUE)
       runPandoc <- FALSE
     } else {
       ## If ignorePandoc is FALSE, stop
