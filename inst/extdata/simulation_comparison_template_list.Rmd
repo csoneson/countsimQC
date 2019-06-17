@@ -124,9 +124,6 @@ references:
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = showCode, warning = FALSE, message = FALSE)
 knitr::opts_knit$set(progress = FALSE, verbose = FALSE)
-if (!runPandoc) {
-  knitr::opts_chunk$set(dev = c("png", "pdf"))
-}
 ```
 
 ```{r preparation, message = FALSE}
