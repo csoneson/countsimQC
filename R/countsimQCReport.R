@@ -111,11 +111,13 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
   if (is.null(outputFormat)) outputFormat <- "html_document"
 
   ## Check if pandoc and pandoc-citeproc is available
+  runPandoc <- TRUE
   if (Sys.which("pandoc") == "") {
     if (ignorePandoc) {
       ## If ignorePandoc is TRUE, just give a warning
       warning("pandoc is not available! ",
               "The final report will not be generated.")
+      runPandoc <- FALSE
     } else {
       ## If ignorePandoc is FALSE, stop
       stop("pandoc is not available!")
@@ -126,6 +128,7 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
       ## If ignorePandoc is TRUE, just give a warning
       warning("pandoc-citeproc is not available! ",
               "The final report will not be generated.")
+      runPandoc <- FALSE
     } else {
       ## If ignorePandoc is FALSE, stop
       stop("pandoc-citeproc is not available!")
@@ -277,6 +280,7 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
   args$output_format <- outputFormat
   args$output_file <- outputFile
   args$quiet <- !knitrProgress
+  args$run_pandoc <- runPandoc
 
   ## ------------------------------------------------------------------------ ##
   ## ------------------------ Render the report ----------------------------- ##
