@@ -124,8 +124,8 @@ references:
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = showCode, warning = FALSE, message = FALSE)
 knitr::opts_knit$set(progress = FALSE, verbose = FALSE)
-if (!run_pandoc) {
-  if (output_format == "html_document") {
+if (!runPandoc) {
+  if (outputFormat == "html_document") {
     knitr::opts_chunk$set(dev = "png")
   } else {
     knitr::opts_chunk$set(dev = "pdf")

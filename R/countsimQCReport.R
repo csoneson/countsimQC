@@ -283,6 +283,7 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
   args$output_file <- outputFile
   args$quiet <- !knitrProgress
   args$run_pandoc <- runPandoc
+  print(args)
 
   ## ------------------------------------------------------------------------ ##
   ## ------------------------ Render the report ----------------------------- ##
