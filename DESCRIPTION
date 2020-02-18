@@ -1,7 +1,7 @@
 Package: countsimQC
 Type: Package
 Title: Compare Characteristic Features of Count Data Sets
-Version: 1.5.0
+Version: 1.5.1
 Authors@R: c(person("Charlotte", "Soneson", role = c("aut", "cre"), 
     email = "charlottesoneson@gmail.com", comment = c(ORCID = "0000-0003-3833-2169")))
 Description: countsimQC provides functionality to create a comprehensive report 
@@ -29,7 +29,7 @@ Imports: rmarkdown (>= 0.9.5),
     stats,
     utils,
     methods
-RoxygenNote: 6.1.0
+RoxygenNote: 7.0.2
 Suggests: knitr,
     testthat
 VignetteBuilder: knitr

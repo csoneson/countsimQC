@@ -4,8 +4,18 @@
 \alias{calculateStats}
 \title{Calculate statistics for pairwise comparison of data sets}
 \usage{
-calculateStats(df, ds1, ds2, column, subsampleSize, permute = FALSE,
-  kmin, kfrac, xmin, xmax)
+calculateStats(
+  df,
+  ds1,
+  ds2,
+  column,
+  subsampleSize,
+  permute = FALSE,
+  kmin,
+  kfrac,
+  xmin,
+  xmax
+)
 }
 \arguments{
 \item{df}{The input data frame. Must contain at least a column named

@@ -4,8 +4,15 @@
 \alias{makeDF}
 \title{Construct data frame with pairwise statistics}
 \usage{
-makeDF(df, column, permutationPvalues, nPermutations, subsampleSize, kmin,
-  kfrac)
+makeDF(
+  df,
+  column,
+  permutationPvalues,
+  nPermutations,
+  subsampleSize,
+  kmin,
+  kfrac
+)
 }
 \arguments{
 \item{df}{The input data frame. Must contain at least a column named

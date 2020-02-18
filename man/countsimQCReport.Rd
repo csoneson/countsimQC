@@ -4,13 +4,29 @@
 \alias{countsimQCReport}
 \title{Generate countsimQC report}
 \usage{
-countsimQCReport(ddsList, outputFile, outputDir = "./",
-  outputFormat = NULL, showCode = FALSE, rmdTemplate = NULL,
-  forceOverwrite = FALSE, savePlots = FALSE, description = NULL,
-  maxNForCorr = 500, maxNForDisp = Inf, calculateStatistics = TRUE,
-  subsampleSize = 500, kfrac = 0.01, kmin = 5,
-  permutationPvalues = FALSE, nPermutations = NULL,
-  knitrProgress = FALSE, quiet = FALSE, ignorePandoc = FALSE, ...)
+countsimQCReport(
+  ddsList,
+  outputFile,
+  outputDir = "./",
+  outputFormat = NULL,
+  showCode = FALSE,
+  rmdTemplate = NULL,
+  forceOverwrite = FALSE,
+  savePlots = FALSE,
+  description = NULL,
+  maxNForCorr = 500,
+  maxNForDisp = Inf,
+  calculateStatistics = TRUE,
+  subsampleSize = 500,
+  kfrac = 0.01,
+  kmin = 5,
+  permutationPvalues = FALSE,
+  nPermutations = NULL,
+  knitrProgress = FALSE,
+  quiet = FALSE,
+  ignorePandoc = FALSE,
+  ...
+)
 }
 \arguments{
 \item{ddsList}{Named list of \code{DESeqDataSets} or count matrices to

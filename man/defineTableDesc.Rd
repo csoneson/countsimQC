@@ -4,8 +4,19 @@
 \alias{defineTableDesc}
 \title{Define table descriptions}
 \usage{
-defineTableDesc(calculateStatistics, subsampleSize, kfrac, kmin, obstype,
-  aspect, minvalue, maxvalue, permutationPvalues, nPermutations, nDatasets)
+defineTableDesc(
+  calculateStatistics,
+  subsampleSize,
+  kfrac,
+  kmin,
+  obstype,
+  aspect,
+  minvalue,
+  maxvalue,
+  permutationPvalues,
+  nPermutations,
+  nDatasets
+)
 }
 \arguments{
 \item{calculateStatistics}{Whether or not statistics and p-values are

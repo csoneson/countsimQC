@@ -119,6 +119,8 @@ references:
   URL: https://link.springer.com/chapter/10.1007%2F978-3-319-07212-8_3
   issued:
     year: 2014
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include = FALSE}
