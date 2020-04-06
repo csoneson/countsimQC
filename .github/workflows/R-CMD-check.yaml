@@ -44,6 +44,8 @@ jobs:
           source ~/.zprofile
           export LDFLAGS="-L/usr/local/opt/libxml2/lib"
           export CPPFLAGS="-I/usr/local/opt/libxml2/include"
+          echo 'LIBXML_LIBDIR=/usr/local/opt/libxml2/lib' >> ~/.Renviron
+          echo 'LIBXML_INCDIR=/usr/local/opt/libxml2/include' >> ~/.Renviron
 
       - name: Query dependencies
         run: |
