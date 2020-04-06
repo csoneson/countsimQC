@@ -39,7 +39,9 @@ jobs:
         run: |
           brew install libxml2
           echo 'export PATH="/usr/local/opt/libxml2/bin:$PATH"' >> ~/.zshrc
+          echo 'export PATH="/usr/local/opt/libxml2/bin:$PATH"' >> ~/.zprofile
           source ~/.zshrc
+          source ~/.zprofile
           export LDFLAGS="-L/usr/local/opt/libxml2/lib"
           export CPPFLAGS="-I/usr/local/opt/libxml2/include"
 
