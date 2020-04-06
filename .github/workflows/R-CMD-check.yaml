@@ -34,6 +34,11 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@master
 
+      - name: Install lib-xml2 (MacOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install libxml2
+
       - name: Query dependencies
         run: |
           install.packages(c('remotes', 'BiocManager'), Ncpu = 2L)
@@ -56,6 +61,7 @@ jobs:
           Rscript -e "remotes::install_github('r-hub/sysreqs')"
           sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
           sudo -s eval "$sysreqs"
+          sudo apt-get update && sudo apt-get -y install qpdf
 
       - name: Install dependencies
         run: |
