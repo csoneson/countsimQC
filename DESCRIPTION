@@ -44,3 +44,5 @@ Collate:
     'makeDF.R'
     'countsimQCReport.R'
     'generateIndividualPlots.R'
+URL: https://github.com/csoneson/countsimQC
+BugReports: https://github.com/csoneson/countsimQC/issues
