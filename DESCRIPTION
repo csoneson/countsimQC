@@ -35,14 +35,5 @@ Suggests: knitr,
 VignetteBuilder: knitr
 biocViews: Microbiome, RNASeq, SingleCell, ExperimentalDesign, QualityControl, 
     ReportWriting, Visualization, ImmunoOncology
-Collate:
-    'calculateCorrelations.R'
-    'calculateDispersionsddsList.R'
-    'calculateStats.R'
-    'countsimExample.R'
-    'countsimExample_dfmat.R'
-    'makeDF.R'
-    'countsimQCReport.R'
-    'generateIndividualPlots.R'
 URL: https://github.com/csoneson/countsimQC
 BugReports: https://github.com/csoneson/countsimQC/issues
