@@ -35,7 +35,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">countsimQC</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.5.2</span>
       </span>
     </div>
 
@@ -85,32 +85,18 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<p><code>countsimQC</code> depends on a number of other R packages. The following commands check whether the dependencies are available and installs them otherwise (note that R version &gt;= 3.5 and Bioconductor version &gt;= 3.8 are required in order to use the <code>BiocManager</code> package). If you have an older version of R (3.4), you can still install <code>countsimQC</code> v0.5.4 (see âReleasesâ). Please see the <code>NEWS</code> file for differences between versions.</p>
+<p><code>countsimQC</code> can be installed from <a href="https://www.bioconductor.org/packages/countsimQC/">Bioconductor</a> with the following commands. Note that R version &gt;= 3.5 and Bioconductor version &gt;= 3.8 are required in order to use the <code>BiocManager</code> package. If you have an older version of R (3.4), you can still install <code>countsimQC</code> v0.5.4 (see the <code>Releases</code> tab in the GitHub repository. Please see the <code>NEWS</code> file for differences between versions.</p>
 <pre><code>## Install `BiocManager` if needed
-if (!("BiocManager" %in% installed.packages()[, "Package"])) {
-  install.packages("BiocManager")
-}
-
-## List dependencies
-pkg &lt;- c("rmarkdown", "edgeR", "DESeq2", "dplyr", "tidyr", "ggplot2", 
-         "SummarizedExperiment", "genefilter", "DT", "GenomeInfoDbData",
-         "caTools", "randtests", "stats", "utils", "methods")
-
-## Check if dependencies are already installed
-pkg &lt;- pkg[!(pkg %in% installed.packages()[, "Package"])]
-
-## If some dependency is missing, install it
-if (length(pkg) &gt; 0) {
-    BiocManager::install(pkg, dependencies = TRUE, ask = FALSE)
-}</code></pre>
-<p>Once all dependencies are available, <code>countsimQC</code> can be installed using the <code>BiocManager</code> package:</p>
-<pre><code><a href="https://rdrr.io/pkg/BiocManager/man/install.html">## Install countsimQC
-BiocManager::install("csoneson/countsimQC")</a></code></pre>
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+    
+## Install countsimQC
+BiocManager::install("countsimQC")</code></pre>
 </div>
 <div id="getting-started" class="section level2">
 <h2 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h2>
-<p>To run <code>countsimQC</code> and generate a report, you simply need to call the function <code><a href="reference/countsimQCReport.html">countsimQCReport()</a></code>, with an input consisting of a named list of <code>DESeqDataSets</code> (see the <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html">DESeq2</a> package for a description of this class). Each <code>DESeqDataSet</code> should correspond to one data set and contain a count matrix, a data frame with sample information and a design formula, which is needed for proper dispersion calculations. To generate a <code>DESeqDataSet</code> from a count matrix <code>counts</code>, a sample information data frame <code>sample_df</code> and a design formula <code>formula</code> (of the form <code>~ predictors</code>), you can do as follows:</p>
+<p>To run <code>countsimQC</code> and generate a report, you simply need to call the function <code><a href="reference/countsimQCReport.html">countsimQCReport()</a></code>, with an input consisting of a named list of <code>DESeqDataSets</code> (see the <a href="https://www.bioconductor.org/packages/DESeq2/">DESeq2</a> package for a description of this class). Each <code>DESeqDataSet</code> should correspond to one data set and contain a count matrix, a data frame with sample information and a design formula, which is needed for proper dispersion calculations. To generate a <code>DESeqDataSet</code> from a count matrix <code>counts</code>, a sample information data frame <code>sample_df</code> and a design formula <code>formula</code> (of the form <code>~ predictors</code>), you can do as follows:</p>
 <pre><code><a href="https://rdrr.io/pkg/DESeq2/man">library(DESeq2)
 dds &lt;- DESeqDataSetFromMatrix(countData = counts, 
                               colData = sample_df,

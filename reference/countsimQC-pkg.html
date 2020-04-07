@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Construct data frame with pairwise statistics — makeDF • countsimQC</title>
+<title>countsimQC — countsimQC-pkg • countsimQC</title>
 
 
 <!-- jquery -->
@@ -39,9 +39,8 @@
 
 
 
-<meta property="og:title" content="Construct data frame with pairwise statistics — makeDF" />
-<meta property="og:description" content="Construct a data frame containing statistics and p-values for pairwise
-comparison of data sets." />
+<meta property="og:title" content="countsimQC — countsimQC-pkg" />
+<meta property="og:description" content="countsimQC" />
 
 
 
@@ -112,67 +111,17 @@ comparison of data sets." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Construct data frame with pairwise statistics</h1>
-    <small class="dont-index">Source: <a href='https://github.com/csoneson/countsimQC/blob/master/R/makeDF.R'><code>R/makeDF.R</code></a></small>
-    <div class="hidden name"><code>makeDF.Rd</code></div>
+    <h1>countsimQC</h1>
+    <small class="dont-index">Source: <a href='https://github.com/csoneson/countsimQC/blob/master/R/countsimQC-pkg.R'><code>R/countsimQC-pkg.R</code></a></small>
+    <div class="hidden name"><code>countsimQC-pkg.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Construct a data frame containing statistics and p-values for pairwise
-comparison of data sets.</p>
+    <p>countsimQC</p>
     </div>
 
-    <pre class="usage"><span class='fu'>makeDF</span>(
-  <span class='no'>df</span>,
-  <span class='no'>column</span>,
-  <span class='no'>permutationPvalues</span>,
-  <span class='no'>nPermutations</span>,
-  <span class='no'>subsampleSize</span>,
-  <span class='no'>kmin</span>,
-  <span class='no'>kfrac</span>
-)</pre>
 
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
-    <table class="ref-arguments">
-    <colgroup><col class="name" /><col class="desc" /></colgroup>
-    <tr>
-      <th>df</th>
-      <td><p>The input data frame. Must contain at least a column named
-'dataset' and an additional column with values</p></td>
-    </tr>
-    <tr>
-      <th>column</th>
-      <td><p>The name of the column(s) of <code>df</code> to be used as the basis
-for the comparison</p></td>
-    </tr>
-    <tr>
-      <th>permutationPvalues</th>
-      <td><p>Whether or not to calculate p-values of statistics
-via permutation</p></td>
-    </tr>
-    <tr>
-      <th>nPermutations</th>
-      <td><p>The number of permutations (only used if
-permutationPvalues = TRUE)</p></td>
-    </tr>
-    <tr>
-      <th>subsampleSize</th>
-      <td><p>The number of observations for which certain
-(time-consuming) statistics will be calculated. The observations will be
-selected randomly among the rows of <code>df</code></p></td>
-    </tr>
-    <tr>
-      <th>kmin, kfrac</th>
-      <td><p>For statistics that require the extraction of k nearest
-neighbors of a given point, the number of neighbors will be max(kmin, kfrac
-* nrow(df))</p></td>
-    </tr>
-    </table>
 
-    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
-
-    <p>A data table with statistics and p-values for pairwise comparisons of
-  data sets, based on the provided <code>column</code></p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
