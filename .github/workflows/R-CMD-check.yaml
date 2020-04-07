@@ -18,7 +18,6 @@ jobs:
         config:
           - {os: windows-latest, r: '3.6'}
           - {os: macOS-latest, r: '3.6'}
-          - {os: macOS-latest, r: 'devel'}
           - {os: ubuntu-16.04, r: '3.6', rspm: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
 
     env:
@@ -33,17 +32,6 @@ jobs:
           r-version: ${{ matrix.config.r }}
 
       - uses: r-lib/actions/setup-pandoc@master
-
-      - name: Install lib-xml2 (MacOS)
-        if: runner.os == 'macOS'
-        run: |
-          brew install libxml2
-          echo 'export PATH="/usr/local/opt/libxml2/bin:$PATH"' >> ~/.zprofile
-          echo 'export PATH="/usr/local/opt/libxml2/bin:$PATH"' >> ~/.zshrc
-          export LDFLAGS="-L/usr/local/opt/libxml2/lib"
-          export CPPFLAGS="-I/usr/local/opt/libxml2/include"
-          export LIBXML_INCDIR=/usr/local/Cellar/libxml2/2.9.10
-          type xml2-config
 
       - name: Query dependencies
         run: |
@@ -71,7 +59,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          Sys.setenv(LIBXML_INCDIR="/usr/local/Cellar/libxml2/2.9.10")
           install.packages("Rcpp", repos="https://rcppcore.github.io/drat", Ncpu = 2L)
           remotes::install_deps(dependencies = TRUE, repos = c(getOption('repos'), BiocManager::repositories()), Ncpu = 2L)
           remotes::install_cran("rcmdcheck")
