@@ -38,7 +38,10 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install libxml2
-          brew link libxml2 --force
+          echo 'export PATH="/usr/local/opt/libxml2/bin:$PATH"' >> ~/.zprofile
+          echo 'export PATH="/usr/local/opt/libxml2/bin:$PATH"' >> ~/.zshrc
+          export LDFLAGS="-L/usr/local/opt/libxml2/lib"
+          export CPPFLAGS="-I/usr/local/opt/libxml2/include"
           type xml2-config
 
       - name: Query dependencies
@@ -67,6 +70,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          Sys.setenv(XML_CONFIG = "/usr/bin/xml2-config")
           install.packages("Rcpp", repos="https://rcppcore.github.io/drat", Ncpu = 2L)
           remotes::install_deps(dependencies = TRUE, repos = c(getOption('repos'), BiocManager::repositories()), Ncpu = 2L)
           remotes::install_cran("rcmdcheck")
