@@ -15,46 +15,28 @@ accompanying paper:
 - Soneson C and Robinson MD: [Towards unified quality verification of synthetic count data with countsimQC](https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btx631/4345646/Towards-unified-quality-verification-of-synthetic). Bioinformatics 34(4):691-692 (2018).
 
 ## Installation
-`countsimQC` depends on a number of other R packages. The following commands 
-check whether the dependencies are available and installs them otherwise 
-(note that R version >= 3.5 and Bioconductor version >= 3.8 are required in 
-order to use the `BiocManager` package). If you have an older version of R
-(3.4), you can still install `countsimQC` v0.5.4 (see "Releases"). Please see
-the `NEWS` file for differences between versions.
+`countsimQC` can be installed from 
+[Bioconductor](https://www.bioconductor.org/packages/countsimQC/) with the 
+following commands. Note that R version >= 3.5 and Bioconductor 
+version >= 3.8 are required in order to use the `BiocManager` package. 
+If you have an older version of R (3.4), you can still install 
+`countsimQC` v0.5.4 (see the `Releases` tab in the GitHub repository. 
+Please see the `NEWS` file for differences between versions.
 
 ```
 ## Install `BiocManager` if needed
-if (!("BiocManager" %in% installed.packages()[, "Package"])) {
-  install.packages("BiocManager")
-}
-
-## List dependencies
-pkg <- c("rmarkdown", "edgeR", "DESeq2", "dplyr", "tidyr", "ggplot2", 
-         "SummarizedExperiment", "genefilter", "DT", "GenomeInfoDbData",
-         "caTools", "randtests", "stats", "utils", "methods")
-
-## Check if dependencies are already installed
-pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
-
-## If some dependency is missing, install it
-if (length(pkg) > 0) {
-	BiocManager::install(pkg, dependencies = TRUE, ask = FALSE)
-}
-```
-
-Once all dependencies are available, `countsimQC` can be installed using 
-the `BiocManager` package:
-
-```
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+    
 ## Install countsimQC
-BiocManager::install("csoneson/countsimQC")
+BiocManager::install("countsimQC")
 ```
 
 ## Getting started
 To run `countsimQC` and generate a report, you simply need to call the
 function `countsimQCReport()`, with an input consisting of a named list of
 `DESeqDataSets` (see the
-[DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)
+[DESeq2](https://www.bioconductor.org/packages/DESeq2/)
 package for a description of this class). Each `DESeqDataSet` should
 correspond to one data set and contain a count matrix, a data frame with sample
 information and a design formula, which is needed for proper dispersion 
