@@ -71,6 +71,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          Sys.setenv(LIBXML_INCDIR="/usr/local/Cellar/libxml2/2.9.10")
           install.packages("Rcpp", repos="https://rcppcore.github.io/drat", Ncpu = 2L)
           remotes::install_deps(dependencies = TRUE, repos = c(getOption('repos'), BiocManager::repositories()), Ncpu = 2L)
           remotes::install_cran("rcmdcheck")
