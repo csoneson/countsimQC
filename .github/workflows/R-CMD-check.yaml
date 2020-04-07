@@ -39,6 +39,7 @@ jobs:
         run: |
           brew install libxml2
           brew link libxml2 --force
+          type xml2-config
 
       - name: Query dependencies
         run: |
