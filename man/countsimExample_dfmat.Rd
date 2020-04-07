@@ -4,8 +4,10 @@
 \name{countsimExample_dfmat}
 \alias{countsimExample_dfmat}
 \title{Example list with three count data sets in different formats}
-\format{A named list with three elements, each corresponding to a (real or
-  simulated) count data set.}
+\format{
+A named list with three elements, each corresponding to a (real or
+  simulated) count data set.
+}
 \usage{
 countsimExample_dfmat
 }

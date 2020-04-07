@@ -4,12 +4,18 @@ context("Check individual functions")
 local({
   data(countsimExample)
   x <- lapply(countsimExample, function(w) w[1:50, ])
+  set.seed(1)
+  xsub <- calculateDispersionsddsList(x, maxNForDisp = 4)
   x <- calculateDispersionsddsList(x, maxNForDisp = Inf)
 
   test_that("Dimensions are correct", {
     expect_equivalent(unlist(lapply(x, function(w) c(nrow(w$dge), nrow(w$dds)))),
                       rep(50, 6))
     expect_equivalent(unlist(lapply(x, function(w) c(ncol(w$dge), ncol(w$dds)))),
+                      rep(11, 6))
+    expect_equivalent(unlist(lapply(xsub, function(w) c(nrow(w$dge), nrow(w$dds)))),
+                      rep(50, 6))
+    expect_equivalent(unlist(lapply(xsub, function(w) c(ncol(w$dge), ncol(w$dds)))),
                       rep(11, 6))
   })
 
@@ -84,4 +90,27 @@ local({
                                             sampleDF$TMM[sampleDF$dataset == "Sim1"])$p.value, 3),
                       statDF$`K-S p-value`[statDF$dataset1 == "Original" & statDF$dataset2 == "Sim1"])
   })
+
+  expect_equal(length(countsimQC:::defaultStats(n = 1, withP = FALSE)), 8L)
+  expect_equal(length(countsimQC:::defaultStats(n = 1, withP = TRUE)), 12L)
+  expect_equal(length(countsimQC:::defaultStats(n = 2, withP = FALSE)), 3L)
+  expect_equal(length(countsimQC:::defaultStats(n = 2, withP = TRUE)), 6L)
+
+  dtd <- countsimQC:::defineTableDesc(
+    calculateStatistics = TRUE, subsampleSize = 5, kfrac = 0.25, kmin = 4,
+    obstype = "sample", aspect = "aspect", minvalue = 0, maxvalue = 1,
+    permutationPvalues = TRUE, nPermutations = 10, nDatasets = 3)
+  expect_is(dtd, "list")
+  expect_length(dtd, 2)
+  expect_named(dtd, c("tabledesc", "tabledesc2d"), ignore.order = TRUE)
+
+  dtd <- countsimQC:::defineTableDesc(
+    calculateStatistics = TRUE, subsampleSize = 5, kfrac = 0.25, kmin = 4,
+    obstype = "sample", aspect = "aspect", minvalue = 0, maxvalue = 1,
+    permutationPvalues = TRUE, nPermutations = 10, nDatasets = 1)
+  expect_is(dtd, "list")
+  expect_length(dtd, 2)
+  expect_named(dtd, c("tabledesc", "tabledesc2d"), ignore.order = TRUE)
+  expect_equal(dtd[[1]],
+               "No statistics were calculated, since there is only one data set.")
 })
