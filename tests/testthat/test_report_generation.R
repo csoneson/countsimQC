@@ -57,7 +57,36 @@ local({
                                   outputFile = "test_generated.html",
                                   outputDir = tempDir, savePlots = TRUE))
     file.remove(file.path(tempDir, "test_generated.Rmd"))
+
+    ## existing plot output
+    file.create(file.path(tempDir, "test_generated2_ggplots.rds"))
+    expect_error(countsimQCReport(ddsList = x, outputFormat = "html_document",
+                                  outputFile = "test_generated2.html",
+                                  outputDir = tempDir, savePlots = TRUE,
+                                  forceOverwrite = FALSE))
+    file.remove(file.path(tempDir, "test_generated2_ggplots.rds"))
   })
+
+  cqr <- countsimQCReport(ddsList = x, outputFormat = "html_document",
+                          outputFile = "test_generated.html",
+                          outputDir = tempDir, savePlots = TRUE,
+                          description = NULL)
+  expect_is(cqr, "character")
+  expect_error(countsimQCReport(ddsList = x, outputFormat = NULL,
+                                outputFile = "test_generated.html",
+                                outputDir = tempDir, savePlots = TRUE,
+                                forceOverwrite = FALSE))
+  cqr <- countsimQCReport(ddsList = x, outputFormat = NULL,
+                          outputFile = "test_generated.html",
+                          outputDir = tempDir, savePlots = TRUE,
+                          forceOverwrite = TRUE)
+  expect_is(cqr, "character")
+  generateIndividualPlots(
+    ggplotsRds = file.path(tempDir, "test_generated_ggplots.rds"),
+    device = "png",
+    outputDir = tempDir, nDatasets = 3
+  )
+
 
   if (file.exists(file.path(tempDir, "report_from_test.html"))) {
     file.remove(file.path(tempDir, "report_from_test.html"))
