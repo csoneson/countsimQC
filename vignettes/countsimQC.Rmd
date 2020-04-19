@@ -14,7 +14,8 @@ editor_options:
 ---
 
 ```{r, include = FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      crop = NA)
 ```
 
 ## Introduction
@@ -37,7 +38,8 @@ matrix, a sample information data frame and a model formula (necessary to
 calculate dispersions). For more information about the `DESeqDataSet` class, 
 please see the
 [`DESeq2`](http://bioconductor.org/packages/release/bioc/html/DESeq2.html)
-Bioconductor package.
+Bioconductor package. For speed reasons, we use only a subset of the features 
+in each data set for the following calculations.
 
 ```{r, warning = FALSE}
 suppressPackageStartupMessages({
@@ -47,6 +49,9 @@ suppressPackageStartupMessages({
 
 data(countsimExample)
 countsimExample
+countsimExample <- lapply(countsimExample, function(cse) {
+  cse[seq_len(1500), ]
+})
 ```
 
 ## Report generation
@@ -72,7 +77,7 @@ time of the analysis considerably.
 
 Here, for the sake of speed, we calculate statistics for a small subset of the
 observations (`subsampleSize = 25`) and refrain from calculating permutation
-p-values.
+p-values. 
 
 ```{r, results = "hide", warning = FALSE, message = FALSE}
 tempDir <- tempdir()
