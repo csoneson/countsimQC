@@ -20,7 +20,7 @@ accompanying paper:
 following commands. Note that R version >= 3.5 and Bioconductor 
 version >= 3.8 are required in order to use the `BiocManager` package. 
 If you have an older version of R (3.4), you can still install 
-`countsimQC` v0.5.4 (see the `Releases` tab in the GitHub repository. 
+`countsimQC` v0.5.4 (see the `Releases` tab in the GitHub repository). 
 Please see the `NEWS` file for differences between versions.
 
 ```
