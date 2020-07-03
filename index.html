@@ -97,13 +97,13 @@ BiocManager::install("countsimQC")</code></pre>
 <h2 class="hasAnchor">
 <a href="#getting-started" class="anchor"></a>Getting started</h2>
 <p>To run <code>countsimQC</code> and generate a report, you simply need to call the function <code><a href="reference/countsimQCReport.html">countsimQCReport()</a></code>, with an input consisting of a named list of <code>DESeqDataSets</code> (see the <a href="https://www.bioconductor.org/packages/DESeq2/">DESeq2</a> package for a description of this class). Each <code>DESeqDataSet</code> should correspond to one data set and contain a count matrix, a data frame with sample information and a design formula, which is needed for proper dispersion calculations. To generate a <code>DESeqDataSet</code> from a count matrix <code>counts</code>, a sample information data frame <code>sample_df</code> and a design formula <code>formula</code> (of the form <code>~ predictors</code>), you can do as follows:</p>
-<pre><code><a href="https://rdrr.io/pkg/DESeq2/man">library(DESeq2)
+<pre><code><a href="https://github.com/mikelove/DESeq2">library(DESeq2)
 dds &lt;- DESeqDataSetFromMatrix(countData = counts, 
                               colData = sample_df,
                               design = formula)</a></code></pre>
 <p>There are many other ways of generating valid <code>DESeqDataSets</code>, depending on in what form your counts are (e.g., reading directly from <a href="http://htseq.readthedocs.io/en/release_0.9.1/">HTSeq</a> output, or from a <a href="http://bioconductor.org/packages/release/bioc/html/tximport.html">tximport</a> output object (see the <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html">DESeq2</a> <a href="http://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html">vignette</a>).</p>
 <p><code>countsimQC</code> contains an small example list with subsets of three data sets: two synthetic ones and the real data set that was used to generate them. The following code generates a comparative report for these three data sets:</p>
-<pre><code><a href="https://rdrr.io/pkg/countsimQC/man">library(countsimQC)
+<pre><code><a href="https://github.com/csoneson/countsimQC">library(countsimQC)
 data(countsimExample)
 countsimQCReport(ddsList = countsimExample, 
                  outputFile = "countsimReport.html", 

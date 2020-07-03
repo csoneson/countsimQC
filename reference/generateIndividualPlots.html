@@ -125,10 +125,10 @@ setting <code>savePlots = TRUE</code>).</p>
     </div>
 
     <pre class="usage"><span class='fu'>generateIndividualPlots</span>(
-  <span class='no'>ggplotsRds</span>,
-  <span class='kw'>device</span> <span class='kw'>=</span> <span class='st'>"png"</span>,
-  <span class='kw'>outputDir</span> <span class='kw'>=</span> <span class='st'>"./"</span>,
-  <span class='kw'>nDatasets</span> <span class='kw'>=</span> <span class='fl'>2</span>
+  <span class='kw'>ggplotsRds</span>,
+  device = <span class='st'>"png"</span>,
+  outputDir = <span class='st'>"./"</span>,
+  nDatasets = <span class='fl'>2</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -161,17 +161,21 @@ This is needed to set the size of the plots correctly.</p></td>
 
     <p>Nothing is returned, but plots are generated in the designated
   output directory.</p>
+    <h2 class="hasAnchor" id="author"><a class="anchor" href="#author"></a>Author</h2>
+
+    <p>Charlotte Soneson</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'>## Load example data</span>
-<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='no'>countsimExample</span>)
-<span class='kw'>if</span> (<span class='fl'>FALSE</span>) {
+<span class='fu'><a href='https://rdrr.io/r/utils/data.html'>data</a></span>(<span class='kw'>countsimExample</span>)
+<span class='co'>if</span> (<span class='fl'>FALSE</span>) {
 <span class='co'>## Generate report</span>
-<span class='fu'><a href='countsimQCReport.html'>countsimQCReport</a></span>(<span class='no'>countsimExample</span>, <span class='kw'>outputDir</span> <span class='kw'>=</span> <span class='st'>"./"</span>,
-                 <span class='kw'>outputFile</span> <span class='kw'>=</span> <span class='st'>"example.html"</span>, <span class='kw'>savePlots</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)
+<span class='fu'>countsimQCReport</span>(<span class='kw'>countsimExample</span>, outputDir = <span class='st'>"./"</span>,
+                 outputFile = <span class='st'>"example.html"</span>, savePlots = <span class='fl'>TRUE</span>)
 <span class='co'>## Generate individual plots</span>
-<span class='fu'>generateIndividualPlots</span>(<span class='st'>"example_ggplots.rds"</span>, <span class='kw'>nDatasets</span> <span class='kw'>=</span> <span class='fl'>3</span>)
-}</div></pre>
+<span class='fu'>generateIndividualPlots</span>(<span class='st'>"example_ggplots.rds"</span>, nDatasets = <span class='fl'>3</span>)
+}
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
