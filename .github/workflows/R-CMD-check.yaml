@@ -20,7 +20,7 @@ jobs:
       matrix:
         config:
         - { os: windows-latest, r: 'devel', bioc: 'devel'}
-        - { os: macOS-latest, r: 'devel', bioc: 'devel'}
+        - { os: macOS-latest, r: 'devel', bioc: 'devel', curlConfigPath: '/usr/bin/'}
         - { os: ubuntu-16.04, r: 'devel', bioc: 'devel', cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
         - { os: ubuntu-latest, r: 'devel', image: 'bioconductor/bioconductor_docker:devel'}
 
@@ -29,6 +29,7 @@ jobs:
       CRAN: ${{ matrix.config.cran }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      CURL_CONFIG: ${{ matrix.config.curlConfigPath }}curl-config
 
     steps:
       - name: Check out repo
@@ -69,7 +70,7 @@ jobs:
           key: ${{ runner.os }}-r-${{ matrix.config.r }}-bioc-${{ matrix.config.bioc }}-${{ hashFiles('depends.Rds') }}
           restore-keys: ${{ runner.os }}-r-${{ matrix.config.r }}-bioc-${{ matrix.config.bioc }}-
 
-      - name: Install system dependencies
+      - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'
         env:
           RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
@@ -78,7 +79,13 @@ jobs:
           sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
           sudo -s eval "$sysreqs"
           sudo apt-get update && sudo apt-get -y install qpdf
-          sudo apt-get -y install libcurl4-gnutls-dev
+          sudo apt-get -y install libcurl4-gnutls-dev libharfbuzz-dev libfribidi-dev
+
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install harfbuzz
+          brew install fribidi
 
       - name: Install dependencies
         run: |
