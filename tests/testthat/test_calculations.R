@@ -81,6 +81,16 @@ local({
   statDF <- makeDF(df = sampleDF, column = "TMM",
                    permutationPvalues = FALSE, nPermutations = 0,
                    subsampleSize = 11, kmin = 3, kfrac = 0.1)$x$data
+  set.seed(1)
+  statDFperm <- makeDF(df = sampleDF, column = "TMM",
+                       permutationPvalues = TRUE, nPermutations = 100,
+                       subsampleSize = 11, kmin = 3, kfrac = 0.1)$x$data
+
+  ## Average silhouette width is different since we're taking a subsample
+  compare_cols <- setdiff(colnames(statDF), "Average silhouette width")
+  test_that("Stats are the same whether permutation p-values are calculated or not", {
+    expect_equal(statDF[, compare_cols], statDFperm[, compare_cols])
+  })
 
   test_that("Derived stats are correct", {
     expect_equivalent(signif(stats::ks.test(sampleDF$TMM[sampleDF$dataset == "Original"],
@@ -103,6 +113,14 @@ local({
   expect_is(dtd, "list")
   expect_length(dtd, 2)
   expect_named(dtd, c("tabledesc", "tabledesc2d"), ignore.order = TRUE)
+
+  dtdnoperm <- countsimQC:::defineTableDesc(
+    calculateStatistics = TRUE, subsampleSize = 5, kfrac = 0.25, kmin = 4,
+    obstype = "sample", aspect = "aspect", minvalue = 0, maxvalue = 1,
+    permutationPvalues = FALSE, nPermutations = 10, nDatasets = 3)
+  expect_is(dtdnoperm, "list")
+  expect_length(dtdnoperm, 2)
+  expect_named(dtdnoperm, c("tabledesc", "tabledesc2d"), ignore.order = TRUE)
 
   dtd <- countsimQC:::defineTableDesc(
     calculateStatistics = TRUE, subsampleSize = 5, kfrac = 0.25, kmin = 4,

@@ -87,6 +87,18 @@ local({
     outputDir = tempDir, nDatasets = 3
   )
 
+  expect_warning(countsimQCReport(ddsList = x, outputFormat = NULL,
+                                  outputFile = "test_generated.html",
+                                  outputDir = tempDir, savePlots = FALSE,
+                                  forceOverwrite = TRUE),
+                 "already exists, but will not be overwritten")
+
+  cqr <- countsimQCReport(ddsList = lapply(x, function(y) DESeq2::counts(y)),
+                          outputFormat = NULL,
+                          outputFile = "test_generated.html",
+                          outputDir = tempDir, savePlots = TRUE,
+                          forceOverwrite = TRUE)
+  expect_is(cqr, "character")
 
   if (file.exists(file.path(tempDir, "report_from_test.html"))) {
     file.remove(file.path(tempDir, "report_from_test.html"))
