@@ -114,13 +114,13 @@ local({
   expect_length(dtd, 2)
   expect_named(dtd, c("tabledesc", "tabledesc2d"), ignore.order = TRUE)
 
-  dtdnoperm <- countsimQC:::defineTableDesc(
-    calculateStatistics = TRUE, subsampleSize = 5, kfrac = 0.25, kmin = 4,
+  dtdnostat <- countsimQC:::defineTableDesc(
+    calculateStatistics = FALSE, subsampleSize = 5, kfrac = 0.25, kmin = 4,
     obstype = "sample", aspect = "aspect", minvalue = 0, maxvalue = 1,
     permutationPvalues = FALSE, nPermutations = 10, nDatasets = 3)
-  expect_is(dtdnoperm, "list")
-  expect_length(dtdnoperm, 2)
-  expect_named(dtdnoperm, c("tabledesc", "tabledesc2d"), ignore.order = TRUE)
+  expect_is(dtdnostat, "list")
+  expect_length(dtdnostat, 2)
+  expect_named(dtdnostat, c("tabledesc", "tabledesc2d"), ignore.order = TRUE)
 
   dtd <- countsimQC:::defineTableDesc(
     calculateStatistics = TRUE, subsampleSize = 5, kfrac = 0.25, kmin = 4,

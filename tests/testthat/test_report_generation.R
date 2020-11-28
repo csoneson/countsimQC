@@ -86,6 +86,18 @@ local({
     device = "png",
     outputDir = tempDir, nDatasets = 3
   )
+  generateIndividualPlots(
+    ggplotsRds = file.path(tempDir, "test_generated_ggplots.rds"),
+    device = "png",
+    outputDir = file.path(tempDir, "subdir"), nDatasets = 3
+  )
+
+  expect_error(generateIndividualPlots(
+    ggplotsRds = 1, device = "png", outputDir = tempDir, nDatasets = 3
+  ), "The provided ggplotsRds object")
+  expect_error(generateIndividualPlots(
+    ggplotsRds = list(1, 2), device = "png", outputDir = tempDir, nDatasets = 3
+  ), "The elements of the provided ggplotsRds object")
 
   expect_warning(countsimQCReport(ddsList = x, outputFormat = NULL,
                                   outputFile = "test_generated.html",
