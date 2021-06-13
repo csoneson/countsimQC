@@ -43,7 +43,7 @@ calculateSampleCorrs <- function(ddsList, maxNForCorr, groupVars = NULL) {
     corrs <- stats::cor(cpms, use = "pairwise.complete.obs",
                         method = "spearman")
 
-    ## Get grouping Variables
+    ## Get grouping variables
     if (!is.null(groupVars)) {
       tmp <- expand.grid(S1 = rownames(cdt), S2 = rownames(cdt))
       for (gv in groupVars) {
