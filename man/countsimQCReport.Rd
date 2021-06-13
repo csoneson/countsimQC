@@ -15,6 +15,7 @@ countsimQCReport(
   savePlots = FALSE,
   description = NULL,
   maxNForCorr = 500,
+  sampleCorrGroupVars = NULL,
   maxNForDisp = Inf,
   calculateStatistics = TRUE,
   subsampleSize = 500,
@@ -71,6 +72,11 @@ included data sets will be used.}
 \item{maxNForCorr}{The maximal number of samples (features) for which
 pairwise correlation coefficients will be calculated. If the number of
 samples (features) exceeds this number, they will be randomly subsampled.}
+
+\item{sampleCorrGroupVars}{Either \code{NULL}, or s character vector of
+grouping sample annotations that will be used to stratify the sample-sample
+correlation boxplots. All values must be present as column names in the
+\code{colData} of each provided \code{DESeqDataSet}.}
 
 \item{maxNForDisp}{The maximal number of samples that will be used to
 estimate dispersions. By default, all samples are used. This can be lowered

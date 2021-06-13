@@ -167,7 +167,8 @@ if (!quiet) {
   message("Calculating sample correlations.")
 }
 sampleCorrDF <- calculateSampleCorrs(ddsList = obj, 
-                                     maxNForCorr = maxNForCorr)
+                                     maxNForCorr = maxNForCorr, 
+                                     groupVars = sampleCorrGroupVars)
 
 ## -------------- Calculate between-feature correlations --------------- ##
 if (!quiet) {
@@ -1060,6 +1061,17 @@ plots[["sampleCorrBox"]] <-
   ylab("Sample-sample correlation") + xlab("") + thm + 
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 plots[["sampleCorrBox"]]
+```
+
+```{r sampleCorrBoxStrat, include=!is.null(sampleCorrGroupVars), eval=!is.null(sampleCorrGroupVars), fig.width = panelSize * colRow[1], fig.height = 2 * panelSize * colRow[2]}
+plots[["sampleCorrBoxStrat"]] <- 
+  ggplot(sampleCorrDF, aes(x = Class, y = Correlation, color = dataset)) + 
+  facet_wrap(~ dataset, nrow = colRow[2], scales = "free_x") + 
+  geom_boxplot(outlier.size = -1, alpha = 0.5) + 
+  geom_point(position = position_jitter(width = 0.2), size = 2, alpha = 0.5) + 
+  ylab("Sample-sample correlation") + xlab("") + thm + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+plots[["sampleCorrBoxStrat"]]
 ```
 
 ### Violin plots

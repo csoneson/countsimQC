@@ -4,7 +4,7 @@
 \alias{calculateSampleCorrs}
 \title{Calculate Spearman correlation between sample pairs}
 \usage{
-calculateSampleCorrs(ddsList, maxNForCorr)
+calculateSampleCorrs(ddsList, maxNForCorr, groupVars = NULL)
 }
 \arguments{
 \item{ddsList}{List of lists, with one element per data set. Each element is
@@ -15,6 +15,9 @@ dispersions (e.g., output from \code{\link{calculateDispersionsddsList}}).}
 calculation. If the number of samples in a data set exceeds
 \code{maxNForCorr}, \code{maxNForCorr} samples will be randomly selected
 for calculation of correlations.}
+
+\item{groupVars}{Additional grouping variables (sample annotations) to use
+for stratification of sample pairs.}
 }
 \value{
 A data frame with pairwise sample correlations for each data set

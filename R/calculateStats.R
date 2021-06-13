@@ -94,8 +94,10 @@ calculateStats <- function(df, ds1, ds2, column, subsampleSize,
       ## Chi-square test comparing distribution of data set labels among
       ## nearest neighbors to the overall distribution
       x <- df$dataset[order(dists)][seq_len(max(kmin, kfrac * nrow(df)))]
-      chisqp <- stats::chisq.test(x = table(factor(x, levels = c(ds1, ds2))),
-                                  p = overallprop)$p.value
+      suppressWarnings({
+        chisqp <- stats::chisq.test(x = table(factor(x, levels = c(ds1, ds2))),
+                                    p = overallprop)$p.value
+      })
       ## Return values
       c(silh = silh, chisqp = chisqp, silh_local = silh_local)
     }, c(silh = NA_real_, chisqp = NA_real_, silh_local = NA_real_)))

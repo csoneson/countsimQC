@@ -98,6 +98,10 @@
 #' @param maxNForCorr The maximal number of samples (features) for which
 #'   pairwise correlation coefficients will be calculated. If the number of
 #'   samples (features) exceeds this number, they will be randomly subsampled.
+#' @param sampleCorrGroupVars Either \code{NULL}, or s character vector of
+#'   grouping sample annotations that will be used to stratify the sample-sample
+#'   correlation boxplots. All values must be present as column names in the
+#'   \code{colData} of each provided \code{DESeqDataSet}.
 #' @param maxNForDisp The maximal number of samples that will be used to
 #'   estimate dispersions. By default, all samples are used. This can be lowered
 #'   to speed up calculations (and obtain approximate results) for large data
@@ -161,7 +165,8 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
                              outputFormat = NULL, showCode = FALSE,
                              rmdTemplate = NULL, forceOverwrite = FALSE,
                              savePlots = FALSE, description = NULL,
-                             maxNForCorr = 500, maxNForDisp = Inf,
+                             maxNForCorr = 500, sampleCorrGroupVars = NULL,
+                             maxNForDisp = Inf,
                              calculateStatistics = TRUE, subsampleSize = 500,
                              kfrac = 0.01, kmin = 5,
                              permutationPvalues = FALSE, nPermutations = NULL,
@@ -225,6 +230,17 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
     }
   })
   stopifnot(all(vapply(ddsList, function(w) is(w, "DESeqDataSet"), FALSE)))
+
+  ## If sampleCorrGroupVars is provided, check that they are all present in
+  ## the colData of all DESeqDataSets
+  if (!is.null(sampleCorrGroupVars)) {
+    if (!all(vapply(ddsList, function(d) {
+        all(sampleCorrGroupVars %in% colnames(SummarizedExperiment::colData(d)))
+    }, FALSE))) {
+      stop("All values in 'sampleCorrGroupVars' must represent columns in the ",
+           "colData of all provided input datasets")
+    }
+  }
 
   ## ------------------------- output files --------------------------------- ##
   outputReport <- file.path(outputDir, basename(outputFile))

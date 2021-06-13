@@ -83,6 +83,15 @@ calculateDispersionsddsList <- function(ddsList, maxNForDisp) {
     ## Check that the genes are in the same order in the DGEList and
     ## DESeqDataSet
     stopifnot(all(rownames(dge) == rownames(dds)))
+    ## Also the samples
+    if (is.null(colnames(dge))) {
+      colnames(dge) <- paste0("S", seq_len(ncol(dge)))
+    }
+    if (is.null(colnames(dds))) {
+      colnames(dds) <- paste0("S", seq_len(ncol(dds)))
+    }
+    stopifnot(all(colnames(dge) == colnames(dds)))
+
     list(dge = dge, dds = dds)
   })
 }

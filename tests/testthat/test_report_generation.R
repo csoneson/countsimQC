@@ -44,6 +44,10 @@ local({
     expect_error(countsimQCReport(ddsList = y, outputFormat = "html_document",
                                   outputFile = "report_from_test.html",
                                   outputDir = tempDir, savePlots = TRUE))
+    expect_error(countsimQCReport(ddsList = x, outputFormat = "html_document",
+                                  outputFile = "report_from_test.html",
+                                  outputDir = tempDir, savePlots = TRUE,
+                                  sampleCorrGroupVars = "missing"))
 
     ## rmd_template
     expect_error(countsimQCReport(ddsList = x, outputFormat = "html_document",
