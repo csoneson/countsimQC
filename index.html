@@ -23,6 +23,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -35,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">countsimQC</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.9.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.11.0</span>
       </span>
     </div>
 
@@ -69,17 +71,17 @@
   <div class="contents col-md-9">
 <div id="countsimqc" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#countsimqc" class="anchor"></a>countsimQC</h1></div>
+<a href="#countsimqc" class="anchor" aria-hidden="true"></a>countsimQC</h1></div>
 
 <p><code>countsimQC</code> is an R package that provides functionality to create a comprehensive report comparing many different characteristics across multiple count data sets. One important use case is comparing one or more synthetic (e.g., RNA-seq) count matrices to a real count matrix, possibly the one based on which the synthetic data sets were generated. However, any collection of one or more count matrices can be visualized and compared.</p>
 <p>If you use <code>countsimQC</code> for your work, we appreciate if you cite the accompanying paper:</p>
 <ul>
-<li>Soneson C and Robinson MD: <a href="https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btx631/4345646/Towards-unified-quality-verification-of-synthetic">Towards unified quality verification of synthetic count data with countsimQC</a>. Bioinformatics 34(4):691-692 (2018).</li>
+<li>Soneson C and Robinson MD: <a href="https://academic.oup.com/bioinformatics/article/doi/10.1093/bioinformatics/btx631/4345646/Towards-unified-quality-verification-of-synthetic" class="external-link">Towards unified quality verification of synthetic count data with countsimQC</a>. Bioinformatics 34(4):691-692 (2018).</li>
 </ul>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p><code>countsimQC</code> can be installed from <a href="https://www.bioconductor.org/packages/countsimQC/">Bioconductor</a> with the following commands. Note that R version &gt;= 3.5 and Bioconductor version &gt;= 3.8 are required in order to use the <code>BiocManager</code> package. If you have an older version of R (3.4), you can still install <code>countsimQC</code> v0.5.4 (see the <code>Releases</code> tab in the GitHub repository). Please see the <code>NEWS</code> file for differences between versions.</p>
+<a href="#installation" class="anchor" aria-hidden="true"></a>Installation</h2>
+<p><code>countsimQC</code> can be installed from <a href="https://www.bioconductor.org/packages/countsimQC/" class="external-link">Bioconductor</a> with the following commands. Note that R version &gt;= 3.5 and Bioconductor version &gt;= 3.8 are required in order to use the <code>BiocManager</code> package. If you have an older version of R (3.4), you can still install <code>countsimQC</code> v0.5.4 (see the <code>Releases</code> tab in the GitHub repository). Please see the <code>NEWS</code> file for differences between versions.</p>
 <pre><code>## Install `BiocManager` if needed
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
@@ -89,33 +91,33 @@ BiocManager::install("countsimQC")</code></pre>
 </div>
 <div id="getting-started" class="section level2">
 <h2 class="hasAnchor">
-<a href="#getting-started" class="anchor"></a>Getting started</h2>
-<p>To run <code>countsimQC</code> and generate a report, you simply need to call the function <code><a href="reference/countsimQCReport.html">countsimQCReport()</a></code>, with an input consisting of a named list of <code>DESeqDataSets</code> (see the <a href="https://www.bioconductor.org/packages/DESeq2/">DESeq2</a> package for a description of this class). Each <code>DESeqDataSet</code> should correspond to one data set and contain a count matrix, a data frame with sample information and a design formula, which is needed for proper dispersion calculations. To generate a <code>DESeqDataSet</code> from a count matrix <code>counts</code>, a sample information data frame <code>sample_df</code> and a design formula <code>formula</code> (of the form <code>~ predictors</code>), you can do as follows:</p>
-<pre><code><a href="https://github.com/mikelove/DESeq2">library(DESeq2)
+<a href="#getting-started" class="anchor" aria-hidden="true"></a>Getting started</h2>
+<p>To run <code>countsimQC</code> and generate a report, you simply need to call the function <code><a href="reference/countsimQCReport.html">countsimQCReport()</a></code>, with an input consisting of a named list of <code>DESeqDataSets</code> (see the <a href="https://www.bioconductor.org/packages/DESeq2/" class="external-link">DESeq2</a> package for a description of this class). Each <code>DESeqDataSet</code> should correspond to one data set and contain a count matrix, a data frame with sample information and a design formula, which is needed for proper dispersion calculations. To generate a <code>DESeqDataSet</code> from a count matrix <code>counts</code>, a sample information data frame <code>sample_df</code> and a design formula <code>formula</code> (of the form <code>~ predictors</code>), you can do as follows:</p>
+<pre><code><a href="https://github.com/mikelove/DESeq2" class="external-link">library(DESeq2)
 dds &lt;- DESeqDataSetFromMatrix(countData = counts, 
                               colData = sample_df,
                               design = formula)</a></code></pre>
-<p>There are many other ways of generating valid <code>DESeqDataSets</code>, depending on in what form your counts are (e.g., reading directly from <a href="http://htseq.readthedocs.io/en/release_0.9.1/">HTSeq</a> output, or from a <a href="http://bioconductor.org/packages/release/bioc/html/tximport.html">tximport</a> output object (see the <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html">DESeq2</a> <a href="http://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html">vignette</a>).</p>
+<p>There are many other ways of generating valid <code>DESeqDataSets</code>, depending on in what form your counts are (e.g., reading directly from <a href="http://htseq.readthedocs.io/en/release_0.9.1/" class="external-link">HTSeq</a> output, or from a <a href="http://bioconductor.org/packages/release/bioc/html/tximport.html" class="external-link">tximport</a> output object (see the <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html" class="external-link">DESeq2</a> <a href="http://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html" class="external-link">vignette</a>).</p>
 <p><code>countsimQC</code> contains an small example list with subsets of three data sets: two synthetic ones and the real data set that was used to generate them. The following code generates a comparative report for these three data sets:</p>
-<pre><code><a href="https://github.com/csoneson/countsimQC">library(countsimQC)
+<pre><code><a href="https://github.com/csoneson/countsimQC" class="external-link">library(countsimQC)
 data(countsimExample)
 countsimQCReport(ddsList = countsimExample, 
                  outputFile = "countsimReport.html", 
                  outputDir = "./", 
                  description = "This is a comparison of three count data sets.")</a></code></pre>
 <p>For more detailed information about how to use the package, we refer to the vignette:</p>
-<pre><code><a href="https://rdrr.io/r/utils/browseVignettes.html">browseVignettes("countsimQC")</a></code></pre>
+<pre><code>browseVignettes("countsimQC")</code></pre>
 </div>
 <div id="example-reports" class="section level2">
 <h2 class="hasAnchor">
-<a href="#example-reports" class="anchor"></a>Example reports</h2>
+<a href="#example-reports" class="anchor" aria-hidden="true"></a>Example reports</h2>
 <ul>
-<li><a href="http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/HMP_sampled_datasets_countsimQC.html">Comparison of 16S microbiome species count matrices for four body subsites from the Human Microbiome Project</a></li>
-<li><a href="http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/bulkrnaseq_crossdataset_countsimQC.html">Comparison of three real bulk RNA-seq data sets</a></li>
-<li><a href="http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/GSE74596_genevstx_countsimQC.html">Comparison of gene- and transcript-level count matrices for a single-cell RNA-seq data set</a></li>
-<li><a href="http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/scrnaseq_crossdataset_countsimQC.html">Comparison of four real scRNA-seq data sets</a></li>
-<li><a href="http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/GSE48968-GPL13112_2simulations_countsimQC.html">Comparison of two simulated scRNA-seq data sets to the underlying real data set</a></li>
-<li><a href="http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/countsimQC_compcodeR_simulations.html">Comparison of six simulated bulk RNA-seq data set with different number of genes</a></li>
+<li><a href="http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/HMP_sampled_datasets_countsimQC.html" class="external-link">Comparison of 16S microbiome species count matrices for four body subsites from the Human Microbiome Project</a></li>
+<li><a href="http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/bulkrnaseq_crossdataset_countsimQC.html" class="external-link">Comparison of three real bulk RNA-seq data sets</a></li>
+<li><a href="http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/GSE74596_genevstx_countsimQC.html" class="external-link">Comparison of gene- and transcript-level count matrices for a single-cell RNA-seq data set</a></li>
+<li><a href="http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/scrnaseq_crossdataset_countsimQC.html" class="external-link">Comparison of four real scRNA-seq data sets</a></li>
+<li><a href="http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/GSE48968-GPL13112_2simulations_countsimQC.html" class="external-link">Comparison of two simulated scRNA-seq data sets to the underlying real data set</a></li>
+<li><a href="http://imlspenticton.uzh.ch/robinson_lab/countsimQC_example_reports/countsimQC_compcodeR_simulations.html" class="external-link">Comparison of six simulated bulk RNA-seq data set with different number of genes</a></li>
 </ul>
 </div>
 </div>
@@ -123,7 +125,7 @@ countsimQCReport(ddsList = countsimExample,
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
 <li>Download from BIOC at <br><a href="https://www.bioconductor.org/packages/countsimQC">https://​www.bioconductor.org/​packages/​countsimQC</a>
 </li>
@@ -133,41 +135,48 @@ countsimQCReport(ddsList = countsimExample,
 </li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>GPL (&gt;=2)</li>
 </ul>
 </div>
+
+
 <div class="citation">
-<h2>Citation</h2>
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
 <li><a href="authors.html">Citing countsimQC</a></li>
 </ul>
 </div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Charlotte Soneson <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-3833-2169" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/csoneson/countsimQC/actions"><img src="https://github.com/csoneson/countsimQC/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://github.com/csoneson/countsimQC/actions" class="external-link"><img src="https://github.com/csoneson/countsimQC/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Charlotte Soneson.</p>
+  <p></p>
+<p>Developed by Charlotte Soneson.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.9000.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p>
 </div>
 
       </footer>
@@ -175,6 +184,8 @@ countsimQCReport(ddsList = countsimExample,
 
   
 
+
+  
 
   </body>
 </html>
