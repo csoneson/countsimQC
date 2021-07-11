@@ -97,7 +97,7 @@ jobs:
           sysreqs=$(Rscript -e "cat(sysreqs::sysreq_commands('DESCRIPTION'))")
           sudo -s eval "$sysreqs"
           sudo apt-get update && sudo apt-get -y install qpdf
-          sudo apt-get -y install libcurl4-gnutls-dev libharfbuzz-dev libfribidi-dev
+          sudo apt-get -y install libcurl3-gnutls-dev libharfbuzz-dev libfribidi-dev
 
       - name: Install system dependencies (macOS)
         if: runner.os == 'macOS'
