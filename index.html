@@ -82,31 +82,31 @@
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p><code>countsimQC</code> can be installed from <a href="https://www.bioconductor.org/packages/countsimQC/" class="external-link">Bioconductor</a> with the following commands. Note that R version &gt;= 3.5 and Bioconductor version &gt;= 3.8 are required in order to use the <code>BiocManager</code> package. If you have an older version of R (3.4), you can still install <code>countsimQC</code> v0.5.4 (see the <code>Releases</code> tab in the GitHub repository). Please see the <code>NEWS</code> file for differences between versions.</p>
-<pre><code>## Install `BiocManager` if needed
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
+<pre><code><span class="co">## Install `BiocManager` if needed</span>
+<span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+    <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span>
     
-## Install countsimQC
-BiocManager::install("countsimQC")</code></pre>
+<span class="co">## Install countsimQC</span>
+<span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/BiocManager/man/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"countsimQC"</span><span class="op">)</span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
 <p>To run <code>countsimQC</code> and generate a report, you simply need to call the function <code><a href="reference/countsimQCReport.html">countsimQCReport()</a></code>, with an input consisting of a named list of <code>DESeqDataSets</code> (see the <a href="https://www.bioconductor.org/packages/DESeq2/" class="external-link">DESeq2</a> package for a description of this class). Each <code>DESeqDataSet</code> should correspond to one data set and contain a count matrix, a data frame with sample information and a design formula, which is needed for proper dispersion calculations. To generate a <code>DESeqDataSet</code> from a count matrix <code>counts</code>, a sample information data frame <code>sample_df</code> and a design formula <code>formula</code> (of the form <code>~ predictors</code>), you can do as follows:</p>
-<pre><code><a href="https://github.com/mikelove/DESeq2" class="external-link">library(DESeq2)
-dds &lt;- DESeqDataSetFromMatrix(countData = counts, 
-                              colData = sample_df,
-                              design = formula)</a></code></pre>
+<pre><code><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mikelove/DESeq2" class="external-link">DESeq2</a></span><span class="op">)</span>
+<span class="va">dds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/DESeq2/man/DESeqDataSet.html" class="external-link">DESeqDataSetFromMatrix</a></span><span class="op">(</span>countData <span class="op">=</span> <span class="va">counts</span>, 
+                              colData <span class="op">=</span> <span class="va">sample_df</span>,
+                              design <span class="op">=</span> <span class="va">formula</span><span class="op">)</span></code></pre>
 <p>There are many other ways of generating valid <code>DESeqDataSets</code>, depending on in what form your counts are (e.g., reading directly from <a href="http://htseq.readthedocs.io/en/release_0.9.1/" class="external-link">HTSeq</a> output, or from a <a href="http://bioconductor.org/packages/release/bioc/html/tximport.html" class="external-link">tximport</a> output object (see the <a href="https://bioconductor.org/packages/release/bioc/html/DESeq2.html" class="external-link">DESeq2</a> <a href="http://bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html" class="external-link">vignette</a>).</p>
 <p><code>countsimQC</code> contains an small example list with subsets of three data sets: two synthetic ones and the real data set that was used to generate them. The following code generates a comparative report for these three data sets:</p>
-<pre><code><a href="https://github.com/csoneson/countsimQC" class="external-link">library(countsimQC)
-data(countsimExample)
-countsimQCReport(ddsList = countsimExample, 
-                 outputFile = "countsimReport.html", 
-                 outputDir = "./", 
-                 description = "This is a comparison of three count data sets.")</a></code></pre>
+<pre><code><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/csoneson/countsimQC" class="external-link">countsimQC</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">countsimExample</span><span class="op">)</span>
+<span class="fu"><a href="reference/countsimQCReport.html">countsimQCReport</a></span><span class="op">(</span>ddsList <span class="op">=</span> <span class="va">countsimExample</span>, 
+                 outputFile <span class="op">=</span> <span class="st">"countsimReport.html"</span>, 
+                 outputDir <span class="op">=</span> <span class="st">"./"</span>, 
+                 description <span class="op">=</span> <span class="st">"This is a comparison of three count data sets."</span><span class="op">)</span></code></pre>
 <p>For more detailed information about how to use the package, we refer to the vignette:</p>
-<pre><code>browseVignettes("countsimQC")</code></pre>
+<pre><code><span class="fu"><a href="https://rdrr.io/r/utils/browseVignettes.html" class="external-link">browseVignettes</a></span><span class="op">(</span><span class="st">"countsimQC"</span><span class="op">)</span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="example-reports">Example reports<a class="anchor" aria-label="anchor" href="#example-reports"></a>
