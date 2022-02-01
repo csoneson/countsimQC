@@ -78,13 +78,15 @@ local({
                         sum(x$Sim2$dge$counts[, 1]))
   })
 
-  statDF <- makeDF(df = sampleDF, column = "TMM",
-                   permutationPvalues = FALSE, nPermutations = 0,
-                   subsampleSize = 11, kmin = 3, kfrac = 0.1)$x$data
+  expect_warning(
+    statDF <- makeDF(df = sampleDF, column = "TMM",
+                     permutationPvalues = FALSE, nPermutations = 0,
+                     subsampleSize = 11, kmin = 3, kfrac = 0.1)$x$data)
   set.seed(1)
-  statDFperm <- makeDF(df = sampleDF, column = "TMM",
-                       permutationPvalues = TRUE, nPermutations = 100,
-                       subsampleSize = 11, kmin = 3, kfrac = 0.1)$x$data
+  expect_warning(
+    statDFperm <- makeDF(df = sampleDF, column = "TMM",
+                         permutationPvalues = TRUE, nPermutations = 100,
+                         subsampleSize = 11, kmin = 3, kfrac = 0.1)$x$data)
 
   ## Average silhouette width is different since we're taking a subsample
   compare_cols <- setdiff(colnames(statDF), "Average silhouette width")

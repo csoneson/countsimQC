@@ -4,7 +4,7 @@ context("Check report generation")
 local({
   tempDir <- tempdir()
   data(countsimExample)
-  x <- lapply(countsimExample, function(w) w[1:50, ])
+  x <- lapply(countsimExample, function(w) w[1:25, ])
   if (file.exists(file.path(tempDir, "report_from_test.Rmd"))) {
     file.remove(file.path(tempDir, "report_from_test.Rmd"))
   }
@@ -67,36 +67,42 @@ local({
     file.remove(file.path(tempDir, "test_generated2_ggplots.rds"))
   })
 
-  cqr <- countsimQCReport(ddsList = x, outputFormat = "html_document",
-                          outputFile = "test_generated.html",
-                          outputDir = tempDir, savePlots = TRUE,
-                          description = NULL)
+  expect_warning(
+    cqr <- countsimQCReport(ddsList = x, outputFormat = "html_document",
+                            outputFile = "test_generated.html",
+                            outputDir = tempDir, savePlots = TRUE,
+                            description = NULL))
   expect_is(cqr, "character")
   expect_error(countsimQCReport(ddsList = x, outputFormat = NULL,
                                 outputFile = "test_generated.html",
                                 outputDir = tempDir, savePlots = TRUE,
                                 forceOverwrite = FALSE))
-  cqr <- countsimQCReport(ddsList = x, outputFormat = NULL,
-                          outputFile = "test_generated.html",
-                          outputDir = tempDir, savePlots = TRUE,
-                          forceOverwrite = TRUE)
-  expect_is(cqr, "character")
-  generateIndividualPlots(
-    ggplotsRds = file.path(tempDir, "test_generated_ggplots.rds"),
-    device = "png",
-    outputDir = tempDir, nDatasets = 3
-  )
-  generateIndividualPlots(
+  ## Test that existing report will be overwritten if requested
+  # expect_warning(
+  #   cqr <- countsimQCReport(ddsList = x, outputFormat = NULL,
+  #                           outputFile = "test_generated.html",
+  #                           outputDir = tempDir, savePlots = TRUE,
+  #                           forceOverwrite = TRUE))
+  # expect_is(cqr, "character")
+
+  # expect_warning(generateIndividualPlots(
+  #   ggplotsRds = file.path(tempDir, "test_generated_ggplots.rds"),
+  #   device = "png",
+  #   outputDir = tempDir, nDatasets = 3
+  # ))
+  expect_warning(generateIndividualPlots(
     ggplotsRds = file.path(tempDir, "test_generated_ggplots.rds"),
     device = "png",
     outputDir = file.path(tempDir, "subdir"), nDatasets = 3
-  )
+  ))
 
   expect_error(generateIndividualPlots(
-    ggplotsRds = 1, device = "png", outputDir = tempDir, nDatasets = 3
+    ggplotsRds = 1, device = "png",
+    outputDir = file.path(tempDir, "subdir"), nDatasets = 3
   ), "The provided ggplotsRds object")
   expect_error(generateIndividualPlots(
-    ggplotsRds = list(1, 2), device = "png", outputDir = tempDir, nDatasets = 3
+    ggplotsRds = list(1, 2), device = "png",
+    outputDir = file.path(tempDir, "subdir"), nDatasets = 3
   ), "The elements of the provided ggplotsRds object")
 
   expect_warning(countsimQCReport(ddsList = x, outputFormat = NULL,
@@ -105,11 +111,13 @@ local({
                                   forceOverwrite = TRUE),
                  "already exists, but will not be overwritten")
 
-  cqr <- countsimQCReport(ddsList = lapply(x, function(y) DESeq2::counts(y)),
-                          outputFormat = NULL,
-                          outputFile = "test_generated.html",
-                          outputDir = tempDir, savePlots = TRUE,
-                          forceOverwrite = TRUE)
+  ## Run with matrix input
+  expect_warning(
+    cqr <- countsimQCReport(ddsList = lapply(x, function(y) DESeq2::counts(y)),
+                            outputFormat = NULL,
+                            outputFile = "test_generated.html",
+                            outputDir = tempDir, savePlots = FALSE,
+                            forceOverwrite = TRUE))
   expect_is(cqr, "character")
 
   if (file.exists(file.path(tempDir, "report_from_test.html"))) {
