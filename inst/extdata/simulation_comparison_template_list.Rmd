@@ -125,6 +125,8 @@ editor_options:
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = showCode, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(dev = "ragg_png")
+# knitr::opts_chunk$set(dev.args = list(png = list(type = "cairo")))
 knitr::opts_knit$set(progress = FALSE, verbose = FALSE)
 ```
 

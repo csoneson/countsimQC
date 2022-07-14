@@ -129,6 +129,17 @@ jobs:
       - name: Build, Install, Check
         uses: grimbough/bioc-actions/build-install-check@v1
 
+      - name: Check size of output report
+        run: |
+          library(countsimQC)
+          data(countsimExample)
+          x <- lapply(countsimExample, function(w) w[1:25, ])
+          tempDir <- tempdir()
+          cqr <- countsimQCReport(ddsList = x, outputFile = "csqc_out.html",
+                                  outputDir = tempDir, forceOverwrite = TRUE)
+          file.size(cqr)
+        shell: Rscript {0}
+
       - name: Run BiocCheck
         uses: grimbough/bioc-actions/run-BiocCheck@v1
         with:

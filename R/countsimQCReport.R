@@ -144,7 +144,7 @@
 #' @importFrom randtests runs.test
 #' @importFrom methods is
 #' @import SummarizedExperiment DESeq2 edgeR dplyr tidyr ggplot2
-#' @import genefilter DT GenomeInfoDbData
+#' @import genefilter DT GenomeInfoDbData ragg
 #' @return No value is returned, but a report is generated in the
 #'   \code{outputDir} directory.
 #'
