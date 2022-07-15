@@ -171,7 +171,7 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
                              permutationPvalues = FALSE, nPermutations = NULL,
                              knitrProgress = FALSE, quiet = FALSE,
                              ignorePandoc = FALSE, useRAGG = FALSE,
-                             dpi = 72, ...){
+                             dpi = 96, ...){
   ## This function was inspired by code from Nicholas Hamilton, provided at
   ## http://stackoverflow.com/questions/37097535/generate-report-in-r
 
