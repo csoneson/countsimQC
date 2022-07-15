@@ -146,6 +146,11 @@ jobs:
                                    outputDir = tempDir, forceOverwrite = TRUE,
                                    useRAGG = TRUE)
           file.size(cqr2)
+          ## With ragg, change dpi
+          cqr3 <- countsimQCReport(ddsList = x, outputFile = "csqc_out3.html",
+                                   outputDir = tempDir, forceOverwrite = TRUE,
+                                   useRAGG = TRUE, dpi = 48)
+          file.size(cqr3)
         shell: Rscript {0}
 
       - name: Run BiocCheck
