@@ -26,7 +26,7 @@ countsimQCReport(
   quiet = FALSE,
   ignorePandoc = FALSE,
   useRAGG = FALSE,
-  dpi = 96,
+  dpi = 72,
   ...
 )
 }

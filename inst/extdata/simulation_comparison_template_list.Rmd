@@ -125,11 +125,10 @@ editor_options:
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(echo = showCode, warning = FALSE, message = FALSE)
-mfct <- 96 / dpi
 if (useRAGG) {
-  knitr::opts_chunk$set(dev = "ragg_png", dpi = dpi, 
-                        dev.args = list(ragg_png = list(scaling = mfct)))
+  knitr::opts_chunk$set(dev = "ragg_png", dpi = dpi)
 }
+
 # knitr::opts_chunk$set(dev.args = list(png = list(type = "cairo")))
 knitr::opts_knit$set(progress = FALSE, verbose = FALSE)
 ```
@@ -144,6 +143,23 @@ colRow <- grDevices::n2mfrow(length(ddsList))
 
 ## Set height/width of each panel in multi-panel plots
 panelSize <- 4
+
+## Define out.width and out.height for the different plot categories
+## barplots, 10x7in
+fw1 <- 10
+fh1 <- 7
+ow1 <- paste0(10 * 72, "px")
+oh1 <- paste0(7 * 72, "px")
+## multipanel, panelSize * colRow[1] x panelSize * colRow[2]
+fw2 <- panelSize * colRow[1]
+fh2 <- panelSize * colRow[2]
+ow2 <- paste0(panelSize * colRow[1] * 72, "px")
+oh2 <- paste0(panelSize * colRow[2] * 72, "px")
+## scatter plots etc, 7x5in
+fw3 <- 7
+fh3 <- 5
+ow3 <- paste0(7 * 72, "px")
+oh3 <- paste0(5 * 72, "px")
 
 ## Initialize plot list
 plots <- list()
@@ -263,7 +279,7 @@ each data set.
 
 ### Number of samples (columns)
 
-```{r nSamples, fig.width = 10 * mfct, fig.height = 7 * mfct}
+```{r nSamples, fig.width = fw1, fig.height = fh1, out.width = ow1, out.height = oh1}
 plots[["nSamples"]] <- 
   ggplot(datasetDF, aes(x = dataset, y = nSamples, fill = dataset)) + 
   geom_bar(stat = "identity", alpha = 0.5) + 
@@ -274,7 +290,7 @@ plots[["nSamples"]]
 
 ### Number of features (rows)
 
-```{r nVariables, fig.width = 10 * mfct, fig.height = 7 * mfct}
+```{r nVariables, fig.width = fw1, fig.height = fh1, out.width = ow1, out.height = oh1}
 plots[["nVariables"]] <- 
   ggplot(datasetDF, aes(x = dataset, y = nVars, fill = dataset)) + 
   geom_bar(stat = "identity", alpha = 0.5) + 
@@ -307,7 +323,7 @@ common dispersion and the blue curve represents the trended dispersion
 estimates. For further information about the dispersion estimation in `edgeR`,
 see @Chen2014Dispersion.
 
-```{r BCVedgeR, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r BCVedgeR, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["BCVedgeR"]] <- 
   ggplot(featureDF %>% dplyr::arrange(AveLogCPMDisp), 
          aes(x = AveLogCPMDisp, y = Tagwise)) + 
@@ -341,7 +357,7 @@ mean-dispersion relationship and the blue circles represent the final dispersion
 estimates.For further information about the dispersion estimation in `DESeq2`,
 see @Love2014DESeq2.
 
-```{r dispersionDESeq2, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r dispersionDESeq2, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["dispersionDESeq2"]] <- 
   ggplot(featureDF %>% dplyr::arrange(baseMeanDisp), 
          aes(x = baseMeanDisp, y = dispGeneEst)) + 
@@ -385,7 +401,7 @@ calculated using the `cpm` function from
 
 ### Separate scatter plots
 
-```{r meanVarSepScatter, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r meanVarSepScatter, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["meanVarSepScatter"]] <- 
   ggplot(featureDF, aes(x = average_log2_cpm, y = variance_log2_cpm)) + 
   geom_point(size = 0.75, alpha = 0.5) + 
@@ -397,7 +413,7 @@ plots[["meanVarSepScatter"]]
 
 ### Overlaid scatter plots
 
-```{r meanVarOverlaidScatter, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r meanVarOverlaidScatter, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["meanVarOverlaidScatter"]] <- 
   ggplot(featureDF, aes(x = average_log2_cpm, y = variance_log2_cpm, color = dataset)) + 
   geom_point(size = 0.75, alpha = 0.5) +
@@ -431,7 +447,7 @@ i.e., the column sums of the respective data matrices.
 
 ### Separate histograms
 
-```{r libsizeSepHist, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r libsizeSepHist, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["libsizeSepHist"]] <- 
   ggplot(sampleDF, aes(x = Libsize)) + geom_histogram(bins = 30) + 
   facet_wrap(~dataset, nrow = colRow[2]) +
@@ -441,7 +457,7 @@ plots[["libsizeSepHist"]]
 
 ### Overlaid histograms
 
-```{r libsizeOverlaidHist, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r libsizeOverlaidHist, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["libsizeOverlaidHist"]] <- 
   ggplot(sampleDF, aes(x = Libsize, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
@@ -451,7 +467,7 @@ plots[["libsizeOverlaidHist"]]
 
 ### Density plots
 
-```{r libsizeDensity, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r libsizeDensity, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["libsizeDensity"]] <- 
   ggplot(sampleDF, aes(x = Libsize, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
@@ -461,7 +477,7 @@ plots[["libsizeDensity"]]
 
 ### Density plots (filled)
 
-```{r libsizeDensityFilled, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r libsizeDensityFilled, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["libsizeDensityFilled"]] <- 
   ggplot(sampleDF, aes(x = Libsize, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
@@ -471,7 +487,7 @@ plots[["libsizeDensityFilled"]]
 
 ### Box plots
 
-```{r libsizeBox, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r libsizeBox, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["libsizeBox"]] <- 
   ggplot(sampleDF, aes(x = dataset, y = Libsize, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
@@ -483,7 +499,7 @@ plots[["libsizeBox"]]
 
 ### Violin plots
 
-```{r libsizeViolin, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r libsizeViolin, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["libsizeViolin"]] <- 
   ggplot(sampleDF, aes(x = dataset, y = Libsize, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
@@ -494,7 +510,7 @@ plots[["libsizeViolin"]]
 
 ### Empirical cumulative distribution function 
 
-```{r libsizeEcdf, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r libsizeEcdf, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["libsizeEcdf"]] <- 
   ggplot(sampleDF, aes(x = Libsize, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
@@ -530,7 +546,7 @@ calculated by
 
 ### Separate histograms
 
-```{r tmmSepHist, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r tmmSepHist, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["tmmSepHist"]] <- 
   ggplot(sampleDF, aes(x = TMM)) + geom_histogram(bins = 30) + 
   facet_wrap(~dataset, nrow = colRow[2]) +
@@ -540,7 +556,7 @@ plots[["tmmSepHist"]]
 
 ### Overlaid histograms
 
-```{r tmmOverlaidHist, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r tmmOverlaidHist, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["tmmOverlaidHist"]] <- 
   ggplot(sampleDF, aes(x = TMM, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
@@ -550,7 +566,7 @@ plots[["tmmOverlaidHist"]]
 
 ### Density plots
 
-```{r tmmDensity, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r tmmDensity, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["tmmDensity"]] <- 
   ggplot(sampleDF, aes(x = TMM, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
@@ -560,7 +576,7 @@ plots[["tmmDensity"]]
 
 ### Density plots (filled) 
 
-```{r tmmDensityFilled, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r tmmDensityFilled, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["tmmDensityFilled"]] <- 
   ggplot(sampleDF, aes(x = TMM, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
@@ -570,7 +586,7 @@ plots[["tmmDensityFilled"]]
 
 ### Box plots
 
-```{r tmmBox, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r tmmBox, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["tmmBox"]] <- 
   ggplot(sampleDF, aes(x = dataset, y = TMM, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
@@ -582,7 +598,7 @@ plots[["tmmBox"]]
 
 ### Violin plots
 
-```{r tmmViolin, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r tmmViolin, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["tmmViolin"]] <- 
   ggplot(sampleDF, aes(x = dataset, y = TMM, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
@@ -593,7 +609,7 @@ plots[["tmmViolin"]]
 
 ### Empirical cumulative distribution function 
 
-```{r tmmEcdf, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r tmmEcdf, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["tmmEcdf"]] <- 
   ggplot(sampleDF, aes(x = TMM, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
@@ -627,7 +643,7 @@ factor.
 
 ### Separate histograms
 
-```{r effLibsizeSepHist, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r effLibsizeSepHist, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["effLibsizeSepHist"]] <- 
   ggplot(sampleDF, aes(x = EffLibsize)) + geom_histogram(bins = 30) + 
   facet_wrap(~dataset, nrow = colRow[2]) +
@@ -637,7 +653,7 @@ plots[["effLibsizeSepHist"]]
 
 ### Overlaid histograms
 
-```{r effLibsizeOverlaidHist, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r effLibsizeOverlaidHist, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["effLibsizeOverlaidHist"]] <- 
   ggplot(sampleDF, aes(x = EffLibsize, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
@@ -647,7 +663,7 @@ plots[["effLibsizeOverlaidHist"]]
 
 ### Density plots
 
-```{r effLibsizeDensity, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r effLibsizeDensity, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["effLibsizeDensity"]] <- 
   ggplot(sampleDF, aes(x = EffLibsize, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
@@ -657,7 +673,7 @@ plots[["effLibsizeDensity"]]
 
 ### Density plots (filled)
 
-```{r effLibsizeDensityFilled, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r effLibsizeDensityFilled, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["effLibsizeDensityFilled"]] <- 
   ggplot(sampleDF, aes(x = EffLibsize, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
@@ -667,7 +683,7 @@ plots[["effLibsizeDensityFilled"]]
 
 ### Box plots
 
-```{r effLibsizeBox, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r effLibsizeBox, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["effLibsizeBox"]] <- 
   ggplot(sampleDF, aes(x = dataset, y = EffLibsize, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
@@ -679,7 +695,7 @@ plots[["effLibsizeBox"]]
 
 ### Violin plots
 
-```{r effLibsizeViolin, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r effLibsizeViolin, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["effLibsizeViolin"]] <- 
   ggplot(sampleDF, aes(x = dataset, y = EffLibsize, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
@@ -690,7 +706,7 @@ plots[["effLibsizeViolin"]]
 
 ### Empirical cumulative distribution function 
 
-```{r effLibsizeEcdf, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r effLibsizeEcdf, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["effLibsizeEcdf"]] <- 
   ggplot(sampleDF, aes(x = EffLibsize, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
@@ -724,7 +740,7 @@ the features. The abundances are log CPM values calculated by `edgeR`.
 
 ### Separate histograms
 
-```{r logCPMSepHist, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r logCPMSepHist, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["logCPMSepHist"]] <- 
   ggplot(featureDF, aes(x = AveLogCPM)) + geom_histogram(bins = 30) + 
   facet_wrap(~dataset, nrow = colRow[2]) +
@@ -734,7 +750,7 @@ plots[["logCPMSepHist"]]
 
 ### Overlaid histograms
 
-```{r logCPMOverlaidHist, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r logCPMOverlaidHist, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["logCPMOverlaidHist"]] <- 
   ggplot(featureDF, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
@@ -744,7 +760,7 @@ plots[["logCPMOverlaidHist"]]
 
 ### Density plots
 
-```{r logCPMDensity, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r logCPMDensity, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["logCPMDensity"]] <- 
   ggplot(featureDF, aes(x = AveLogCPM, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
@@ -754,7 +770,7 @@ plots[["logCPMDensity"]]
 
 ### Density plots (filled) 
 
-```{r logCPMDensityFilled, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r logCPMDensityFilled, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["logCPMDensityFilled"]] <- 
   ggplot(featureDF, aes(x = AveLogCPM, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
@@ -764,7 +780,7 @@ plots[["logCPMDensityFilled"]]
 
 ### Box plots
 
-```{r logCPMBox, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r logCPMBox, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["logCPMBox"]] <- 
   ggplot(featureDF, aes(x = dataset, y = AveLogCPM, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
@@ -776,7 +792,7 @@ plots[["logCPMBox"]]
 
 ### Violin plots
 
-```{r logCPMViolin, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r logCPMViolin, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["logCPMViolin"]] <- 
   ggplot(featureDF, aes(x = dataset, y = AveLogCPM, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
@@ -787,7 +803,7 @@ plots[["logCPMViolin"]]
 
 ### Empirical cumulative distribution function 
 
-```{r logCPMEcdf, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r logCPMEcdf, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["logCPMEcdf"]] <- 
   ggplot(featureDF, aes(x = AveLogCPM, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
@@ -821,7 +837,7 @@ These plots show the distribution of the fraction of zeros observed per sample
 
 ### Separate histograms
 
-```{r fraczeroSampleSepHist, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r fraczeroSampleSepHist, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["fraczeroSampleSepHist"]] <- 
   ggplot(sampleDF, aes(x = Fraczero)) + geom_histogram(bins = 30) + 
   facet_wrap(~dataset, nrow = colRow[2]) +
@@ -831,7 +847,7 @@ plots[["fraczeroSampleSepHist"]]
 
 ### Overlaid histograms
 
-```{r fraczeroSampleOverlaidHist, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r fraczeroSampleOverlaidHist, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["fraczeroSampleOverlaidHist"]] <- 
   ggplot(sampleDF, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
@@ -841,7 +857,7 @@ plots[["fraczeroSampleOverlaidHist"]]
 
 ### Density plots
 
-```{r fraczeroSampleDensity, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r fraczeroSampleDensity, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["fraczeroSampleDensity"]] <- 
   ggplot(sampleDF, aes(x = Fraczero, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
@@ -851,7 +867,7 @@ plots[["fraczeroSampleDensity"]]
 
 ### Density plots (filled) 
 
-```{r fraczeroSampleDensityFilled, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r fraczeroSampleDensityFilled, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["fraczeroSampleDensityFilled"]] <- 
   ggplot(sampleDF, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
@@ -861,7 +877,7 @@ plots[["fraczeroSampleDensityFilled"]]
 
 ### Box plots
 
-```{r fraczeroSampleBox, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r fraczeroSampleBox, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["fraczeroSampleBox"]] <- 
   ggplot(sampleDF, aes(x = dataset, y = Fraczero, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
@@ -873,7 +889,7 @@ plots[["fraczeroSampleBox"]]
 
 ### Violin plots
 
-```{r fraczeroSampleViolin, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r fraczeroSampleViolin, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["fraczeroSampleViolin"]] <- 
   ggplot(sampleDF, aes(x = dataset, y = Fraczero, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
@@ -884,7 +900,7 @@ plots[["fraczeroSampleViolin"]]
 
 ### Empirical cumulative distribution function 
 
-```{r fraczeroSampleEcdf, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r fraczeroSampleEcdf, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["fraczeroSampleEcdf"]] <- 
   ggplot(sampleDF, aes(x = Fraczero, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
@@ -918,7 +934,7 @@ feature (row) in the count matrices.
 
 ### Separate histograms
 
-```{r fraczeroFeatureSepHist, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r fraczeroFeatureSepHist, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["fraczeroFeatureSepHist"]] <- 
   ggplot(featureDF, aes(x = Fraczero)) + geom_histogram(bins = 30) + 
   facet_wrap(~dataset, nrow = colRow[2]) +
@@ -928,7 +944,7 @@ plots[["fraczeroFeatureSepHist"]]
 
 ### Overlaid histograms
 
-```{r fraczeroFeatureOverlaidHist, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r fraczeroFeatureOverlaidHist, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["fraczeroFeatureOverlaidHist"]] <- 
   ggplot(featureDF, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
@@ -938,7 +954,7 @@ plots[["fraczeroFeatureOverlaidHist"]]
 
 ### Density plots
 
-```{r fraczeroFeatureDensity, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r fraczeroFeatureDensity, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["fraczeroFeatureDensity"]] <- 
   ggplot(featureDF, aes(x = Fraczero, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
@@ -948,7 +964,7 @@ plots[["fraczeroFeatureDensity"]]
 
 ### Density plots (filled) 
 
-```{r fraczeroFeatureDensityFilled, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r fraczeroFeatureDensityFilled, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["fraczeroFeatureDensityFilled"]] <- 
   ggplot(featureDF, aes(x = Fraczero, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
@@ -958,7 +974,7 @@ plots[["fraczeroFeatureDensityFilled"]]
 
 ### Box plots
 
-```{r fraczeroFeatureBox, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r fraczeroFeatureBox, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["fraczeroFeatureBox"]] <- 
   ggplot(featureDF, aes(x = dataset, y = Fraczero, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
@@ -970,7 +986,7 @@ plots[["fraczeroFeatureBox"]]
 
 ### Violin plots
 
-```{r fraczeroFeatureViolin, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r fraczeroFeatureViolin, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["fraczeroFeatureViolin"]] <- 
   ggplot(featureDF, aes(x = dataset, y = Fraczero, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
@@ -981,7 +997,7 @@ plots[["fraczeroFeatureViolin"]]
 
 ### Empirical cumulative distribution function 
 
-```{r fraczeroFeatureEcdf, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r fraczeroFeatureEcdf, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["fraczeroFeatureEcdf"]] <- 
   ggplot(featureDF, aes(x = Fraczero, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
@@ -1018,7 +1034,7 @@ function from `edgeR`, with a prior.count of 2. If there are more than
 
 ### Separate histograms
 
-```{r sampleCorrSepHist, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r sampleCorrSepHist, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["sampleCorrSepHist"]] <- 
   ggplot(sampleCorrDF, aes(x = Correlation)) + geom_histogram(bins = 30) + 
   facet_wrap(~dataset, nrow = colRow[2]) +
@@ -1028,7 +1044,7 @@ plots[["sampleCorrSepHist"]]
 
 ### Overlaid histograms
 
-```{r sampleCorrOverlaidHist, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r sampleCorrOverlaidHist, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["sampleCorrOverlaidHist"]] <- 
   ggplot(sampleCorrDF, aes(x = Correlation, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
@@ -1038,7 +1054,7 @@ plots[["sampleCorrOverlaidHist"]]
 
 ### Density plots
 
-```{r sampleCorrDensity, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r sampleCorrDensity, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["sampleCorrDensity"]] <- 
   ggplot(sampleCorrDF, aes(x = Correlation, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
@@ -1048,7 +1064,7 @@ plots[["sampleCorrDensity"]]
 
 ### Density plots (filled)
 
-```{r sampleCorrDensityFilled, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r sampleCorrDensityFilled, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["sampleCorrDensityFilled"]] <- 
   ggplot(sampleCorrDF, aes(x = Correlation, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
@@ -1058,7 +1074,7 @@ plots[["sampleCorrDensityFilled"]]
 
 ### Box plots
 
-```{r sampleCorrBox, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r sampleCorrBox, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["sampleCorrBox"]] <- 
   ggplot(sampleCorrDF, aes(x = dataset, y = Correlation, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
@@ -1070,7 +1086,7 @@ plots[["sampleCorrBox"]]
 
 ### Violin plots
 
-```{r sampleCorrViolin, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r sampleCorrViolin, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["sampleCorrViolin"]] <- 
   ggplot(sampleCorrDF, aes(x = dataset, y = Correlation, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
@@ -1081,7 +1097,7 @@ plots[["sampleCorrViolin"]]
 
 ### Empirical cumulative distribution function 
 
-```{r sampleCorrEcdf, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r sampleCorrEcdf, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["sampleCorrEcdf"]] <- 
   ggplot(sampleCorrDF, aes(x = Correlation, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
@@ -1119,7 +1135,7 @@ features are shown.
 
 ### Separate histograms
 
-```{r featureCorrSepHist, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r featureCorrSepHist, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["featureCorrSepHist"]] <- 
   ggplot(featureCorrDF, aes(x = Correlation)) + geom_histogram(bins = 30) + 
   facet_wrap(~dataset, nrow = colRow[2]) +
@@ -1129,7 +1145,7 @@ plots[["featureCorrSepHist"]]
 
 ### Overlaid histograms
 
-```{r featureCorrOverlaidHist, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r featureCorrOverlaidHist, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["featureCorrOverlaidHist"]] <- 
   ggplot(featureCorrDF, aes(x = Correlation, group = dataset, fill = dataset)) + 
   geom_histogram(bins = 30, alpha = 0.5, position = "identity") +
@@ -1139,7 +1155,7 @@ plots[["featureCorrOverlaidHist"]]
 
 ### Density plots
 
-```{r featureCorrDensity, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r featureCorrDensity, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["featureCorrDensity"]] <- 
   ggplot(featureCorrDF, aes(x = Correlation, group = dataset, color = dataset)) + 
   geom_line(alpha = 0.5, size = 1.5, stat = "density") +
@@ -1149,7 +1165,7 @@ plots[["featureCorrDensity"]]
 
 ### Density plots (filled)
 
-```{r featureCorrDensityFilled, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r featureCorrDensityFilled, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["featureCorrDensityFilled"]] <- 
   ggplot(featureCorrDF, aes(x = Correlation, group = dataset, fill = dataset)) + 
   geom_density(alpha = 0.5) +
@@ -1159,7 +1175,7 @@ plots[["featureCorrDensityFilled"]]
 
 ### Box plots
 
-```{r featureCorrBox, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r featureCorrBox, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["featureCorrBox"]] <- 
   ggplot(featureCorrDF, aes(x = dataset, y = Correlation, color = dataset)) + 
   geom_boxplot(outlier.size = -1, alpha = 0.5) + 
@@ -1171,7 +1187,7 @@ plots[["featureCorrBox"]]
 
 ### Violin plots
 
-```{r featureCorrViolin, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r featureCorrViolin, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["featureCorrViolin"]] <- 
   ggplot(featureCorrDF, aes(x = dataset, y = Correlation, fill = dataset)) + 
   geom_violin(alpha = 0.5) + 
@@ -1182,7 +1198,7 @@ plots[["featureCorrViolin"]]
 
 ### Empirical cumulative distribution function 
 
-```{r featureCorrEcdf, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r featureCorrEcdf, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["featureCorrEcdf"]] <- 
   ggplot(featureCorrDF, aes(x = Correlation, group = dataset, color = dataset)) + 
   stat_ecdf(size = 1.5, alpha = 0.5) + ylab("Cumulative proportion") + 
@@ -1216,7 +1232,7 @@ and the fraction of zeros observed per sample.
 
 ### Separate scatter plots
 
-```{r libsizeFraczeroSepScatter, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r libsizeFraczeroSepScatter, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["libsizeFraczeroSepScatter"]] <- 
   ggplot(sampleDF, aes(x = Libsize, y = Fraczero)) + 
   geom_point(size = 1, alpha = 0.5) + 
@@ -1227,7 +1243,7 @@ plots[["libsizeFraczeroSepScatter"]]
 
 ### Overlaid scatter plots
 
-```{r libsizeFraczeroOverlaidScatter, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r libsizeFraczeroOverlaidScatter, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["libsizeFraczeroOverlaidScatter"]] <- 
   ggplot(sampleDF, aes(x = Libsize, y = Fraczero, color = dataset)) + 
   geom_point(size = 1, alpha = 0.5) + 
@@ -1262,7 +1278,7 @@ log(CPM) values as calculated by `edgeR`.
 
 ### Separate scatter plots
 
-```{r logCPMFraczeroSepScatter, fig.width = panelSize * colRow[1] * mfct, fig.height = panelSize * colRow[2] * mfct}
+```{r logCPMFraczeroSepScatter, fig.width = fw2, fig.height = fh2, out.width = ow2, out.height = oh2}
 plots[["logCPMFraczeroSepScatter"]] <- 
   ggplot(featureDF, aes(x = AveLogCPM, y = Fraczero)) + 
   geom_point(size = 0.75, alpha = 0.5) + 
@@ -1273,7 +1289,7 @@ plots[["logCPMFraczeroSepScatter"]]
 
 ### Overlaid scatter plots
 
-```{r logCPMFraczeroOverlaidScatter, fig.width = 7 * mfct, fig.height = 5 * mfct}
+```{r logCPMFraczeroOverlaidScatter, fig.width = fw3, fig.height = fh3, out.width = ow3, out.height = oh3}
 plots[["logCPMFraczeroOverlaidScatter"]] <- 
   ggplot(featureDF, aes(x = AveLogCPM, y = Fraczero, color = dataset)) + 
   geom_point(size = 0.75, alpha = 0.5) + 

@@ -149,7 +149,7 @@ jobs:
           ## With ragg, change dpi
           cqr3 <- countsimQCReport(ddsList = x, outputFile = "csqc_out3.html",
                                    outputDir = tempDir, forceOverwrite = TRUE,
-                                   useRAGG = TRUE, dpi = 48)
+                                   useRAGG = TRUE, dpi = 36)
           file.size(cqr3)
         shell: Rscript {0}
 
