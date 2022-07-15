@@ -127,6 +127,8 @@
 #'   the execution stops immediately.
 #' @param useRAGG Logical scalar, indicating whether to use ragg_png as the
 #'   graphics device in the report rather than the default png.
+#' @param dpi Numeric scalar, setting the dpi of the generated plots. Only
+#'   used if \code{useRAGG} is \code{TRUE}.
 #' @param ... Other arguments that will be passed to \code{rmarkdown::render}.
 #'
 #' @author Charlotte Soneson
@@ -168,7 +170,8 @@ countsimQCReport <- function(ddsList, outputFile, outputDir = "./",
                              kfrac = 0.01, kmin = 5,
                              permutationPvalues = FALSE, nPermutations = NULL,
                              knitrProgress = FALSE, quiet = FALSE,
-                             ignorePandoc = FALSE, useRAGG = FALSE, ...){
+                             ignorePandoc = FALSE, useRAGG = FALSE,
+                             dpi = 96, ...){
   ## This function was inspired by code from Nicholas Hamilton, provided at
   ## http://stackoverflow.com/questions/37097535/generate-report-in-r
 
