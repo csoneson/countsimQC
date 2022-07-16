@@ -145,21 +145,34 @@ colRow <- grDevices::n2mfrow(length(ddsList))
 panelSize <- 4
 
 ## Define out.width and out.height for the different plot categories
+scalefactor <- 96
 ## barplots, 10x7in
 fw1 <- 10
 fh1 <- 7
-ow1 <- paste0(10 * 72, "px")
-oh1 <- paste0(7 * 72, "px")
+if (useRAGG) {
+  ow1 <- paste0(fw1 * scalefactor, "px")
+  oh1 <- NULL
+} else {
+  ow1 <- oh1 <- NULL
+}
 ## multipanel, panelSize * colRow[1] x panelSize * colRow[2]
 fw2 <- panelSize * colRow[1]
 fh2 <- panelSize * colRow[2]
-ow2 <- paste0(panelSize * colRow[1] * 72, "px")
-oh2 <- paste0(panelSize * colRow[2] * 72, "px")
+if (useRAGG) {
+  ow2 <- paste0(fw2 * scalefactor, "px")
+  oh2 <- NULL
+} else {
+  ow2 <- oh2 <- NULL
+}
 ## scatter plots etc, 7x5in
 fw3 <- 7
 fh3 <- 5
-ow3 <- paste0(7 * 72, "px")
-oh3 <- paste0(5 * 72, "px")
+if (useRAGG) {
+  ow3 <- paste0(fw3 * scalefactor, "px")
+  oh3 <- NULL
+} else {
+  ow3 <- oh3 <- NULL
+}
 
 ## Initialize plot list
 plots <- list()
