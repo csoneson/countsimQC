@@ -25,6 +25,8 @@ countsimQCReport(
   knitrProgress = FALSE,
   quiet = FALSE,
   ignorePandoc = FALSE,
+  useRAGG = FALSE,
+  dpi = 96,
   ...
 )
 }
@@ -107,6 +109,12 @@ missing (if Sys.which("pandoc") or Sys.which("pandoc-citeproc") is ""). If
 ignorePandoc is TRUE, only a warning is given. The figures will be
 generated, but not the final report. If ignorePandoc is FALSE (default),
 the execution stops immediately.}
+
+\item{useRAGG}{Logical scalar, indicating whether to use ragg_png as the
+graphics device in the report rather than the default png.}
+
+\item{dpi}{Numeric scalar, setting the dpi of the generated plots. Only
+used if \code{useRAGG} is \code{TRUE}.}
 
 \item{...}{Other arguments that will be passed to \code{rmarkdown::render}.}
 }

@@ -103,6 +103,7 @@ jobs:
         run: |
           brew install harfbuzz
           brew install fribidi
+          brew install --cask xquartz
 
       - name: Set up gfortran symlinks (macOS)
         if: runner.os == 'macOS'
@@ -128,6 +129,29 @@ jobs:
 
       - name: Build, Install, Check
         uses: grimbough/bioc-actions/build-install-check@v1
+
+      - name: Check size of output report
+        run: |
+          library(countsimQC)
+          data(countsimExample)
+          x <- lapply(countsimExample, function(w) w[1:25, ])
+          tempDir <- tempdir()
+          ## Without ragg
+          cqr <- countsimQCReport(ddsList = x, outputFile = "csqc_out.html",
+                                  outputDir = tempDir, forceOverwrite = TRUE,
+                                  useRAGG = FALSE)
+          file.size(cqr)
+          ## With ragg
+          cqr2 <- countsimQCReport(ddsList = x, outputFile = "csqc_out2.html",
+                                   outputDir = tempDir, forceOverwrite = TRUE,
+                                   useRAGG = TRUE)
+          file.size(cqr2)
+          ## With ragg, change dpi
+          cqr3 <- countsimQCReport(ddsList = x, outputFile = "csqc_out3.html",
+                                   outputDir = tempDir, forceOverwrite = TRUE,
+                                   useRAGG = TRUE, dpi = 36)
+          file.size(cqr3)
+        shell: Rscript {0}
 
       - name: Run BiocCheck
         uses: grimbough/bioc-actions/run-BiocCheck@v1
