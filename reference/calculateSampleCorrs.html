@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">countsimQC</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.1</span>
       </span>
     </div>
 
@@ -53,7 +53,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">calculateSampleCorrs</span><span class="op">(</span><span class="va">ddsList</span>, <span class="va">maxNForCorr</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calculateSampleCorrs</span><span class="op">(</span><span class="va">ddsList</span>, <span class="va">maxNForCorr</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -62,15 +62,20 @@
 <dd><p>List of lists, with one element per data set. Each element is
 a list containing a DGEList and a DESeqDataSet, with calculated
 dispersions (e.g., output from <code><a href="calculateDispersionsddsList.html">calculateDispersionsddsList</a></code>).</p></dd>
+
+
 <dt>maxNForCorr</dt>
 <dd><p>Maximal number of samples to use for correlation
 calculation. If the number of samples in a data set exceeds
 <code>maxNForCorr</code>, <code>maxNForCorr</code> samples will be randomly selected
 for calculation of correlations.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data frame with pairwise sample correlations for each data set</p>
+    
+
+<p>A data frame with pairwise sample correlations for each data set</p>
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -89,7 +94,7 @@ for calculation of correlations.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>

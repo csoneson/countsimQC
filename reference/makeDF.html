@@ -18,7 +18,7 @@ comparison of data sets."><!-- mathjax --><script src="https://cdnjs.cloudflare.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">countsimQC</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.1</span>
       </span>
     </div>
 
@@ -55,15 +55,15 @@ comparison of data sets.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">makeDF</span><span class="op">(</span>
-  <span class="va">df</span>,
-  <span class="va">column</span>,
-  <span class="va">permutationPvalues</span>,
-  <span class="va">nPermutations</span>,
-  <span class="va">subsampleSize</span>,
-  <span class="va">kmin</span>,
-  <span class="va">kfrac</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">makeDF</span><span class="op">(</span></span>
+<span>  <span class="va">df</span>,</span>
+<span>  <span class="va">column</span>,</span>
+<span>  <span class="va">permutationPvalues</span>,</span>
+<span>  <span class="va">nPermutations</span>,</span>
+<span>  <span class="va">subsampleSize</span>,</span>
+<span>  <span class="va">kmin</span>,</span>
+<span>  <span class="va">kfrac</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -71,28 +71,43 @@ comparison of data sets.</p>
     <dl><dt>df</dt>
 <dd><p>The input data frame. Must contain at least a column named
 'dataset' and an additional column with values</p></dd>
+
+
 <dt>column</dt>
 <dd><p>The name of the column(s) of <code>df</code> to be used as the basis
 for the comparison</p></dd>
+
+
 <dt>permutationPvalues</dt>
 <dd><p>Whether or not to calculate p-values of statistics
 via permutation</p></dd>
+
+
 <dt>nPermutations</dt>
 <dd><p>The number of permutations (only used if
 permutationPvalues = TRUE)</p></dd>
+
+
 <dt>subsampleSize</dt>
 <dd><p>The number of observations for which certain
 (time-consuming) statistics will be calculated. The observations will be
 selected randomly among the rows of <code>df</code></p></dd>
+
+
 <dt>kmin, kfrac</dt>
 <dd><p>For statistics that require the extraction of k nearest
 neighbors of a given point, the number of neighbors will be max(kmin, kfrac
 * nrow(df))</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A data table with statistics and p-values for pairwise comparisons of
+    
+
+<p>A data table with statistics and p-values for pairwise comparisons of
   data sets, based on the provided <code>column</code></p>
+
+
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -111,7 +126,7 @@ neighbors of a given point, the number of neighbors will be max(kmin, kfrac
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>

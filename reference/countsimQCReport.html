@@ -18,7 +18,7 @@ one or more count data sets."><!-- mathjax --><script src="https://cdnjs.cloudfl
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">countsimQC</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.1</span>
       </span>
     </div>
 
@@ -55,29 +55,31 @@ one or more count data sets.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">countsimQCReport</span><span class="op">(</span>
-  <span class="va">ddsList</span>,
-  <span class="va">outputFile</span>,
-  outputDir <span class="op">=</span> <span class="st">"./"</span>,
-  outputFormat <span class="op">=</span> <span class="cn">NULL</span>,
-  showCode <span class="op">=</span> <span class="cn">FALSE</span>,
-  rmdTemplate <span class="op">=</span> <span class="cn">NULL</span>,
-  forceOverwrite <span class="op">=</span> <span class="cn">FALSE</span>,
-  savePlots <span class="op">=</span> <span class="cn">FALSE</span>,
-  description <span class="op">=</span> <span class="cn">NULL</span>,
-  maxNForCorr <span class="op">=</span> <span class="fl">500</span>,
-  maxNForDisp <span class="op">=</span> <span class="cn">Inf</span>,
-  calculateStatistics <span class="op">=</span> <span class="cn">TRUE</span>,
-  subsampleSize <span class="op">=</span> <span class="fl">500</span>,
-  kfrac <span class="op">=</span> <span class="fl">0.01</span>,
-  kmin <span class="op">=</span> <span class="fl">5</span>,
-  permutationPvalues <span class="op">=</span> <span class="cn">FALSE</span>,
-  nPermutations <span class="op">=</span> <span class="cn">NULL</span>,
-  knitrProgress <span class="op">=</span> <span class="cn">FALSE</span>,
-  quiet <span class="op">=</span> <span class="cn">FALSE</span>,
-  ignorePandoc <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">countsimQCReport</span><span class="op">(</span></span>
+<span>  <span class="va">ddsList</span>,</span>
+<span>  <span class="va">outputFile</span>,</span>
+<span>  outputDir <span class="op">=</span> <span class="st">"./"</span>,</span>
+<span>  outputFormat <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  showCode <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  rmdTemplate <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  forceOverwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  savePlots <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  description <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxNForCorr <span class="op">=</span> <span class="fl">500</span>,</span>
+<span>  maxNForDisp <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>  calculateStatistics <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  subsampleSize <span class="op">=</span> <span class="fl">500</span>,</span>
+<span>  kfrac <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  kmin <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  permutationPvalues <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  nPermutations <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  knitrProgress <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ignorePandoc <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  useRAGG <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  dpi <span class="op">=</span> <span class="fl">96</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -92,82 +94,134 @@ information and a design formula. The sample information and design formula
 will be used to calculate dispersions appropriately. If count matrices are
 provided, it is assumed that all columns represent replicate samples, and
 the design formula ~1 will be used.</p></dd>
+
+
 <dt>outputFile</dt>
 <dd><p>The file name of the final report. The extension must match
 the selected <code>outputFormat</code> (i.e., either .html or .pdf).</p></dd>
+
+
 <dt>outputDir</dt>
 <dd><p>The directory where the final report should be saved.</p></dd>
+
+
 <dt>outputFormat</dt>
 <dd><p>The output format of the report. If set to NULL or
 "html_document", an html report will be generated. If set to
 "pdf_document", a pdf report will be generated.</p></dd>
+
+
 <dt>showCode</dt>
 <dd><p>Whether or not to include the code in the final report.</p></dd>
+
+
 <dt>rmdTemplate</dt>
 <dd><p>The Rmarkdown (.Rmd) file that will be used as the
 template for generating the report. If set to NULL (default), the template
 provided with the countsimQC package will be used. See Details for more
 information.</p></dd>
+
+
 <dt>forceOverwrite</dt>
 <dd><p>Whether to force overwrite existing output files when
 saving the generated report and figures.</p></dd>
+
+
 <dt>savePlots</dt>
 <dd><p>Whether to save the ggplot objects for all the output
 figures, to allow additional fine-tuning and generation of individual
 plots. Note that the resulting file can be quite large, especially when
 many and/or large data sets are compared.</p></dd>
+
+
 <dt>description</dt>
 <dd><p>A string (of arbitrary length) describing the content of
 the generated report. This will be included in the beginning of the report.
 If set to NULL, a default description listing the number and names of the
 included data sets will be used.</p></dd>
+
+
 <dt>maxNForCorr</dt>
 <dd><p>The maximal number of samples (features) for which
 pairwise correlation coefficients will be calculated. If the number of
 samples (features) exceeds this number, they will be randomly subsampled.</p></dd>
+
+
 <dt>maxNForDisp</dt>
 <dd><p>The maximal number of samples that will be used to
 estimate dispersions. By default, all samples are used. This can be lowered
 to speed up calculations (and obtain approximate results) for large data
 sets.</p></dd>
+
+
 <dt>calculateStatistics</dt>
 <dd><p>Whether to calculate quantitative pairwise
 statistics for comparing data sets in addition to generating the plots.</p></dd>
+
+
 <dt>subsampleSize</dt>
 <dd><p>The number of randomly selected observations (samples,
 features or pairs of samples or features) for which certain
 (time-consuming) statistics will be calculated. Only used if
 <code>calculateStatistics</code> = TRUE.</p></dd>
+
+
 <dt>kmin, kfrac</dt>
 <dd><p>For statistics that require the extraction of the k nearest
 neighbors of a given point, the number of neighbors will be max(kmin, kfrac
 * nrow(df))</p></dd>
+
+
 <dt>permutationPvalues</dt>
 <dd><p>Whether to calculate permutation p-values for
 selected pairwise data set comparison statistics.</p></dd>
+
+
 <dt>nPermutations</dt>
 <dd><p>The number of permutations to perform when calculating
 permutation p-values for data set comparison statistics. Only used if
 <code>permutationPvalues</code> = TRUE.</p></dd>
+
+
 <dt>knitrProgress</dt>
 <dd><p>Whether to show the progress bar when the report is
 generated.</p></dd>
+
+
 <dt>quiet</dt>
 <dd><p>Whether to suppress warnings and progress messages when the
 report is generated.</p></dd>
+
+
 <dt>ignorePandoc</dt>
 <dd><p>Determines what to do if pandoc or pandoc-citeproc is
 missing (if Sys.which("pandoc") or Sys.which("pandoc-citeproc") is ""). If
 ignorePandoc is TRUE, only a warning is given. The figures will be
 generated, but not the final report. If ignorePandoc is FALSE (default),
 the execution stops immediately.</p></dd>
+
+
+<dt>useRAGG</dt>
+<dd><p>Logical scalar, indicating whether to use ragg_png as the
+graphics device in the report rather than the default png.</p></dd>
+
+
+<dt>dpi</dt>
+<dd><p>Numeric scalar, setting the dpi of the generated plots. Only
+used if <code>useRAGG</code> is <code>TRUE</code>.</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Other arguments that will be passed to <code><a href="https://pkgs.rstudio.com/rmarkdown/reference/render.html" class="external-link">rmarkdown::render</a></code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>No value is returned, but a report is generated in the
-<code>outputDir</code> directory.</p>
+    
+
+<p>No value is returned, but a report is generated in the</p>
+<p></p>
+<p><code>outputDir</code> directory.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -186,14 +240,14 @@ the execution stops immediately.</p></dd>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co">## Load example data</span></span>
-<span class="r-in"><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">countsimExample</span><span class="op">)</span></span>
-<span class="r-in"><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span>
-<span class="r-in"><span class="co">## Generate report</span></span>
-<span class="r-in"><span class="fu">countsimQCReport</span><span class="op">(</span><span class="va">countsimExample</span>, outputDir <span class="op">=</span> <span class="st">"./"</span>,</span>
-<span class="r-in">                 outputFile <span class="op">=</span> <span class="st">"example.html"</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">}</span></span>
-<span class="r-in"></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co">## Load example data</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">countsimExample</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co">## Generate report</span></span></span>
+<span class="r-in"><span><span class="fu">countsimQCReport</span><span class="op">(</span><span class="va">countsimExample</span>, outputDir <span class="op">=</span> <span class="st">"./"</span>,</span></span>
+<span class="r-in"><span>                 outputFile <span class="op">=</span> <span class="st">"example.html"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -208,7 +262,7 @@ the execution stops immediately.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>

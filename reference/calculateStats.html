@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">countsimQC</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.13.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.15.1</span>
       </span>
     </div>
 
@@ -53,18 +53,18 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">calculateStats</span><span class="op">(</span>
-  <span class="va">df</span>,
-  <span class="va">ds1</span>,
-  <span class="va">ds2</span>,
-  <span class="va">column</span>,
-  <span class="va">subsampleSize</span>,
-  permute <span class="op">=</span> <span class="cn">FALSE</span>,
-  <span class="va">kmin</span>,
-  <span class="va">kfrac</span>,
-  <span class="va">xmin</span>,
-  <span class="va">xmax</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calculateStats</span><span class="op">(</span></span>
+<span>  <span class="va">df</span>,</span>
+<span>  <span class="va">ds1</span>,</span>
+<span>  <span class="va">ds2</span>,</span>
+<span>  <span class="va">column</span>,</span>
+<span>  <span class="va">subsampleSize</span>,</span>
+<span>  permute <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">kmin</span>,</span>
+<span>  <span class="va">kfrac</span>,</span>
+<span>  <span class="va">xmin</span>,</span>
+<span>  <span class="va">xmax</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -73,29 +73,44 @@
 <dd><p>The input data frame. Must contain at least a column named
 'dataset' and an additional column with values to use as the basis for the
 comparison.</p></dd>
+
+
 <dt>ds1, ds2</dt>
 <dd><p>The names of the two data sets to be compared.</p></dd>
+
+
 <dt>column</dt>
 <dd><p>The name of the column(s) of <code>df</code> to be used as the basis
 for the comparison.</p></dd>
+
+
 <dt>subsampleSize</dt>
 <dd><p>The number of observations for which certain
 time-consuming statistics will be calculated. The observations will be
 selected randomly among the rows of <code>df</code>.</p></dd>
+
+
 <dt>permute</dt>
 <dd><p>Whether to permute the dataset column of <code>df</code> before
 calculating the statistics.</p></dd>
+
+
 <dt>kmin, kfrac</dt>
 <dd><p>For statistics that require the extraction of k nearest
 neighbors of a given point, the number of neighbors will be max(kmin, kfrac
 * nrow(df)).</p></dd>
+
+
 <dt>xmin, xmax</dt>
 <dd><p>Smallest and largest value of <code>column</code>, used to
 normalize the x-axis when calculating the area between the eCDFs.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A vector with statistics and p-values</p>
+    
+
+<p>A vector with statistics and p-values</p>
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -114,7 +129,7 @@ normalize the x-axis when calculating the area between the eCDFs.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.9000.</p>
 </div>
 
       </footer></div>
