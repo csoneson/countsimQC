@@ -1,7 +1,7 @@
 pandoc: 2.19.2
-pkgdown: 2.0.6.9000
-pkgdown_sha: 5bb671b1a8bac8e926479868681936f7c9ee41b3
+pkgdown: 2.0.7.9000
+pkgdown_sha: c354aa7e5ea1f9936692494c28c89e5bdd31fc68
 articles:
   countsimQC: countsimQC.html
-last_built: 2022-11-01T21:29Z
+last_built: 2022-12-16T09:27Z
 
