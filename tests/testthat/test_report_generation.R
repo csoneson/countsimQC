@@ -67,11 +67,16 @@ local({
     file.remove(file.path(tempDir, "test_generated2_ggplots.rds"))
   })
 
-  expect_warning(
+  ## This doesn't generate a warning ("Chi-squared approximation may be incorrect")
+  ## anymore (starting from 2022-12-15).
+  ## Also the progress messages are not displayed in the console anymore.
+  ## Maybe due to changes in rmarkdown 2.19? They are still displayed with 2.18.
+  wns <- capture_warnings({
     cqr <- countsimQCReport(ddsList = x, outputFormat = "html_document",
                             outputFile = "test_generated.html",
                             outputDir = tempDir, savePlots = TRUE,
-                            description = NULL))
+                            description = NULL)
+    })
   expect_is(cqr, "character")
   expect_error(countsimQCReport(ddsList = x, outputFormat = NULL,
                                 outputFile = "test_generated.html",
