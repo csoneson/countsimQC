@@ -2,7 +2,7 @@ on:
   push:
   pull_request:
     branches:
-      - master
+      - devel
   schedule:
     - cron: '0 7 * * 5'
 
@@ -36,7 +36,7 @@ jobs:
 
     steps:
       - name: Check out repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up R and install BiocManager
         uses: grimbough/bioc-actions/setup-bioc@v1
@@ -128,7 +128,35 @@ jobs:
         shell: Rscript {0}
 
       - name: Build, Install, Check
+        id: build-install-check
         uses: grimbough/bioc-actions/build-install-check@v1
+
+      - name: Upload install log if the build/install/check step fails
+        if: always() && (steps.build-install-check.outcome == 'failure')
+        uses: actions/upload-artifact@v3
+        with:
+          name: install-log
+          path: |
+            ${{ steps.build-install-check.outputs.install-log }}
+
+      - name: Show testthat output (windows)
+        if: always() && runner.os == 'Windows'
+        run: |
+            type ${{ steps.build-install-check.outputs.check-dir }}\tests\testthat.Rout
+        shell: cmd
+
+      - name: Show testthat output (non-windows)
+        if: always() && runner.os != 'Windows'
+        run: |
+            cat ${{ steps.build-install-check.outputs.check-dir }}/tests/testthat.Rout
+        shell: bash
+
+      - name: Upload check results
+        if: failure()
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{ runner.os }}-bioc-${{ matrix.config.bioc }}-results
+          path: ${{ steps.build-install-check.outputs.check-dir }}
 
       - name: Check size of output report
         run: |
@@ -159,18 +187,6 @@ jobs:
           arguments: '--no-check-bioc-views --no-check-bioc-help'
           error-on: 'error'
 
-      - name: Show testthat output
-        if: always()
-        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-
-      - name: Upload check results
-        if: failure()
-        uses: actions/upload-artifact@master
-        with:
-          name: ${{ runner.os }}-bioc-${{ matrix.config.bioc }}-results
-          path: check
-
       - name: Test coverage
         if: matrix.config.os == 'macOS-latest' && matrix.config.pandoc == null
         run: |
@@ -179,7 +195,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Deploy
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.config.os == 'macOS-latest' && matrix.config.pandoc == null
+        if: github.event_name == 'push' && github.ref == 'refs/heads/devel' && matrix.config.os == 'macOS-latest' && matrix.config.pandoc == null
         run: |
           R CMD INSTALL .
           Rscript -e "remotes::install_dev('pkgdown'); pkgdown::deploy_to_branch(new_process = FALSE)"
