@@ -108,8 +108,9 @@ jobs:
       - name: Check gcc version
         if: runner.os == 'macOS'
         run: |
-          ls /usr/local/Cellar/gcc@11
-          ls /usr/local/Cellar/gcc@12
+          ls /usr/local/Cellar/gcc@12/12.3.0
+          ls /usr/local/Cellar/gcc@12/12.3.0/lib
+          ls /usr/local/Cellar/gcc@12/12.3.0/lib/gcc
 
       - name: Set up gfortran symlinks (macOS)
         if: runner.os == 'macOS'
