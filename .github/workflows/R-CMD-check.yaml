@@ -114,7 +114,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           set -x
-          mkdir -p /usr/local/gfortran
+          sudo mkdir -p /usr/local/gfortran
           sudo ln -s /usr/local/Cellar/gcc@12/12.3.0/lib/gcc/12 /usr/local/gfortran/lib
           gfortran --version
 
