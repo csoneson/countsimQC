@@ -70,7 +70,7 @@ across count data sets</h1>
                         <h4 data-toc-skip class="author">Charlotte
 Soneson</h4>
             
-            <h4 data-toc-skip class="date">2025-04-16</h4>
+            <h4 data-toc-skip class="date">2025-06-27</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/csoneson/countsimQC/blob/devel/vignettes/countsimQC.Rmd" class="external-link"><code>vignettes/countsimQC.Rmd</code></a></small>
       <div class="hidden name"><code>countsimQC.Rmd</code></div>
@@ -261,9 +261,9 @@ provided with the package.</p>
 </h2>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## R version 4.5.0 Patched (2025-04-15 r88147)</span></span>
+<pre><code><span><span class="co">## R version 4.5.1 (2025-06-13)</span></span>
 <span><span class="co">## Platform: aarch64-apple-darwin20</span></span>
-<span><span class="co">## Running under: macOS Sonoma 14.7.4</span></span>
+<span><span class="co">## Running under: macOS Sonoma 14.7.6</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
 <span><span class="co">## BLAS:   /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRblas.0.dylib </span></span>
@@ -280,43 +280,43 @@ provided with the package.</p>
 <span><span class="co">## [8] base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] DESeq2_1.47.5               SummarizedExperiment_1.37.0</span></span>
-<span><span class="co">##  [3] Biobase_2.67.0              MatrixGenerics_1.19.1      </span></span>
-<span><span class="co">##  [5] matrixStats_1.5.0           GenomicRanges_1.59.1       </span></span>
-<span><span class="co">##  [7] GenomeInfoDb_1.43.4         IRanges_2.41.3             </span></span>
-<span><span class="co">##  [9] S4Vectors_0.45.4            BiocGenerics_0.53.6        </span></span>
-<span><span class="co">## [11] generics_0.1.3              countsimQC_1.27.0          </span></span>
+<span><span class="co">##  [1] DESeq2_1.49.2               SummarizedExperiment_1.39.1</span></span>
+<span><span class="co">##  [3] Biobase_2.69.0              MatrixGenerics_1.21.0      </span></span>
+<span><span class="co">##  [5] matrixStats_1.5.0           GenomicRanges_1.61.1       </span></span>
+<span><span class="co">##  [7] Seqinfo_0.99.1              IRanges_2.43.0             </span></span>
+<span><span class="co">##  [9] S4Vectors_0.47.0            BiocGenerics_0.55.0        </span></span>
+<span><span class="co">## [11] generics_0.1.4              countsimQC_1.27.0          </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##  [1] tidyselect_1.2.1        farver_2.1.2            dplyr_1.1.4            </span></span>
-<span><span class="co">##  [4] blob_1.2.4              bitops_1.0-9            Biostrings_2.75.4      </span></span>
+<span><span class="co">##  [1] tidyselect_1.2.1        dplyr_1.1.4             farver_2.1.2           </span></span>
+<span><span class="co">##  [4] blob_1.2.4              bitops_1.0-9            Biostrings_2.77.2      </span></span>
 <span><span class="co">##  [7] fastmap_1.2.0           XML_3.99-0.18           digest_0.6.37          </span></span>
 <span><span class="co">## [10] lifecycle_1.0.4         survival_3.8-3          statmod_1.5.0          </span></span>
-<span><span class="co">## [13] KEGGREST_1.47.1         RSQLite_2.3.9           magrittr_2.0.3         </span></span>
-<span><span class="co">## [16] genefilter_1.89.0       compiler_4.5.0          rlang_1.1.6            </span></span>
-<span><span class="co">## [19] sass_0.4.10             tools_4.5.0             yaml_2.3.10            </span></span>
-<span><span class="co">## [22] knitr_1.50              labeling_0.4.3          S4Arrays_1.7.3         </span></span>
-<span><span class="co">## [25] htmlwidgets_1.6.4       bit_4.6.0               DelayedArray_0.33.6    </span></span>
-<span><span class="co">## [28] abind_1.4-8             BiocParallel_1.41.5     withr_3.0.2            </span></span>
-<span><span class="co">## [31] purrr_1.0.4             desc_1.4.3              grid_4.5.0             </span></span>
-<span><span class="co">## [34] caTools_1.18.3          xtable_1.8-4            colorspace_2.1-1       </span></span>
-<span><span class="co">## [37] edgeR_4.5.10            ggplot2_3.5.2           scales_1.3.0           </span></span>
-<span><span class="co">## [40] cli_3.6.4               rmarkdown_2.29          crayon_1.5.3           </span></span>
+<span><span class="co">## [13] KEGGREST_1.49.1         RSQLite_2.4.1           magrittr_2.0.3         </span></span>
+<span><span class="co">## [16] genefilter_1.91.0       compiler_4.5.1          rlang_1.1.6            </span></span>
+<span><span class="co">## [19] sass_0.4.10             tools_4.5.1             yaml_2.3.10            </span></span>
+<span><span class="co">## [22] knitr_1.50              labeling_0.4.3          S4Arrays_1.9.1         </span></span>
+<span><span class="co">## [25] htmlwidgets_1.6.4       bit_4.6.0               DelayedArray_0.35.2    </span></span>
+<span><span class="co">## [28] RColorBrewer_1.1-3      abind_1.4-8             BiocParallel_1.43.4    </span></span>
+<span><span class="co">## [31] withr_3.0.2             purrr_1.0.4             desc_1.4.3             </span></span>
+<span><span class="co">## [34] grid_4.5.1              caTools_1.18.3          xtable_1.8-4           </span></span>
+<span><span class="co">## [37] edgeR_4.7.2             ggplot2_3.5.2           scales_1.4.0           </span></span>
+<span><span class="co">## [40] cli_3.6.5               rmarkdown_2.29          crayon_1.5.3           </span></span>
 <span><span class="co">## [43] ragg_1.4.0              httr_1.4.7              DBI_1.2.3              </span></span>
-<span><span class="co">## [46] cachem_1.1.0            splines_4.5.0           parallel_4.5.0         </span></span>
-<span><span class="co">## [49] AnnotationDbi_1.69.1    XVector_0.47.2          vctrs_0.6.5            </span></span>
+<span><span class="co">## [46] cachem_1.1.0            splines_4.5.1           parallel_4.5.1         </span></span>
+<span><span class="co">## [49] AnnotationDbi_1.71.0    XVector_0.49.0          vctrs_0.6.5            </span></span>
 <span><span class="co">## [52] Matrix_1.7-3            jsonlite_2.0.0          bit64_4.6.0-1          </span></span>
-<span><span class="co">## [55] crosstalk_1.2.1         systemfonts_1.2.2       locfit_1.5-9.12        </span></span>
-<span><span class="co">## [58] limma_3.63.13           jquerylib_0.1.4         tidyr_1.3.1            </span></span>
-<span><span class="co">## [61] annotate_1.85.0         glue_1.8.0              pkgdown_2.1.1.9000     </span></span>
+<span><span class="co">## [55] crosstalk_1.2.1         systemfonts_1.2.3       locfit_1.5-9.12        </span></span>
+<span><span class="co">## [58] limma_3.65.1            jquerylib_0.1.4         tidyr_1.3.1            </span></span>
+<span><span class="co">## [61] annotate_1.87.0         glue_1.8.0              pkgdown_2.1.3.9000     </span></span>
 <span><span class="co">## [64] randtests_1.0.2         codetools_0.2-20        DT_0.33                </span></span>
-<span><span class="co">## [67] gtable_0.3.6            UCSC.utils_1.3.1        munsell_0.5.1          </span></span>
-<span><span class="co">## [70] tibble_3.2.1            pillar_1.10.2           htmltools_0.5.8.1      </span></span>
-<span><span class="co">## [73] GenomeInfoDbData_1.2.14 R6_2.6.1                textshaping_1.0.0      </span></span>
-<span><span class="co">## [76] evaluate_1.0.3          lattice_0.22-7          png_0.1-8              </span></span>
-<span><span class="co">## [79] memoise_2.0.1           bslib_0.9.0             Rcpp_1.0.14            </span></span>
-<span><span class="co">## [82] nlme_3.1-168            SparseArray_1.7.7       mgcv_1.9-3             </span></span>
-<span><span class="co">## [85] xfun_0.52               fs_1.6.6                pkgconfig_2.0.3</span></span></code></pre>
+<span><span class="co">## [67] gtable_0.3.6            tibble_3.3.0            pillar_1.10.2          </span></span>
+<span><span class="co">## [70] htmltools_0.5.8.1       GenomeInfoDbData_1.2.14 R6_2.6.1               </span></span>
+<span><span class="co">## [73] textshaping_1.0.1       evaluate_1.0.4          lattice_0.22-7         </span></span>
+<span><span class="co">## [76] png_0.1-8               memoise_2.0.1           bslib_0.9.0            </span></span>
+<span><span class="co">## [79] Rcpp_1.0.14             nlme_3.1-168            SparseArray_1.9.0      </span></span>
+<span><span class="co">## [82] mgcv_1.9-3              xfun_0.52               fs_1.6.6               </span></span>
+<span><span class="co">## [85] pkgconfig_2.0.3</span></span></code></pre>
 </div>
   </div>
 
@@ -335,7 +335,7 @@ provided with the package.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.9000.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.9000.</p>
 </div>
 
       </footer>
