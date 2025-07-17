@@ -16,4 +16,6 @@
 #'
 #' @return A named list with three elements, each corresponding to a (real or
 #'   simulated) count data set.
+#'
+#' @usage data("countsimExample")
 "countsimExample"

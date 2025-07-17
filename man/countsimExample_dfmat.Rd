@@ -9,7 +9,7 @@ A named list with three elements, each corresponding to a (real or
   simulated) count data set.
 }
 \usage{
-countsimExample_dfmat
+data("countsimExample_dfmat")
 }
 \value{
 A named list with three elements, each corresponding to a (real or
