@@ -54,7 +54,7 @@ countsimExample_dfmat <- list(Original = dds_orig[1:10000, c(1:5, 84:89)],
                               Sim2 = as.data.frame(counts(dds_lun[1:10000, c(1:5, 84:89)])))
 devtools::use_data(countsimExample_dfmat, pkg = "../..", overwrite = TRUE)
 
-# Update data for Bioc 3.22
+# Update data for Bioc 3.22 (not used in the end as it didn't make a difference)
 data("countsimExample")
 countsimExample <- list(
   Original = DESeqDataSetFromMatrix(

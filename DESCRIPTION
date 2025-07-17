@@ -34,7 +34,6 @@ Imports:
 RoxygenNote: 7.3.2
 Suggests: 
     knitr,
-    Seqinfo,
     testthat
 VignetteBuilder: knitr
 biocViews: Microbiome, RNASeq, SingleCell, ExperimentalDesign, QualityControl, 
