@@ -20,6 +20,7 @@
 #'
 #' @importFrom grDevices n2mfrow
 #' @importFrom methods is
+#' @importFrom ggplot2 is_ggplot
 #'
 #' @return Nothing is returned, but plots are generated in the designated
 #'   output directory.
@@ -48,7 +49,7 @@ generateIndividualPlots <- function(ggplotsRds, device = "png",
     stop("The provided ggplotsRds object, or the object stored ",
          "in the ggplotsRds file, must be a list.")
   }
-  if (!all(vapply(ggplotsRds, function(w) is(w, "ggplot"), FALSE))) {
+  if (!all(vapply(ggplotsRds, function(w) is_ggplot(w), FALSE))) {
     stop("The elements of the provided ggplotsRds object, or the object ",
          "stored in the ggplotsRds file, must be ggplot objects. ")
   }
