@@ -32,7 +32,9 @@ Imports:
     methods,
     ragg
 RoxygenNote: 7.3.2
-Suggests: knitr,
+Suggests: 
+    knitr,
+    Seqinfo,
     testthat
 VignetteBuilder: knitr
 biocViews: Microbiome, RNASeq, SingleCell, ExperimentalDesign, QualityControl, 
