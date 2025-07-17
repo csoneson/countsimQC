@@ -31,7 +31,7 @@ Imports:
     utils,
     methods,
     ragg
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Suggests: knitr,
     testthat
 VignetteBuilder: knitr
