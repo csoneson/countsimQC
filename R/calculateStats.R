@@ -25,6 +25,9 @@
 #' @author Charlotte Soneson
 #'
 #' @importFrom stats ks.test ecdf chisq.test
+#' @importFrom rlang .data
+#' @importFrom caTools trapz
+#' @importFrom randtests runs.test
 #'
 calculateStats <- function(df, ds1, ds2, column, subsampleSize,
                            permute = FALSE, kmin, kfrac, xmin, xmax) {
@@ -106,7 +109,7 @@ calculateStats <- function(df, ds1, ds2, column, subsampleSize,
 
   ## Runs test
   if (length(column) == 1) {
-    df <- df %>% arrange_(column)
+    df <- df %>% arrange(.data[[column]])
     runs_res <- randtests::runs.test(as.numeric(df$dataset == ds1),
                                      threshold = 0.5,
                                      alternative = "left.sided", plot = FALSE)
